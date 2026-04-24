@@ -1,284 +1,191 @@
-# Heritage Condition Report Copilot
+# STEWRD Heritage CareLog
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
-[![Version](https://img.shields.io/badge/version-1.0-blue.svg)](https://github.com/mightytonylun/heritage-condition-report-copilot/releases)
-[![Browser Support](https://img.shields.io/badge/browser-all%20modern-brightgreen.svg)](#browser-support)
+[![Version](https://img.shields.io/badge/version-2.0--agent2--demo-brightgreen.svg)](https://github.com/mightytonylun/heritage-condition-report-copilot/releases)
+[![Browser Support](https://img.shields.io/badge/browser-all%20modern-blue.svg)](#browser-support)
 
-> Desktop webapp that works alongside Microsoft Word for heritage property assessments. v1.0: Desktop copilot for structured documentation and Word export. v1.1+: Mobile field capture with camera integration.
+**Agent 2: Condition Report Digitizer** · Part of the STEWRD Heritage Management Copilot
 
-## Overview
-
-Heritage Condition Report Copilot v1.0 is a **desktop companion tool** that runs in your browser alongside Word documents. Inspectors structure their assessment findings, attach photos, group defects by element, and export formatted tables directly to Word reports—no setup required, all data stored locally.
-
-**v1.0 Workflow:**
-```
-📋 Browser form open → Document findings → Export to Word → Finalize report
-```
-
-**Perfect for:**
-- Heritage conservationists documenting property conditions
-- Structural engineers preparing condition reports
-- Insurance assessors creating assessment documents
-- Maintenance planners estimating repair costs
-
-**v1.1+ will add:** Direct tablet camera capture for on-site photo documentation.
-
-## Table of Contents
-
-- [Features](#features)
-- [Quick Start](#quick-start)
-- [How It Works](#how-it-works)
-- [Data Structure](#data-structure)
-- [Browser Support](#browser-support)
-- [Troubleshooting](#troubleshooting)
-- [Roadmap](#roadmap)
-- [License](#license)
-
-## Features
-
-### Core Functionality
-- **Structured Assessment Sections** — Electrical, plumbing, structural, hazard identification, and more
-- **Grouped Entry System** — Organize findings by reference numbers + room/element categories
-- **Photo Support** — Attach images directly to entries; stored locally in browser
-- **Cost Estimation** — Calculate subtotals by defect group for budget planning
-- **Word Export** — Copy formatted tables directly into condition report documents
-- **Offline-First** — All data persists in-browser; works without internet
-- **Desktop-Optimized** — Built for work alongside Word (responsive design for future mobile capture)
-
-### User Experience
-- **Zero Setup** — Open HTML file, start using immediately
-- **Auto-Save** — Data persists as you type (browser localStorage)
-- **Sample Data** — Pre-populated examples demonstrate structure and workflow
-- **Inline Editing** — Modify entries directly in preview tables
-- **Clear/Reset** — Easily clear all data to start fresh
-
-## Quick Start
-
-### Opening the Tool
-
-```bash
-# Option 1: Direct download
-# Download heritage-property-assessment.html and open in your browser
-
-# Option 2: Clone repository
-git clone https://github.com/mightytonylun/heritage-condition-report-copilot.git
-cd heritage-condition-report-copilot
-# Open heritage-property-assessment.html in your browser
-```
-
-### First Use (Desktop)
-
-1. **Open** `heritage-property-assessment.html` in desktop browser
-2. **Open Word document** in parallel for your condition report
-3. **Review** sample data to understand structure (then clear for your property)
-4. **Document** findings in form sections
-5. **Export to Word** using copy buttons to transfer data to your report
-
-### v1.0 Desktop Workflow Example
-
-```
-Browser + Word open  → Document conditions and findings in form
-↓
-Structured entry     → Organize defects by element/room with ref numbers
-↓
-Export to Word       → Copy grouped tables into condition report
-↓
-Final report         → Format and finalize for submission/archive
-```
-
-### Future: v1.1 Field Workflow (Mobile Camera)
-
-Coming in v1.1: Capture photos directly on tablets on-site using device camera, then sync with desktop for reporting.
-
-## How It Works
-
-### Assessment Sections
-
-The form is organized into 10 logical sections:
-
-| Section | Purpose | Grouped? |
-|---------|---------|----------|
-| **1. Property Details** | Address, date, inspector | No |
-| **2. Electrical** | RCD presence, condition notes | No |
-| **3. Plumbing** | Leaks, pressure, condition | No |
-| **4. Moisture/Ventilation** | Dampness, condensation, hazards | No |
-| **5. Hazardous Materials** | Asbestos, lead, other | No |
-| **6. Structural** | Foundation, walls, movement | No |
-| **7. Exterior Elements** | Roof, elevations, etc. | ✓ By location |
-| **8. Interior Spaces** | Rooms, finishes, condition | ✓ By room |
-| **9. Defects** | Issues, priority, repairs | ✓ By element |
-| **10. Overall Summary** | Final assessment notes | No |
-
-### Grouped Entry System (Sections 7, 8, 9)
-
-For Exterior, Interior, and Defects sections, structure entries with:
-
-- **Reference Number** — Unique identifier (e.g., `RM-01`, `R-01`, `D-02`)
-- **Room/Element/Location** — Grouping category (e.g., `Kitchen`, `Roof`, `Window`)
-- **Description** — Detailed notes
-- **Priority** — (Defects only) `Urgent`, `Important`, `Routine`
-- **Suggested Work** — (Defects only) Recommended repairs
-- **Photos** — Attachable evidence images
-
-**Example entry:**
-```
-Ref Number:  D-01
-Element:     Roof
-Notes:       Missing tiles on east side, exposed underlayment
-Priority:    Urgent
-Repair:      Replace tiles, inspect flashing
-Photos:      [roof-east-01.jpg, roof-east-02.jpg]
-```
-
-### Data Storage
-
-```
-┌─────────────────────────┐
-│   Browser LocalStorage  │
-├─────────────────────────┤
-│ • assessmentForm        │  (Sections 1-10)
-│ • complexData           │  (Grouped entries 7-9)
-│ • assessmentPhotos      │  (Photo data)
-└─────────────────────────┘
-```
-
-**Privacy & Security:**
-- All data stored locally on your device
-- No cloud upload or external server
-- Private until you choose to export
-- Persists across browser sessions
-
-## Browser Support
-
-**v1.0 (Desktop-Optimized)**
-
-| Browser | Support |
-|---------|---------|
-| **Chrome** | ✓ Full support |
-| **Firefox** | ✓ Full support |
-| **Safari** | ✓ Full support |
-| **Edge** | ✓ Full support |
-
-v1.0 is optimized for desktop and laptop use. Mobile/tablet support improves in v1.1 with camera integration.
-
-**Requirements:**
-- Modern JavaScript support (ES6+)
-- localStorage enabled
-- File upload capability
-
-## Troubleshooting
-
-### Photos not displaying in tables
-
-**Symptom:** Broken image icons in preview tables  
-**Solutions:**
-- Refresh browser (F5 or Cmd+R)
-- Check browser console (F12) for errors
-- Ensure browser allows file uploads
-- Try a different browser
-
-### Data disappeared after refresh
-
-**Symptom:** Form is empty after closing/reopening  
-**Solutions:**
-- Check browser privacy settings (may block localStorage)
-- Verify browser isn't in private/incognito mode
-- Try a standard browsing window
-- Keep backups of exported Word documents
-
-### Export to Word not working
-
-**Symptom:** Copy buttons don't transfer data to Word  
-**Solutions:**
-- Ensure Microsoft Word or compatible software is installed
-- Try copying text manually to a new Word document
-- Check browser console (F12) for JavaScript errors
-- Use browser's developer tools to verify data exists
-
-### Browser console shows storage warnings
-
-**Symptom:** "Tracking Prevention blocked access to storage"  
-**Solution:**
-- Adjust browser privacy settings to allow storage for this site
-- Or use a standard browsing window (not private/incognito mode)
-
-## Tips for Best Results
-
-### Desktop Workflow (v1.0)
-- **Dual monitor setup**: One screen for form, one for Word document
-- **Copy-paste workflow**: Use export buttons to move data to Word seamlessly
-- **Sample data**: Review examples, then clear and document your property
-- **Photo uploads**: Pre-collect photos before entering in form, or upload as you document
-
-### Best Practices
-- Develop consistent ref number scheme (e.g., `RM-##` for rooms, `D-##` for defects)
-- Use element names matching building terminology
-- Include timestamps in notes for dated assessments
-- Organize photos with descriptive file names before upload
-
-### Future: Mobile Field Work (v1.1+)
-- Planned: Direct camera capture on tablets for on-site documentation
-- Planned: Sync photos with desktop for reporting
-
-## Roadmap
-
-### v1.0 (Current)
-- ✅ Desktop webapp copilot for Word
-- ✅ Structured assessment sections
-- ✅ Grouped defect entry system
-- ✅ Photo attachment and preview
-- ✅ Cost estimation and export
-- ✅ Offline data persistence
-
-### v1.1 (Planned)
-- 📱 Direct camera capture on tablets
-- 📱 Mobile-optimized photo workflow
-- 🔄 Data sync between devices
-- 📊 Enhanced photo gallery
-- 🏷️ Photo tagging and organization
-
-### Future Considerations
-- PWA installation (app icon on home screen)
-- Collaborative editing/sharing
-- Cloud backup option
-- Template customization
-- Advanced reporting features
-
-[View Full Roadmap](https://github.com/mightytonylun/heritage-condition-report-copilot/discussions)
-
-## Citation
-
-If you use this project in research, publications, or derivative works, please cite it:
-
-```
-Heritage Condition Report Copilot
-https://github.com/mightytonylun/heritage-condition-report-copilot
-```
-
-This helps recognize the original research contribution.
-
-## License
-
-MIT License — See [LICENSE](LICENSE) file for full details.
-
-You are free to:
-- ✓ Use commercially
-- ✓ Modify and create derivative works  
-- ✓ Distribute and fork
-- ✓ Use privately
-
-You must:
-- Include the original license and copyright notice
-- **Recommended:** Cite this project if used in research/publications
-
-## Contributing
-
-Found a bug? Have a feature suggestion? Issues and pull requests welcome!
-
-[Report an Issue](https://github.com/mightytonylun/heritage-condition-report-copilot/issues) · [Suggest a Feature](https://github.com/mightytonylun/heritage-condition-report-copilot/issues)
+> A free, open-source management copilot for non-professional heritage custodians. Turns a paper-based property walk-around into structured digital data — no specialist knowledge required.
 
 ---
 
-**Made for heritage property professionals** who need practical, offline-first assessment tools.
+## Quick Start
 
-[⬆ Back to top](#heritage-condition-report-copilot)
+**No installation. No server. No build step.**
+
+1. [Download `heritage-copilot-v2.html`](https://github.com/mightytonylun/heritage-condition-report-copilot/releases/tag/v2.0-agent2-demo) from the latest release
+2. Open in any modern browser
+3. Click **▶ Load Demo Assessment** to explore a pre-populated example
+
+**iPad / Tablet (recommended):** Open in Safari → Share → Add to Home Screen → installs as a PWA, works offline.
+
+---
+
+## What Is STEWRD
+
+The heritage conservation sector has a long-tail problem. Well-resourced institutions — national museums, major landmarks, large conservation trusts — are well served. The majority are not:
+
+- Community-managed historic houses run by volunteers
+- Small religious buildings maintained by congregations with no conservation budget
+- Owner-custodians of heritage-listed homes who inherited both the building and the obligation
+- Local government assets managed by generalists with no heritage training
+
+> *"These custodians know their buildings matter. They just don't know what to do next — and every tool built for the sector assumes knowledge and resources they don't have."*
+
+STEWRD is a suite of five modular, free, open-source tools that together give a non-professional custodian the capability to document condition, identify urgency, and generate reports useful to funding bodies and tradespeople.
+
+---
+
+## The Five Agents
+
+```
+Agent 2 → Condition Digitizer     ✅ Demo live (this repo)
+Agent 1 → AI Photo Assessor       🏗 Next
+Agent 3 → Urgency Ranker          📋 Planned
+Agent 4 → Archive Organiser       📋 Planned
+Agent 5 → Narrative Generator     📋 Planned
+```
+
+**Research question for Agent 2:** What is the minimal digital structure for heritage property assessments that a non-expert can reliably complete?
+
+---
+
+## Features
+
+### Assessment Structure
+
+10 guided sections covering a complete property condition survey:
+
+| # | Section | Type |
+|---|---------|------|
+| 1 | Property Details | Form |
+| 2 | Electrical | Form + Condition Rating |
+| 3 | Plumbing | Form + Condition Rating |
+| 4 | Moisture & Ventilation | Form + Condition Rating |
+| 5 | Hazardous Materials | Form + Risk Level |
+| 6 | Structural | Form + Condition Rating |
+| 7 | Exterior Elements | Grouped entries |
+| 8 | Interior Spaces | Grouped entries |
+| 9 | Defects & Repairs | Defect register with priorities + costs |
+| 10 | Overall Summary | Auto-stats + final notes |
+
+### Condition Rating
+
+Every section has a **Good / Fair / Poor / Critical / N/A** rating as the primary input — the core structured data unit that feeds into downstream STEWRD agents.
+
+### Grouped Entry System
+
+Sections 7, 8, and 9 use a slide-up drawer for structured entries:
+- Auto-assigned reference numbers (EE-01, RM-01, D-01…)
+- Location / room / element
+- Condition rating + notes
+- Photo capture (direct camera on tablet, gallery on desktop)
+- Priority + estimated cost (defects only)
+
+### Export
+
+| Format | Use |
+|--------|-----|
+| JSON | Full data backup / pipeline handoff to other STEWRD agents |
+| CSV | Entries spreadsheet for cost planning |
+| Word / HTML | Copy formatted tables into a condition report document |
+| Print / PDF | Browser print dialog |
+
+### Session Management
+
+Save and reload named assessments. Auto-saves every 1.2 seconds. All data stored in `localStorage` — nothing sent anywhere.
+
+---
+
+## Demo Assessment
+
+Click **▶ Load Demo Assessment** in the sidebar to load a pre-populated example:
+
+> **Thornton Cottage** — heritage-listed Victorian worker's cottage, Ballarat VIC 3350  
+> Heritage Overlay HO47 · Double brick, bluestone foundations · Terracotta tile roof  
+> Assessed by: Sarah Chen, Ballarat Community Heritage Trust
+
+The demo covers all 10 sections including 6 exterior entries, 6 interior rooms, and 8 defects ranging from urgent safety items (electrical rewire, chimney collapse risk) to routine maintenance (repointing, sub-floor vents). Estimated repair cost: ~$21,200.
+
+---
+
+## Architecture
+
+Single `.html` file — no build tools, no dependencies, no server required.
+
+- **CSS:** Custom properties design system, responsive at 900px breakpoint
+- **JS:** Vanilla ES6+, no frameworks
+- **Storage:** `localStorage` only — all data stays on device
+- **PWA:** Manifest + service worker injected as Blob URLs at runtime
+- **Camera:** `getUserMedia` with `facingMode: environment` (rear camera on tablets)
+- **Export:** Client-side Blob download for JSON/CSV/HTML; browser print for PDF
+
+---
+
+## Browser Support
+
+| Browser | Support |
+|---------|---------|
+| Chrome | Full |
+| Firefox | Full |
+| Safari | Full (PWA on iOS) |
+| Edge | Full |
+
+Requirements: ES6+, localStorage enabled, camera permissions for photo capture.
+
+---
+
+## Version History
+
+### v2.0 — Agent 2 Demo (April 2026)
+- Tablet-first layout with pill-strip navigation
+- PWA — Add to Home Screen on iPad
+- `getUserMedia` direct camera capture (no file picker on tablet)
+- Condition rating (Good / Fair / Poor / Critical / N/A) on every section
+- Unified slide-up drawer for grouped entries
+- Realistic full demo assessment (Thornton Cottage, Ballarat)
+- STEWRD pipeline panel and agent identity
+- Deep green `#1B5E38` palette, 7px border radius
+
+### v1.1 (April 2026, archived)
+- Desktop sidebar layout
+- Gallery photo picker
+- Basic export (Word HTML, JSON)
+
+### v1.0 (Initial)
+- Desktop copilot for structured documentation alongside Word
+
+---
+
+## Roadmap
+
+### Agent 2 (this tool)
+- [ ] Field-tested with real heritage custodians
+- [ ] Schema validation and error states
+- [ ] Offline sync between devices
+
+### Agent 1 — AI Photo Assessor (next)
+- AI-assisted condition classification (Good / Fair / Poor / Critical) from smartphone photos
+- Research question: Can automated image analysis of uncontrolled field photos provide condition classifications useful to non-professional custodians?
+
+### Agent 3 — Urgency Ranker (planned)
+- Prioritised repair schedule from Agent 2 + Agent 1 output
+- Ranking by urgency, cost tier, and consequence of inaction
+
+---
+
+## Citation
+
+```
+STEWRD Heritage CareLog — Condition Report Digitizer v2
+https://github.com/mightytonylun/heritage-condition-report-copilot
+```
+
+## License
+
+MIT License — see [LICENSE](LICENSE) for details.
+
+---
+
+*STEWRD Heritage CareLog · Draft April 2026 · Agent 2 of 5*
