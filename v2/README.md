@@ -88,6 +88,8 @@ Click **▶ Load Demo Assessment** in the sidebar to load a pre-populated exampl
 
 The demo covers all 10 sections including 6 exterior entries, 6 interior rooms, and 8 defects ranging from urgent safety items (electrical rewire, chimney collapse risk) to routine maintenance (repointing, sub-floor vents). Estimated repair cost: ~$21,200.
 
+> **Note:** All property details, names, addresses, and data in the demo are entirely fictional and created for demonstration purposes only. Any resemblance to real properties or persons is coincidental.
+
 This scenario reflects the STEWRD target user — a community trust volunteer with no conservation training managing a property they did not choose.
 
 ---
@@ -135,6 +137,19 @@ Single `.html` file — no build tools, no dependencies, no server required.
 - **PWA:** Manifest + service worker injected as Blob URLs at runtime — keeps the file self-contained
 - **Camera:** `getUserMedia` with `facingMode: environment` default (rear camera on tablets)
 - **Export:** Client-side Blob download for JSON/CSV/HTML; browser print for PDF
+
+---
+
+## Browser Support
+
+| Browser | Support |
+|---------|---------|
+| Chrome | Full |
+| Firefox | Full |
+| Safari | Full (iOS PWA via Add to Home Screen only) |
+| Edge | Full |
+
+Requirements: ES6+, localStorage enabled, camera permissions for photo capture.
 
 ---
 
