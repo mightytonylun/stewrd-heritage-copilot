@@ -1,0 +1,1752 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Heritage Assessment Copilot - Enhanced</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        * { scroll-behavior: smooth; }
+
+        /* Heritage Color Palette */
+        :root {
+            --primary: #3D5C45;      /* Brunswick Green */
+            --cream: #F5F1E8;        /* Main background */
+            --alert: #9B5B5B;        /* Indian Red */
+            --good: #A8C9C3;         /* Duck Egg */
+            --text: #7A8B85;         /* Stone Grey */
+            --light-bg: #FAF9F6;     /* Light backgrounds */
+            --border: #E8E4DA;       /* Border color */
+        }
+
+        body {
+            font-family: 'Georgia', 'Inter', serif;
+            background: linear-gradient(135deg, var(--cream) 0%, #f8f6f1 100%);
+            color: var(--text);
+            min-height: 100vh;
+        }
+
+        .app-container {
+            display: flex;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        /* SIDEBAR STYLES */
+        .sidebar {
+            width: 280px;
+            background: white;
+            border-right: 2px solid var(--border);
+            overflow-y: auto;
+            box-shadow: 2px 0 8px rgba(61, 92, 69, 0.08);
+        }
+
+        .sidebar-header {
+            padding: 20px;
+            background: linear-gradient(135deg, var(--primary) 0%, #2d4435 100%);
+            color: var(--cream);
+            border-bottom: 2px solid var(--primary);
+        }
+
+        .sidebar-header h1 {
+            margin: 0;
+            font-size: 18px;
+            font-weight: 700;
+            font-family: 'Georgia', serif;
+        }
+
+        .sidebar-header p {
+            margin: 4px 0 0 0;
+            font-size: 12px;
+            opacity: 0.9;
+            font-family: 'Inter', sans-serif;
+        }
+
+        .sidebar-sections {
+            padding: 12px;
+        }
+
+        .section-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 12px 16px;
+            margin: 6px 0;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s;
+            border: 2px solid transparent;
+            background: var(--light-bg);
+            color: var(--text);
+            font-weight: 600;
+            font-size: 14px;
+            font-family: 'Inter', sans-serif;
+        }
+
+        .section-item:hover {
+            background: rgba(61, 92, 69, 0.05);
+            border-color: var(--primary);
+            color: var(--primary);
+        }
+
+        .section-item.active {
+            background: rgba(168, 201, 195, 0.2);
+            border-color: var(--good);
+            color: var(--primary);
+            box-shadow: 0 4px 12px rgba(61, 92, 69, 0.1);
+        }
+
+        .section-item .icon {
+            font-size: 18px;
+            width: 24px;
+            text-align: center;
+        }
+
+        .section-badge {
+            margin-left: auto;
+            font-size: 12px;
+            background: var(--good);
+            color: white;
+            padding: 2px 6px;
+            border-radius: 4px;
+        }
+
+        /* MAIN CONTENT */
+        .main-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .form-header {
+            padding: 24px;
+            background: linear-gradient(135deg, var(--primary) 0%, #2d4435 100%);
+            color: var(--cream);
+            border-bottom: 2px solid var(--primary);
+        }
+
+        .form-header h2 {
+            margin: 0;
+            font-size: 24px;
+            font-weight: 700;
+            font-family: 'Georgia', serif;
+        }
+
+        .form-header-actions {
+            display: flex;
+            gap: 12px;
+            margin-top: 16px;
+            flex-wrap: wrap;
+        }
+
+        .btn-action {
+            background: linear-gradient(135deg, var(--good) 0%, #96b5ad 100%);
+            color: white;
+            border: none;
+            padding: 10px 16px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 13px;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-family: 'Inter', sans-serif;
+        }
+
+        .btn-action:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 16px rgba(168, 201, 195, 0.3);
+        }
+
+        .btn-action.primary {
+            background: linear-gradient(135deg, var(--primary) 0%, #2d4435 100%);
+        }
+
+        .form-content {
+            flex: 1;
+            overflow-y: auto;
+            padding: 32px;
+        }
+
+        /* CARD STYLES */
+        .glass {
+            backdrop-filter: blur(12px);
+            background: rgba(245, 241, 232, 0.95);
+            border: 1px solid var(--border);
+            box-shadow: 0 8px 32px rgba(61, 92, 69, 0.08);
+            border-radius: 16px;
+            padding: 32px;
+        }
+
+        .section-card {
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            background: linear-gradient(135deg, var(--cream) 0%, var(--light-bg) 100%);
+            border-top: 4px solid var(--primary);
+            margin-bottom: 24px;
+        }
+
+        .section-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 25px 50px rgba(61, 92, 69, 0.1);
+        }
+
+        .section-header {
+            display: flex;
+            align-items: start;
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+
+        .section-icon {
+            width: 56px;
+            height: 56px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 28px;
+            background: linear-gradient(135deg, rgba(168, 201, 195, 0.2), rgba(61, 92, 69, 0.1));
+            box-shadow: 0 4px 12px rgba(61, 92, 69, 0.08);
+            flex-shrink: 0;
+        }
+
+        .section-title-group h2 {
+            margin: 0;
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--primary);
+            font-family: 'Georgia', serif;
+        }
+
+        .step-badge {
+            display: inline-block;
+            padding: 6px 14px;
+            background: linear-gradient(135deg, rgba(168, 201, 195, 0.3), rgba(61, 92, 69, 0.1));
+            color: var(--primary);
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+            box-shadow: 0 2px 4px rgba(61, 92, 69, 0.06);
+            margin-bottom: 8px;
+            font-family: 'Inter', sans-serif;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .form-group label {
+            display: block;
+            font-size: 14px;
+            font-weight: 700;
+            color: var(--primary);
+            margin-bottom: 8px;
+            font-family: 'Georgia', serif;
+        }
+
+        .form-input {
+            border: 2px solid var(--border);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            border-radius: 10px;
+            background: white;
+            font-family: inherit;
+            padding: 10px 14px;
+            font-size: 14px;
+            color: var(--text);
+        }
+
+        .form-input:hover {
+            border-color: var(--good);
+            background: var(--light-bg);
+        }
+
+        .form-input:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 4px rgba(61, 92, 69, 0.1);
+            outline: none;
+            background: white;
+        }
+
+        textarea.form-input {
+            resize: vertical;
+            min-height: 80px;
+            font-family: inherit;
+        }
+
+        select.form-input {
+            appearance: none;
+            background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%233D5C45' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+            background-repeat: no-repeat;
+            background-position: right 10px center;
+            background-size: 18px;
+            padding-right: 38px;
+        }
+
+        /* PHOTO UPLOAD STYLES */
+        .photo-section {
+            margin: 20px 0;
+            padding: 20px;
+            background: var(--light-bg);
+            border: 2px dashed var(--border);
+            border-radius: 12px;
+        }
+
+        .photo-upload-input {
+            display: none;
+        }
+
+        .photo-upload-button {
+            background: linear-gradient(135deg, var(--primary) 0%, #2d4435 100%);
+            color: var(--cream);
+            border: none;
+            padding: 12px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            font-family: 'Inter', sans-serif;
+        }
+
+        .photo-upload-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 16px rgba(61, 92, 69, 0.2);
+        }
+
+        .photo-gallery {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+            gap: 12px;
+            margin-top: 16px;
+        }
+
+        .photo-item {
+            position: relative;
+            border-radius: 8px;
+            overflow: hidden;
+            background: white;
+            border: 2px solid var(--border);
+        }
+
+        .photo-item img {
+            width: 100%;
+            height: 100px;
+            object-fit: cover;
+            display: block;
+        }
+
+        .photo-item-caption {
+            padding: 8px;
+            font-size: 12px;
+            background: var(--light-bg);
+            border-top: 1px solid var(--border);
+        }
+
+        .photo-item-remove {
+            position: absolute;
+            top: 4px;
+            right: 4px;
+            background: rgba(155, 91, 91, 0.9);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 28px;
+            height: 28px;
+            cursor: pointer;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+        }
+
+        .photo-item-remove:hover {
+            background: rgba(155, 91, 91, 1);
+        }
+
+        /* PREVIEW CARD STYLES */
+        .preview-card {
+            margin-top: 24px;
+            padding: 16px;
+            background: rgba(168, 201, 195, 0.08);
+            border: 2px solid var(--good);
+            border-radius: 12px;
+        }
+
+        .preview-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            cursor: pointer;
+            padding: 8px 0;
+        }
+
+        .preview-header:hover {
+            opacity: 0.8;
+        }
+
+        .preview-title {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-weight: 700;
+            color: var(--primary);
+            font-family: 'Georgia', serif;
+        }
+
+        .preview-toggle {
+            font-size: 18px;
+            transition: transform 0.3s;
+            color: var(--good);
+        }
+
+        .preview-toggle.open {
+            transform: rotate(180deg);
+        }
+
+        .preview-content {
+            display: none;
+            margin-top: 16px;
+            padding-top: 16px;
+            border-top: 2px solid var(--good);
+        }
+
+        .preview-content.open {
+            display: block;
+        }
+
+        .preview-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+            font-size: 13px;
+            border-bottom: 1px solid rgba(61, 92, 69, 0.1);
+        }
+
+        .preview-label {
+            font-weight: 600;
+            color: var(--primary);
+        }
+
+        .preview-value {
+            color: var(--text);
+            max-width: 200px;
+            word-break: break-word;
+            text-align: right;
+        }
+
+        .preview-photos {
+            margin-top: 12px;
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
+            gap: 8px;
+        }
+
+        .preview-photo {
+            width: 100%;
+            height: 80px;
+            border-radius: 6px;
+            overflow: hidden;
+            border: 1px solid var(--border);
+        }
+
+        .preview-photo img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .preview-empty {
+            padding: 12px;
+            background: rgba(61, 92, 69, 0.05);
+            border-radius: 8px;
+            color: var(--text);
+            font-size: 13px;
+            text-align: center;
+        }
+
+        /* YES/NO BUTTONS */
+        .yes-no-buttons {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+            gap: 10px;
+        }
+
+        .yes-no-btn {
+            padding: 10px 16px;
+            border: 2px solid var(--border);
+            border-radius: 10px;
+            background: white;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            font-weight: 500;
+            color: var(--text);
+            font-size: 14px;
+            font-family: 'Inter', sans-serif;
+        }
+
+        .yes-no-btn:hover {
+            border-color: var(--good);
+            background: var(--light-bg);
+            box-shadow: 0 2px 8px rgba(61, 92, 69, 0.08);
+        }
+
+        .yes-no-btn.selected {
+            background: linear-gradient(135deg, var(--primary) 0%, #2d4435 100%);
+            color: var(--cream);
+            border-color: var(--primary);
+            box-shadow: 0 4px 12px rgba(61, 92, 69, 0.2);
+        }
+
+        /* MODAL STYLES */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.6);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            backdrop-filter: blur(4px);
+        }
+
+        .modal-overlay.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 25px 50px rgba(61, 92, 69, 0.25);
+            max-width: 700px;
+            width: 90%;
+            max-height: 85vh;
+            overflow-y: auto;
+            padding: 32px;
+        }
+
+        .modal-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 20px;
+            border-bottom: 2px solid var(--border);
+            padding-bottom: 16px;
+        }
+
+        .modal-header h3 {
+            margin: 0;
+            font-size: 20px;
+            font-weight: 700;
+            color: var(--primary);
+            font-family: 'Georgia', serif;
+        }
+
+        .modal-body {
+            margin: 20px 0;
+            font-family: 'Monaco', 'Courier New', monospace;
+            font-size: 13px;
+            background: var(--light-bg);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 16px;
+            overflow-x: auto;
+            line-height: 1.6;
+            color: var(--text);
+            white-space: pre-wrap;
+            word-break: break-word;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+
+        .modal-image {
+            max-width: 100%;
+            height: auto;
+            margin: 12px 0;
+            border-radius: 6px;
+            border: 1px solid var(--border);
+        }
+
+        .modal-actions {
+            display: flex;
+            gap: 12px;
+            margin-top: 24px;
+            justify-content: flex-end;
+        }
+
+        .btn-copy {
+            background: linear-gradient(135deg, var(--primary) 0%, #2d4435 100%);
+            color: var(--cream);
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s;
+            font-family: 'Inter', sans-serif;
+        }
+
+        .btn-copy:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 16px rgba(61, 92, 69, 0.3);
+        }
+
+        .btn-close {
+            background: var(--border);
+            color: var(--text);
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            font-family: 'Inter', sans-serif;
+        }
+
+        .btn-close:hover {
+            background: #ddd8ce;
+        }
+
+        .copy-feedback {
+            position: fixed;
+            bottom: 24px;
+            right: 24px;
+            background: var(--good);
+            color: white;
+            padding: 12px 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            animation: slideIn 0.3s ease-out;
+            z-index: 1001;
+            font-family: 'Inter', sans-serif;
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateY(100px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        /* SCROLLBAR */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: var(--light-bg);
+        }
+        ::-webkit-scrollbar-thumb {
+            background: var(--border);
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #c0b8ac;
+        }
+
+        @media (max-width: 1024px) {
+            .sidebar {
+                width: 240px;
+            }
+            .form-content {
+                padding: 24px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .app-container {
+                flex-direction: column;
+            }
+            .sidebar {
+                width: 100%;
+                height: auto;
+                max-height: 200px;
+                overflow-x: auto;
+                overflow-y: hidden;
+                display: flex;
+            }
+            .sidebar-header {
+                min-width: 240px;
+            }
+            .sidebar-sections {
+                display: flex;
+                overflow-x: auto;
+                gap: 8px;
+            }
+            .section-item {
+                min-width: 140px;
+                margin: 0;
+            }
+            .form-content {
+                padding: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="app-container">
+        <!-- SIDEBAR NAVIGATION -->
+        <div class="sidebar">
+            <div class="sidebar-header">
+                <h1>🏛️ Heritage Assessment</h1>
+                <p>Copilot + Photos</p>
+            </div>
+            <div class="sidebar-sections">
+                <div class="section-item active" onclick="showSection(1)">
+                    <span class="icon">🏠</span>
+                    <span>Property Info</span>
+                    <span class="section-badge" id="badge-1">0</span>
+                </div>
+                <div class="section-item" onclick="showSection(2)">
+                    <span class="icon">⚡</span>
+                    <span>Electrical</span>
+                    <span class="section-badge" id="badge-2">0</span>
+                </div>
+                <div class="section-item" onclick="showSection(3)">
+                    <span class="icon">💧</span>
+                    <span>Plumbing</span>
+                    <span class="section-badge" id="badge-3">0</span>
+                </div>
+                <div class="section-item" onclick="showSection(4)">
+                    <span class="icon">🌱</span>
+                    <span>Environmental</span>
+                    <span class="section-badge" id="badge-4">0</span>
+                </div>
+                <div class="section-item" onclick="showSection(5)">
+                    <span class="icon">⚠️</span>
+                    <span>Hazards</span>
+                    <span class="section-badge" id="badge-5">0</span>
+                </div>
+                <div class="section-item" onclick="showSection(6)">
+                    <span class="icon">🔨</span>
+                    <span>Structural</span>
+                    <span class="section-badge" id="badge-6">0</span>
+                </div>
+                <div class="section-item" onclick="showSection(7)">
+                    <span class="icon">🪟</span>
+                    <span>Exterior</span>
+                    <span class="section-badge" id="badge-7">📸</span>
+                </div>
+                <div class="section-item" onclick="showSection(8)">
+                    <span class="icon">🏗️</span>
+                    <span>Interior</span>
+                    <span class="section-badge" id="badge-8">📸</span>
+                </div>
+                <div class="section-item" onclick="showSection(9)">
+                    <span class="icon">📋</span>
+                    <span>Defects</span>
+                    <span class="section-badge" id="badge-9">0</span>
+                </div>
+                <div class="section-item" onclick="showSection(10)">
+                    <span class="icon">💰</span>
+                    <span>Costs</span>
+                    <span class="section-badge" id="badge-10">0</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- MAIN CONTENT -->
+        <div class="main-content">
+            <div class="form-header">
+                <h2 id="section-title">Property Information</h2>
+                <div class="form-header-actions">
+                    <button class="btn-action" onclick="openTablePreview()" title="Preview data as tables">
+                        <i class="fas fa-table"></i> Preview Tables
+                    </button>
+                    <button class="btn-action primary" onclick="copyTablePreviewToWord()" title="Copy formatted table to Word">
+                        <i class="fas fa-copy"></i> Copy to Word
+                    </button>
+                    <button class="btn-action" onclick="copySectionData()">
+                        <i class="fas fa-copy"></i> Copy Section
+                    </button>
+                    <button class="btn-action" onclick="copyAllData()">
+                        <i class="fas fa-file-export"></i> Copy All
+                    </button>
+                </div>
+            </div>
+
+            <div class="form-content">
+                <form id="assessment-form" class="space-y-0">
+
+                    <!-- SECTION 1: PROPERTY INFO -->
+                    <div id="section-1" class="section-card glass rounded-2xl shadow-lg p-8">
+                        <div class="section-header">
+                            <div class="section-icon">🏠</div>
+                            <div>
+                                <span class="step-badge">Step 1</span>
+                                <h2 class="text-2xl font-bold mt-2">Property Information</h2>
+                            </div>
+                        </div>
+
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+                            <div>
+                                <label class="block text-sm font-bold mb-2">Property Name</label>
+                                <input type="text" name="propertyName" class="form-input w-full px-4 py-2.5" placeholder="e.g., Labassa Mansion" oninput="saveFormData(); updateBadge(1)">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-bold mb-2">Address</label>
+                                <input type="text" name="address" class="form-input w-full px-4 py-2.5" placeholder="Street address" oninput="saveFormData()">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-bold mb-2">Year Built</label>
+                                <input type="number" name="yearBuilt" class="form-input w-full px-4 py-2.5" placeholder="1890" oninput="saveFormData()">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-bold mb-2">Assessment Date</label>
+                                <input type="date" name="assessmentDate" class="form-input w-full px-4 py-2.5" oninput="saveFormData()">
+                            </div>
+                        </div>
+
+                        <div class="mt-5 pt-5 border-t border-slate-200">
+                            <label class="block text-sm font-bold mb-2">Building Overview</label>
+                            <textarea name="overview" class="form-input w-full px-4 py-2.5" rows="3" placeholder="History, construction stages, key features..." oninput="saveFormData()"></textarea>
+                        </div>
+
+                        <!-- PROPERTY PHOTOS -->
+                        <div class="photo-section">
+                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+                                <label style="font-weight: 700; color: var(--primary); font-family: 'Georgia', serif;">Building Photos</label>
+                                <span style="font-size: 12px; color: var(--text);">Main photo + evidence</span>
+                            </div>
+                            <button type="button" class="photo-upload-button" onclick="document.getElementById('photos-1-main').click()">
+                                <i class="fas fa-image"></i> Add Photos
+                            </button>
+                            <input type="file" id="photos-1-main" class="photo-upload-input" accept="image/*" multiple onchange="handlePhotoUpload(event, 1)">
+                            <div class="photo-gallery" id="photo-gallery-1"></div>
+                        </div>
+
+                        <!-- PREVIEW CARD -->
+                        <div class="preview-card">
+                            <div class="preview-header" onclick="togglePreview(event, 1)">
+                                <div class="preview-title">
+                                    <i class="fas fa-eye"></i> Preview
+                                </div>
+                                <span class="preview-toggle" id="preview-toggle-1">▼</span>
+                            </div>
+                            <div class="preview-content" id="preview-1"></div>
+                        </div>
+                    </div>
+
+                    <!-- SECTION 2: ELECTRICAL -->
+                    <div id="section-2" class="section-card glass rounded-2xl shadow-lg p-8 hidden">
+                        <div class="section-header">
+                            <div class="section-icon">⚡</div>
+                            <div>
+                                <span class="step-badge">Step 2</span>
+                                <h2 class="text-2xl font-bold mt-2">Electrical Systems</h2>
+                            </div>
+                        </div>
+
+                        <div class="space-y-5">
+                            <div class="bg-gradient-to-br from-slate-50 to-slate-100 rounded-lg p-5 border border-slate-200 hover:border-indigo-300 transition-colors">
+                                <h3 class="text-base font-bold text-slate-900 mb-3">Safety Switch (RCD) Present?</h3>
+                                <div class="yes-no-buttons">
+                                    <button type="button" class="yes-no-btn" onclick="selectYesNo(event, 'rcdPresent', 'Yes')">Yes</button>
+                                    <button type="button" class="yes-no-btn" onclick="selectYesNo(event, 'rcdPresent', 'No')">No</button>
+                                    <button type="button" class="yes-no-btn" onclick="selectYesNo(event, 'rcdPresent', 'Unknown')">Unknown</button>
+                                </div>
+                                <input type="hidden" name="rcdPresent">
+                            </div>
+
+                            <div>
+                                <label class="block text-sm font-bold mb-2">Electrical Notes</label>
+                                <textarea name="electricalNotes" class="form-input w-full px-4 py-2.5" rows="3" placeholder="Meter, last inspection, safety concerns..." oninput="saveFormData()"></textarea>
+                            </div>
+                        </div>
+
+                        <!-- PREVIEW CARD -->
+                        <div class="preview-card">
+                            <div class="preview-header" onclick="togglePreview(event, 2)">
+                                <div class="preview-title">
+                                    <i class="fas fa-eye"></i> Preview
+                                </div>
+                                <span class="preview-toggle" id="preview-toggle-2">▼</span>
+                            </div>
+                            <div class="preview-content" id="preview-2"></div>
+                        </div>
+                    </div>
+
+                    <!-- SECTION 3: PLUMBING -->
+                    <div id="section-3" class="section-card glass rounded-2xl shadow-lg p-8 hidden">
+                        <div class="section-header">
+                            <div class="section-icon">💧</div>
+                            <div>
+                                <span class="step-badge">Step 3</span>
+                                <h2 class="text-2xl font-bold mt-2">Plumbing Systems</h2>
+                            </div>
+                        </div>
+                        <div class="space-y-5">
+                            <div>
+                                <h3 class="text-base font-bold mb-3">System Type</h3>
+                                <select name="plumbingType" class="form-input w-full px-4 py-2.5" onchange="saveFormData()">
+                                    <option value="">Select...</option>
+                                    <option value="Original">Original</option>
+                                    <option value="Partial Modern">Partial Modern</option>
+                                    <option value="Modern">Modern</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-bold mb-2">Plumbing Notes</label>
+                                <textarea name="plumbingNotes" class="form-input w-full px-4 py-2.5" rows="3" placeholder="System condition, repairs needed..." oninput="saveFormData()"></textarea>
+                            </div>
+                        </div>
+                        <div class="preview-card">
+                            <div class="preview-header" onclick="togglePreview(event, 3)">
+                                <div class="preview-title">
+                                    <i class="fas fa-eye"></i> Preview
+                                </div>
+                                <span class="preview-toggle" id="preview-toggle-3">▼</span>
+                            </div>
+                            <div class="preview-content" id="preview-3"></div>
+                        </div>
+                    </div>
+
+                    <!-- SECTION 4: ENVIRONMENTAL -->
+                    <div id="section-4" class="section-card glass rounded-2xl shadow-lg p-8 hidden">
+                        <div class="section-header">
+                            <div class="section-icon">🌱</div>
+                            <div>
+                                <span class="step-badge">Step 4</span>
+                                <h2 class="text-2xl font-bold mt-2">Environmental Conditions</h2>
+                            </div>
+                        </div>
+                        <div class="space-y-5">
+                            <div>
+                                <h3 class="text-base font-bold mb-3">Water Ingress Present?</h3>
+                                <div class="yes-no-buttons">
+                                    <button type="button" class="yes-no-btn" onclick="selectYesNo(event, 'waterIngress', 'Yes')">Yes</button>
+                                    <button type="button" class="yes-no-btn" onclick="selectYesNo(event, 'waterIngress', 'No')">No</button>
+                                </div>
+                                <input type="hidden" name="waterIngress">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-bold mb-2">Environmental Notes</label>
+                                <textarea name="environmentalNotes" class="form-input w-full px-4 py-2.5" rows="3" placeholder="Water locations, damp areas..." oninput="saveFormData()"></textarea>
+                            </div>
+                        </div>
+                        <div class="preview-card">
+                            <div class="preview-header" onclick="togglePreview(event, 4)">
+                                <div class="preview-title">
+                                    <i class="fas fa-eye"></i> Preview
+                                </div>
+                                <span class="preview-toggle" id="preview-toggle-4">▼</span>
+                            </div>
+                            <div class="preview-content" id="preview-4"></div>
+                        </div>
+                    </div>
+
+                    <!-- SECTION 5: HAZARDOUS MATERIALS -->
+                    <div id="section-5" class="section-card glass rounded-2xl shadow-lg p-8 hidden">
+                        <div class="section-header">
+                            <div class="section-icon">⚠️</div>
+                            <div>
+                                <span class="step-badge">Step 5</span>
+                                <h2 class="text-2xl font-bold mt-2">Hazardous Materials</h2>
+                            </div>
+                        </div>
+                        <div class="space-y-5">
+                            <div>
+                                <h3 class="text-base font-bold mb-3">Asbestos Present?</h3>
+                                <div class="yes-no-buttons">
+                                    <button type="button" class="yes-no-btn" onclick="selectYesNo(event, 'asbestos', 'Yes')">Yes</button>
+                                    <button type="button" class="yes-no-btn" onclick="selectYesNo(event, 'asbestos', 'No')">No</button>
+                                    <button type="button" class="yes-no-btn" onclick="selectYesNo(event, 'asbestos', 'Unknown')">Unknown</button>
+                                </div>
+                                <input type="hidden" name="asbestos">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-bold mb-2">Hazard Notes</label>
+                                <textarea name="hazardNotes" class="form-input w-full px-4 py-2.5" rows="3" placeholder="Locations, testing done, recommendations..." oninput="saveFormData()"></textarea>
+                            </div>
+                        </div>
+                        <div class="preview-card">
+                            <div class="preview-header" onclick="togglePreview(event, 5)">
+                                <div class="preview-title">
+                                    <i class="fas fa-eye"></i> Preview
+                                </div>
+                                <span class="preview-toggle" id="preview-toggle-5">▼</span>
+                            </div>
+                            <div class="preview-content" id="preview-5"></div>
+                        </div>
+                    </div>
+
+                    <!-- SECTION 6: STRUCTURAL ASSESSMENT -->
+                    <div id="section-6" class="section-card glass rounded-2xl shadow-lg p-8 hidden">
+                        <div class="section-header">
+                            <div class="section-icon">🔨</div>
+                            <div>
+                                <span class="step-badge">Step 6</span>
+                                <h2 class="text-2xl font-bold mt-2">Structural Assessment</h2>
+                            </div>
+                        </div>
+                        <div class="space-y-5">
+                            <div>
+                                <label class="block text-sm font-bold mb-2">Foundation Condition</label>
+                                <select name="foundationCondition" class="form-input w-full px-4 py-2.5" onchange="saveFormData()">
+                                    <option value="">Select...</option>
+                                    <option value="Excellent">Excellent</option>
+                                    <option value="Good">Good</option>
+                                    <option value="Fair">Fair</option>
+                                    <option value="Poor">Poor</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-bold mb-2">Structural Notes</label>
+                                <textarea name="structuralNotes" class="form-input w-full px-4 py-2.5" rows="3" placeholder="Cracks, settlement, repairs..." oninput="saveFormData()"></textarea>
+                            </div>
+                        </div>
+                        <div class="preview-card">
+                            <div class="preview-header" onclick="togglePreview(event, 6)">
+                                <div class="preview-title">
+                                    <i class="fas fa-eye"></i> Preview
+                                </div>
+                                <span class="preview-toggle" id="preview-toggle-6">▼</span>
+                            </div>
+                            <div class="preview-content" id="preview-6"></div>
+                        </div>
+                    </div>
+
+                    <!-- SECTION 7: EXTERIOR ELEMENTS -->
+                    <div id="section-7" class="section-card glass rounded-2xl shadow-lg p-8 hidden">
+                        <div class="section-header">
+                            <div class="section-icon">🪟</div>
+                            <div>
+                                <span class="step-badge">Step 7</span>
+                                <h2 class="text-2xl font-bold mt-2">Exterior Elements</h2>
+                            </div>
+                        </div>
+                        <div class="space-y-5">
+                            <div>
+                                <label class="block text-sm font-bold mb-2">Roof Condition</label>
+                                <select name="roofCondition" class="form-input w-full px-4 py-2.5" onchange="saveFormData()">
+                                    <option value="">Select...</option>
+                                    <option value="Excellent">Excellent</option>
+                                    <option value="Good">Good</option>
+                                    <option value="Fair">Fair</option>
+                                    <option value="Poor">Poor</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-bold mb-2">Masonry/Walls Condition</label>
+                                <select name="masonryCondition" class="form-input w-full px-4 py-2.5" onchange="saveFormData()">
+                                    <option value="">Select...</option>
+                                    <option value="Excellent">Excellent</option>
+                                    <option value="Good">Good</option>
+                                    <option value="Fair">Fair</option>
+                                    <option value="Poor">Poor</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-bold mb-2">Exterior Notes</label>
+                                <textarea name="exteriorNotes" class="form-input w-full px-4 py-2.5" rows="3" placeholder="Gutters, downpipes, repointing needed..." oninput="saveFormData()"></textarea>
+                            </div>
+
+                            <!-- EXTERIOR PHOTOS -->
+                            <div class="photo-section">
+                                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+                                    <label style="font-weight: 700; color: var(--primary); font-family: 'Georgia', serif;">Exterior Photos</label>
+                                    <span style="font-size: 12px; color: var(--text);">Roof, elevation, details</span>
+                                </div>
+                                <button type="button" class="photo-upload-button" onclick="document.getElementById('photos-7-main').click()">
+                                    <i class="fas fa-image"></i> Add Photos
+                                </button>
+                                <input type="file" id="photos-7-main" class="photo-upload-input" accept="image/*" multiple onchange="handlePhotoUpload(event, 7)">
+                                <div class="photo-gallery" id="photo-gallery-7"></div>
+                            </div>
+                        </div>
+                        <div class="preview-card">
+                            <div class="preview-header" onclick="togglePreview(event, 7)">
+                                <div class="preview-title">
+                                    <i class="fas fa-eye"></i> Preview
+                                </div>
+                                <span class="preview-toggle" id="preview-toggle-7">▼</span>
+                            </div>
+                            <div class="preview-content" id="preview-7"></div>
+                        </div>
+                    </div>
+
+                    <!-- SECTION 8: INTERIOR SPACES -->
+                    <div id="section-8" class="section-card glass rounded-2xl shadow-lg p-8 hidden">
+                        <div class="section-header">
+                            <div class="section-icon">🏗️</div>
+                            <div>
+                                <span class="step-badge">Step 8</span>
+                                <h2 class="text-2xl font-bold mt-2">Interior Spaces</h2>
+                            </div>
+                        </div>
+                        <div class="space-y-5">
+                            <div>
+                                <label class="block text-sm font-bold mb-2">Floor Condition</label>
+                                <select name="floorCondition" class="form-input w-full px-4 py-2.5" onchange="saveFormData()">
+                                    <option value="">Select...</option>
+                                    <option value="Original">Original</option>
+                                    <option value="Good">Good</option>
+                                    <option value="Fair">Fair</option>
+                                    <option value="Poor">Poor</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-bold mb-2">Walls/Paint Condition</label>
+                                <select name="wallCondition" class="form-input w-full px-4 py-2.5" onchange="saveFormData()">
+                                    <option value="">Select...</option>
+                                    <option value="Excellent">Excellent</option>
+                                    <option value="Good">Good</option>
+                                    <option value="Fair">Fair</option>
+                                    <option value="Poor">Poor</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-bold mb-2">Interior Notes</label>
+                                <textarea name="interiorNotes" class="form-input w-full px-4 py-2.5" rows="3" placeholder="Plasterwork, features, decorative elements..." oninput="saveFormData()"></textarea>
+                            </div>
+
+                            <!-- INTERIOR PHOTOS -->
+                            <div class="photo-section">
+                                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+                                    <label style="font-weight: 700; color: var(--primary); font-family: 'Georgia', serif;">Interior Photos</label>
+                                    <span style="font-size: 12px; color: var(--text);">Rooms, walls, features</span>
+                                </div>
+                                <button type="button" class="photo-upload-button" onclick="document.getElementById('photos-8-main').click()">
+                                    <i class="fas fa-image"></i> Add Photos
+                                </button>
+                                <input type="file" id="photos-8-main" class="photo-upload-input" accept="image/*" multiple onchange="handlePhotoUpload(event, 8)">
+                                <div class="photo-gallery" id="photo-gallery-8"></div>
+                            </div>
+                        </div>
+                        <div class="preview-card">
+                            <div class="preview-header" onclick="togglePreview(event, 8)">
+                                <div class="preview-title">
+                                    <i class="fas fa-eye"></i> Preview
+                                </div>
+                                <span class="preview-toggle" id="preview-toggle-8">▼</span>
+                            </div>
+                            <div class="preview-content" id="preview-8"></div>
+                        </div>
+                    </div>
+
+                    <!-- SECTIONS 9-10 WITH PREVIEWS -->
+                    <div id="section-9" class="section-card glass rounded-2xl shadow-lg p-8 hidden">
+                        <div class="section-header">
+                            <div class="section-icon">📋</div>
+                            <div>
+                                <span class="step-badge">Step 9</span>
+                                <h2 class="text-2xl font-bold mt-2">Identified Defects</h2>
+                            </div>
+                        </div>
+                        <div class="space-y-5">
+                            <div id="defects-container"></div>
+                            <button type="button" class="btn-action" onclick="addDefectRow()" style="width: 100%; justify-content: center;">
+                                <i class="fas fa-plus"></i> Add Defect Entry
+                            </button>
+                        </div>
+                        <div class="preview-card">
+                            <div class="preview-header" onclick="togglePreview(event, 9)">
+                                <div class="preview-title">
+                                    <i class="fas fa-eye"></i> Preview
+                                </div>
+                                <span class="preview-toggle" id="preview-toggle-9">▼</span>
+                            </div>
+                            <div class="preview-content" id="preview-9"></div>
+                        </div>
+                    </div>
+
+                    <div id="section-10" class="section-card glass rounded-2xl shadow-lg p-8 hidden">
+                        <div class="section-header">
+                            <div class="section-icon">💰</div>
+                            <div>
+                                <span class="step-badge">Step 10</span>
+                                <h2 class="text-2xl font-bold mt-2">Cost Summary</h2>
+                            </div>
+                        </div>
+                        <div class="space-y-5">
+                            <div id="costs-container"></div>
+                            <button type="button" class="btn-action" onclick="addCostRow()" style="width: 100%; justify-content: center;">
+                                <i class="fas fa-plus"></i> Add Cost Item
+                            </button>
+                        </div>
+                        <div class="preview-card">
+                            <div class="preview-header" onclick="togglePreview(event, 10)">
+                                <div class="preview-title">
+                                    <i class="fas fa-eye"></i> Preview
+                                </div>
+                                <span class="preview-toggle" id="preview-toggle-10">▼</span>
+                            </div>
+                            <div class="preview-content" id="preview-10"></div>
+                        </div>
+                    </div>
+
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- COPY MODAL -->
+    <div id="copyModal" class="modal-overlay">
+        <div class="modal-content">
+            <div class="modal-header">
+                <i class="fas fa-copy" style="color: var(--primary); font-size: 24px;"></i>
+                <h3></h3>
+            </div>
+            <div class="modal-body" id="modalBody"></div>
+            <div class="modal-actions">
+                <button class="btn-copy" onclick="copyModalData()">
+                    <i class="fas fa-copy"></i> Copy to Clipboard
+                </button>
+                <button class="btn-close" onclick="closeCopyModal()">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- TABLE PREVIEW MODAL -->
+    <div id="tablePreviewModal" class="modal-overlay">
+        <div class="modal-content" style="max-width: 900px; max-height: 80vh; overflow-y: auto;">
+            <div class="modal-header">
+                <i class="fas fa-table" style="color: var(--primary); font-size: 24px;"></i>
+                <h3>Table Preview for Word</h3>
+            </div>
+            <div class="modal-body" id="tablePreviewBody" style="text-align: left;"></div>
+            <div class="modal-actions">
+                <button class="btn-copy" onclick="copyTablePreviewToWord()">
+                    <i class="fas fa-copy"></i> Copy This Table
+                </button>
+                <button class="btn-close" onclick="closeTablePreview()">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const sectionTitles = {
+            1: 'Property Information',
+            2: 'Electrical Systems',
+            3: 'Plumbing Systems',
+            4: 'Environmental Conditions',
+            5: 'Hazardous Materials',
+            6: 'Structural Assessment',
+            7: 'Exterior Elements',
+            8: 'Interior Spaces',
+            9: 'Identified Defects',
+            10: 'Cost Summary'
+        };
+
+        const photoSections = [1, 7, 8]; // Sections with photos
+
+        let currentSection = 1;
+        let defectRowCount = 0;
+        let costRowCount = 0;
+        let photoData = {}; // Store photos as base64
+
+        function showSection(sectionNum) {
+            document.querySelectorAll('[id^="section-"]').forEach(el => {
+                el.style.display = 'none';
+            });
+            document.getElementById(`section-${sectionNum}`).style.display = 'block';
+            document.getElementById('section-title').textContent = sectionTitles[sectionNum];
+
+            document.querySelectorAll('.section-item').forEach(el => {
+                el.classList.remove('active');
+            });
+            document.querySelectorAll('.section-item')[sectionNum - 1].classList.add('active');
+
+            currentSection = sectionNum;
+            saveFormData();
+            document.querySelector('.form-content').scrollTop = 0;
+            updateAllPreviews();
+        }
+
+        function selectYesNo(event, fieldName, value) {
+            event.preventDefault();
+            const buttons = event.target.parentElement.querySelectorAll('.yes-no-btn');
+            buttons.forEach(btn => btn.classList.remove('selected'));
+            event.target.classList.add('selected');
+            document.querySelector(`input[name="${fieldName}"]`).value = value;
+            saveFormData();
+            updateAllPreviews();
+        }
+
+        function handlePhotoUpload(event, sectionNum) {
+            const files = Array.from(event.target.files);
+            if (!photoData[sectionNum]) {
+                photoData[sectionNum] = [];
+            }
+
+            files.forEach(file => {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const photoObj = {
+                        base64: e.target.result,
+                        name: file.name,
+                        caption: ''
+                    };
+                    photoData[sectionNum].push(photoObj);
+                    renderPhotoGallery(sectionNum);
+                    saveFormData();
+                    updateAllPreviews();
+                };
+                reader.readAsDataURL(file);
+            });
+        }
+
+        function renderPhotoGallery(sectionNum) {
+            const gallery = document.getElementById(`photo-gallery-${sectionNum}`);
+            gallery.innerHTML = '';
+
+            if (!photoData[sectionNum]) return;
+
+            photoData[sectionNum].forEach((photo, index) => {
+                const photoEl = document.createElement('div');
+                photoEl.className = 'photo-item';
+                photoEl.innerHTML = `
+                    <img src="${photo.base64}" alt="Photo ${index + 1}">
+                    <button type="button" class="photo-item-remove" onclick="removePhoto(${sectionNum}, ${index})">
+                        <i class="fas fa-times"></i>
+                    </button>
+                    <div class="photo-item-caption">
+                        <input type="text" placeholder="Caption" value="${photo.caption}" style="width: 100%; padding: 2px; border: none; background: transparent; font-size: 11px;" onchange="updatePhotoCaption(${sectionNum}, ${index}, this.value)">
+                    </div>
+                `;
+                gallery.appendChild(photoEl);
+            });
+        }
+
+        function updatePhotoCaption(sectionNum, index, caption) {
+            if (photoData[sectionNum] && photoData[sectionNum][index]) {
+                photoData[sectionNum][index].caption = caption;
+                saveFormData();
+            }
+        }
+
+        function removePhoto(sectionNum, index) {
+            if (photoData[sectionNum]) {
+                photoData[sectionNum].splice(index, 1);
+                renderPhotoGallery(sectionNum);
+                saveFormData();
+                updateAllPreviews();
+            }
+        }
+
+        function togglePreview(event, sectionNum) {
+            event.preventDefault();
+            const toggle = document.getElementById(`preview-toggle-${sectionNum}`);
+            const content = document.getElementById(`preview-${sectionNum}`);
+            toggle.classList.toggle('open');
+            content.classList.toggle('open');
+            if (content.classList.contains('open') && !content.innerHTML.trim()) {
+                updatePreview(sectionNum);
+            }
+        }
+
+        function updateAllPreviews() {
+            for (let i = 1; i <= 10; i++) {
+                const content = document.getElementById(`preview-${i}`);
+                if (content && content.classList.contains('open')) {
+                    updatePreview(i);
+                }
+            }
+        }
+
+        function updatePreview(sectionNum) {
+            const content = document.getElementById(`preview-${sectionNum}`);
+            const section = document.getElementById(`section-${sectionNum}`);
+            let html = '';
+
+            // Get all form inputs for this section
+            const inputs = section.querySelectorAll('.form-input:not([type="hidden"])');
+            let hasData = false;
+
+            inputs.forEach(input => {
+                if (input.value) {
+                    hasData = true;
+                    const label = input.parentElement?.querySelector('label')?.textContent || '';
+                    html += `<div class="preview-item">
+                        <span class="preview-label">${label}</span>
+                        <span class="preview-value">${input.value}</span>
+                    </div>`;
+                }
+            });
+
+            // Add yes/no buttons
+            const yesNoButtons = section.querySelectorAll('.yes-no-btn.selected');
+            yesNoButtons.forEach(btn => {
+                hasData = true;
+                const label = btn.parentElement?.parentElement?.querySelector('h3')?.textContent || '';
+                html += `<div class="preview-item">
+                    <span class="preview-label">${label}</span>
+                    <span class="preview-value">${btn.textContent}</span>
+                </div>`;
+            });
+
+            // Add photos if any
+            if (photoData[sectionNum] && photoData[sectionNum].length > 0) {
+                hasData = true;
+                html += '<div style="margin-top: 12px; padding-top: 12px; border-top: 1px solid rgba(61, 92, 69, 0.2);">';
+                html += `<div style="font-weight: 700; color: var(--primary); margin-bottom: 8px;">📸 Photos (${photoData[sectionNum].length})</div>`;
+                html += '<div class="preview-photos">';
+                photoData[sectionNum].forEach((photo, idx) => {
+                    html += `<div class="preview-photo"><img src="${photo.base64}" alt="Photo"></div>`;
+                });
+                html += '</div></div>';
+            }
+
+            if (!hasData) {
+                html = '<div class="preview-empty">No data entered yet</div>';
+            }
+
+            content.innerHTML = html;
+            updateBadge(sectionNum);
+        }
+
+        function updateBadge(sectionNum) {
+            const badge = document.getElementById(`badge-${sectionNum}`);
+            if (!badge) return;
+
+            const section = document.getElementById(`section-${sectionNum}`);
+            let count = 0;
+
+            // Count filled inputs
+            const inputs = section.querySelectorAll('.form-input:not([type="hidden"])');
+            inputs.forEach(input => {
+                if (input.value) count++;
+            });
+
+            // Count selected yes/no buttons
+            const yesNoBtns = section.querySelectorAll('.yes-no-btn.selected');
+            count += yesNoBtns.length;
+
+            // Show photo count for photo sections
+            if (photoSections.includes(sectionNum) && photoData[sectionNum]) {
+                badge.textContent = photoData[sectionNum].length > 0 ? '📸' : count;
+            } else {
+                badge.textContent = count > 0 ? count : '0';
+            }
+        }
+
+        function saveFormData() {
+            const formData = new FormData(document.getElementById('assessment-form'));
+            const data = Object.fromEntries(formData);
+            localStorage.setItem('assessmentForm', JSON.stringify(data));
+            localStorage.setItem('assessmentPhotos', JSON.stringify(photoData));
+        }
+
+        function loadFormData() {
+            const saved = localStorage.getItem('assessmentForm');
+            const savedPhotos = localStorage.getItem('assessmentPhotos');
+
+            if (saved) {
+                const data = JSON.parse(saved);
+                for (let [key, value] of Object.entries(data)) {
+                    const input = document.querySelector(`[name="${key}"]`);
+                    if (input) {
+                        input.value = value;
+                        if (input.type === 'hidden') {
+                            const parent = input.parentElement;
+                            parent.querySelectorAll('.yes-no-btn').forEach(btn => {
+                                if (btn.textContent === value) {
+                                    btn.classList.add('selected');
+                                }
+                            });
+                        }
+                    }
+                }
+            }
+
+            if (savedPhotos) {
+                photoData = JSON.parse(savedPhotos);
+                photoSections.forEach(sectionNum => {
+                    if (photoData[sectionNum]) {
+                        renderPhotoGallery(sectionNum);
+                    }
+                });
+            }
+
+            // Update all badges
+            for (let i = 1; i <= 10; i++) {
+                updateBadge(i);
+            }
+        }
+
+        function addDefectRow() {
+            const container = document.getElementById('defects-container');
+            const rowId = `defect-${defectRowCount++}`;
+            const html = `
+                <div class="defect-row" data-id="${rowId}" style="background: var(--light-bg); border: 1px solid var(--border); border-radius: 12px; padding: 16px; margin-bottom: 12px;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+                        <span style="font-weight: 700; color: var(--primary);">Defect Entry</span>
+                        <button type="button" class="btn-remove" onclick="removeDefectRow('${rowId}')" style="background: #fee2e2; color: #991b1b; border: none; padding: 6px 12px; border-radius: 6px; cursor: pointer; font-size: 12px; font-weight: 600;">Remove</button>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Location</label>
+                            <input type="text" class="form-input location" placeholder="e.g., East wall" oninput="saveFormData(); updateAllPreviews()">
+                        </div>
+                        <div class="form-group">
+                            <label>Priority</label>
+                            <select class="form-input priority" onchange="saveFormData(); updateAllPreviews()">
+                                <option value="">Select...</option>
+                                <option value="Urgent">Urgent</option>
+                                <option value="Important">Important</option>
+                                <option value="Routine">Routine</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>Description</label>
+                        <textarea class="form-input description" placeholder="Detailed description..." oninput="saveFormData(); updateAllPreviews()"></textarea>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Estimated Cost</label>
+                            <input type="text" class="form-input cost" placeholder="$" oninput="saveFormData(); updateAllPreviews()">
+                        </div>
+                    </div>
+                </div>
+            `;
+            container.insertAdjacentHTML('beforeend', html);
+        }
+
+        function removeDefectRow(rowId) {
+            document.querySelector(`[data-id="${rowId}"]`).remove();
+            saveFormData();
+            updateAllPreviews();
+        }
+
+        function addCostRow() {
+            const container = document.getElementById('costs-container');
+            const rowId = `cost-${costRowCount++}`;
+            const html = `
+                <div class="cost-row" data-id="${rowId}" style="background: var(--light-bg); border: 1px solid var(--border); border-radius: 12px; padding: 16px; margin-bottom: 12px;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+                        <span style="font-weight: 700; color: var(--primary);">Cost Item</span>
+                        <button type="button" class="btn-remove" onclick="removeCostRow('${rowId}')" style="background: #fee2e2; color: #991b1b; border: none; padding: 6px 12px; border-radius: 6px; cursor: pointer; font-size: 12px; font-weight: 600;">Remove</button>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Item Description</label>
+                            <input type="text" class="form-input item-name" placeholder="e.g., Roof Replacement" oninput="saveFormData(); updateAllPreviews()">
+                        </div>
+                        <div class="form-group">
+                            <label>Estimated Cost</label>
+                            <input type="text" class="form-input cost-estimate" placeholder="$" oninput="saveFormData(); updateAllPreviews()">
+                        </div>
+                    </div>
+                </div>
+            `;
+            container.insertAdjacentHTML('beforeend', html);
+        }
+
+        function removeCostRow(rowId) {
+            document.querySelector(`[data-id="${rowId}"]`).remove();
+            saveFormData();
+            updateAllPreviews();
+        }
+
+        function copySectionData() {
+            let text = `${sectionTitles[currentSection]}\n${'═'.repeat(60)}\n\n`;
+
+            const section = document.getElementById(`section-${currentSection}`);
+            const inputs = section.querySelectorAll('.form-input:not([type="hidden"])');
+
+            inputs.forEach(input => {
+                if (input.value) {
+                    const label = input.parentElement?.querySelector('label')?.textContent || '';
+                    if (label) text += `${label}: ${input.value}\n`;
+                }
+            });
+
+            // Add yes/no button values
+            const yesNoBtns = section.querySelectorAll('.yes-no-btn.selected');
+            yesNoBtns.forEach(btn => {
+                const label = btn.parentElement?.parentElement?.querySelector('h3')?.textContent || '';
+                if (label) text += `${label}: ${btn.textContent}\n`;
+            });
+
+            // Add photos as embedded base64 or references
+            if (photoData[currentSection] && photoData[currentSection].length > 0) {
+                text += `\n📸 PHOTOS (${photoData[currentSection].length}):\n`;
+                photoData[currentSection].forEach((photo, idx) => {
+                    text += `\n[PHOTO ${idx + 1}: ${photo.caption || photo.name}]\n`;
+                    text += `${photo.base64}\n`;
+                });
+            }
+
+            showCopyModal(text, `${sectionTitles[currentSection]} - Ready to Copy`);
+        }
+
+        function copyAllData() {
+            let text = `HERITAGE BUILDING CONDITION ASSESSMENT REPORT\n${'═'.repeat(60)}\n\n`;
+
+            for (let i = 1; i <= 10; i++) {
+                const section = document.getElementById(`section-${i}`);
+                if (!section) continue;
+
+                text += `\n${sectionTitles[i]}\n${'-'.repeat(60)}\n`;
+                section.querySelectorAll('.form-input:not([type="hidden"])').forEach(input => {
+                    if (input.value) {
+                        const label = input.parentElement?.querySelector('label')?.textContent || '';
+                        if (label) text += `${label}: ${input.value}\n`;
+                    }
+                });
+
+                // Photos
+                if (photoData[i] && photoData[i].length > 0) {
+                    text += `\n📸 Photos (${photoData[i].length}):\n`;
+                    photoData[i].forEach((photo, idx) => {
+                        text += `[PHOTO ${idx + 1}: ${photo.caption || photo.name}]\n`;
+                        text += `${photo.base64}\n`;
+                    });
+                }
+            }
+
+            showCopyModal(text, 'Complete Assessment Report - Ready to Copy');
+        }
+
+        function showCopyModal(text, title) {
+            document.getElementById('modalBody').textContent = text;
+            document.querySelector('.modal-header h3').textContent = title;
+            document.getElementById('copyModal').classList.add('active');
+        }
+
+        function closeCopyModal() {
+            document.getElementById('copyModal').classList.remove('active');
+        }
+
+        function copyModalData() {
+            const text = document.getElementById('modalBody').textContent;
+            navigator.clipboard.writeText(text).then(() => {
+                const feedback = document.createElement('div');
+                feedback.className = 'copy-feedback';
+                feedback.textContent = '✓ Copied to clipboard!';
+                document.body.appendChild(feedback);
+                setTimeout(() => feedback.remove(), 2000);
+                closeCopyModal();
+            });
+        }
+
+        // TABLE PREVIEW FUNCTIONS
+        function openTablePreview() {
+            const html = generateTablePreview();
+            document.getElementById('tablePreviewBody').innerHTML = html;
+            document.getElementById('tablePreviewModal').classList.add('active');
+        }
+
+        function closeTablePreview() {
+            document.getElementById('tablePreviewModal').classList.remove('active');
+        }
+
+        function generateTablePreview() {
+            let html = '<style>.preview-table { width: 100%; border-collapse: collapse; margin: 20px 0; font-size: 14px; } .preview-table th { background: var(--primary); color: var(--cream); padding: 12px; text-align: left; font-weight: 600; border: 1px solid #ddd; } .preview-table td { padding: 12px; border: 1px solid #ddd; vertical-align: top; } .preview-table tr:nth-child(even) { background: var(--light-bg); } .table-photo { max-width: 120px; max-height: 120px; border: 1px solid var(--border); border-radius: 4px; margin: 4px; } </style>';
+
+            // Exterior Section
+            const exteriorSection = document.getElementById('section-7');
+            if (exteriorSection) {
+                html += '<h3 style="color: var(--primary); margin-top: 20px; margin-bottom: 10px; border-bottom: 2px solid var(--border); padding-bottom: 8px;">EXTERIOR ELEMENTS</h3>';
+                html += '<table class="preview-table"><tr><th style="width: 30%;">Assessment Area</th><th style="width: 70%;">Condition</th></tr>';
+
+                const inputs = exteriorSection.querySelectorAll('.form-input:not([type="hidden"])');
+                let hasExterior = false;
+                inputs.forEach(input => {
+                    if (input.value) {
+                        hasExterior = true;
+                        const label = input.parentElement?.querySelector('label')?.textContent || '';
+                        html += `<tr><td><strong>${label}</strong></td><td>${input.value}`;
+                        if (photoData[7] && photoData[7].length > 0) {
+                            html += '<div style="margin-top: 8px;">';
+                            photoData[7].forEach(photo => {
+                                html += `<img src="${photo.base64}" class="table-photo" alt="${photo.caption}">`;
+                            });
+                            html += '</div>';
+                        }
+                        html += '</td></tr>';
+                    }
+                });
+                html += '</table>';
+            }
+
+            // Interior Section
+            const interiorSection = document.getElementById('section-8');
+            if (interiorSection) {
+                html += '<h3 style="color: var(--primary); margin-top: 20px; margin-bottom: 10px; border-bottom: 2px solid var(--border); padding-bottom: 8px;">INTERIOR SPACES</h3>';
+                html += '<table class="preview-table"><tr><th style="width: 30%;">Assessment Area</th><th style="width: 70%;">Condition</th></tr>';
+
+                const inputs = interiorSection.querySelectorAll('.form-input:not([type="hidden"])');
+                inputs.forEach(input => {
+                    if (input.value) {
+                        const label = input.parentElement?.querySelector('label')?.textContent || '';
+                        html += `<tr><td><strong>${label}</strong></td><td>${input.value}`;
+                        if (photoData[8] && photoData[8].length > 0) {
+                            html += '<div style="margin-top: 8px;">';
+                            photoData[8].forEach(photo => {
+                                html += `<img src="${photo.base64}" class="table-photo" alt="${photo.caption}">`;
+                            });
+                            html += '</div>';
+                        }
+                        html += '</td></tr>';
+                    }
+                });
+                html += '</table>';
+            }
+
+            // Defects Section
+            const defectsSection = document.getElementById('section-9');
+            if (defectsSection) {
+                html += '<h3 style="color: var(--alert); margin-top: 20px; margin-bottom: 10px; border-bottom: 2px solid var(--border); padding-bottom: 8px;">IDENTIFIED DEFECTS</h3>';
+                html += '<table class="preview-table"><tr><th style="width: 20%;">Location</th><th style="width: 15%;">Priority</th><th style="width: 50%;">Description</th><th style="width: 15%;">Cost</th></tr>';
+
+                const defectRows = defectsSection.querySelectorAll('.defect-row');
+                defectRows.forEach(row => {
+                    const location = row.querySelector('.location')?.value || '';
+                    const priority = row.querySelector('.priority')?.value || '';
+                    const description = row.querySelector('.description')?.value || '';
+                    const cost = row.querySelector('.cost')?.value || '';
+                    if (location || priority || description || cost) {
+                        html += `<tr><td>${location}</td><td>${priority}</td><td>${description}</td><td>${cost}</td></tr>`;
+                    }
+                });
+                html += '</table>';
+            }
+
+            return html || '<p>No data entered yet. Fill in the form to see tables.</p>';
+        }
+
+        function copyTablePreviewToWord() {
+            const html = generateTablePreview();
+            const blob = new Blob([html], { type: 'text/html' });
+            const data = [new ClipboardItem({ 'text/html': blob })];
+
+            navigator.clipboard.write(data).then(() => {
+                const feedback = document.createElement('div');
+                feedback.className = 'copy-feedback';
+                feedback.textContent = '✓ Table copied to clipboard! Paste into Word now.';
+                document.body.appendChild(feedback);
+                setTimeout(() => feedback.remove(), 3000);
+                closeTablePreview();
+            }).catch(err => {
+                alert('Try copying from the preview window using Ctrl+C');
+            });
+        }
+
+        window.addEventListener('load', loadFormData);
+    </script>
+</body>
+</html>

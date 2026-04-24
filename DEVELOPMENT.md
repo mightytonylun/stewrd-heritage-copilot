@@ -77,6 +77,29 @@
 
 **Positioning:** Changed from "field-first" to "desktop copilot" to reflect current capabilities accurately.
 
+### Phase 6: UX, Export & Persistence Improvements (April 21, 2026)
+**Focus:** v1.1 — addressing feedback on workflow friction and data management
+
+**UX & Workflow:**
+- Added **Prev/Next navigation bar** at bottom of every section (no need to use sidebar for linear flow)
+- Added **section completion dots** in sidebar (green dot = has data; at-a-glance overview of what's filled)
+- Added **Cancel Edit button** when editing a complex entry (previously had to scroll away and lose state)
+- Replaced all native `confirm()` dialogs with a polished **custom confirm modal** (consistent with app design)
+
+**Data & Persistence:**
+- Added **named multi-assessment sessions** — save, load, delete assessments by name (via Sessions panel in sidebar)
+- Sessions auto-persist after each save; current session name shown in sidebar header
+- Auto-save is **debounced** (1.2s) to reduce unnecessary localStorage writes during typing
+- Save indicator now shows **timestamp** ("Saved 2:34 PM") not just a static "Saved"
+- "Clear" now resets session name to "Untitled Assessment"
+
+**Export:**
+- No new export format added; prep work done for future improvements
+
+**File:** `heritage-property-assessment-v1.1.html`
+
+---
+
 ### Phase 5: Research Protection & Open Source (April 14, 2026)
 **Focus:** Licensing and public release
 
@@ -84,6 +107,34 @@
 - MIT License with research citation guidelines
 - Enables community contributions while protecting research credit
 - Clear documentation of features and roadmap
+
+---
+
+### Phase 7: v2 — Tablet-First Rebuild (April 24, 2026)
+**Focus:** Full redesign for iPad/tablet field use; structural UX overhaul
+
+**Why v2 (not patching v1.1):**
+- v1.1 had an inconsistent layout language: sections 1–6 used entry-left/preview-right, sections 7–9 used preview-top/entry-right — a structural problem, not patchable
+- Tablet requirement demanded PWA (`getUserMedia`, manifest, service worker) — justified a clean rebuild
+- Opportunity to unify condition rating as the primary input across all 10 sections
+
+**Architecture decisions for v2:**
+- **HTML + PWA**: still single-file; PWA manifest + service worker injected at runtime (no server needed)
+- **Tablet-first layout**: pill strip nav on mobile/tablet → sidebar collapses on desktop
+- **Unified card pattern**: same component for all 10 sections — condition rating + notes + entries
+- **Condition rating (Good/Fair/Poor/Critical/N/A)** as primary first-class input on every section
+- **getUserMedia camera**: direct camera capture on iPad, falls back to gallery picker on desktop
+- **Slide-up entry drawer**: replaces inline form — same UX for all complex entries
+- **Auto-suggested ref numbers**: auto-increments per section prefix (EE-01, RM-01, D-01)
+- **Entry success toast + row flash**: green toast + highlighted new row on add
+- **Single "Export Report" CTA** in header/sidebar; export modal with Word/JSON/CSV/Print
+
+**New in v2 data layer:**
+- All localStorage keys namespaced `hcl_v2_*` (no conflict with v1.1)
+- `photoData` keyed by `entry.id` (stable across edits)
+- Session auto-persist runs only for named sessions (skips "Untitled Assessment")
+
+**File:** `v2/heritage-copilot-v2.html`
 
 ---
 
@@ -301,7 +352,9 @@ complexData = {
 |------|-------|---------|--------|
 | `form-minimal-heritage.html` | 1 | Baseline form structure | Archived (reference) |
 | `form-heritage-copilot-enhanced-updated.html` | 2 | Layout improvements | Archived (reference) |
-| `heritage-property-assessment.html` | 3-5 | **Current production v1.0** | Active |
+| `heritage-property-assessment.html` | 3-5 | Production v1.0 | Archived (reference) |
+| `heritage-property-assessment-v1.1.html` | 6 | Production v1.1 (desktop copilot) | Archived (reference) |
+| `v2/heritage-copilot-v2.html` | 7 | **v2 — Tablet-first PWA rebuild** | Active |
 
 ---
 
@@ -354,6 +407,6 @@ For questions, feedback, or collaboration on this research:
 
 ---
 
-**Last Updated:** 2026-04-14  
-**Current Version:** v1.0 (Desktop Copilot)  
-**Next Phase:** v1.1 (Mobile Camera Capture)
+**Last Updated:** 2026-04-24  
+**Current Version:** v2.0 (Tablet-First PWA Rebuild)  
+**Next Phase:** v2.1 (Field testing, photo annotation, sync)
