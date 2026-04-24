@@ -1,7 +1,7 @@
 # STEWRD Heritage CareLog
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
-[![Version](https://img.shields.io/badge/version-2.0--agent2--demo-brightgreen.svg)](https://github.com/mightytonylun/heritage-condition-report-copilot/releases)
+[![Version](https://img.shields.io/badge/version-2.0--agent2--demo-brightgreen.svg)](https://github.com/mightytonylun/stewrd-heritage-carelog/releases)
 [![Browser Support](https://img.shields.io/badge/browser-all%20modern-blue.svg)](#browser-support)
 
 **Agent 2: Condition Report Digitizer** · Part of the STEWRD Heritage Management Copilot
@@ -14,7 +14,7 @@
 
 **No installation. No server. No build step.**
 
-1. [Download `heritage-copilot-v2.html`](https://github.com/mightytonylun/heritage-condition-report-copilot/releases/tag/v2.0-agent2-demo) from the latest release
+1. [Download `heritage-copilot-v2.html`](https://github.com/mightytonylun/stewrd-heritage-carelog/releases/tag/v2.0-agent2-demo) from the latest release
 2. Open in any modern browser
 3. Click **▶ Load Demo Assessment** to explore a pre-populated example
 
@@ -179,7 +179,7 @@ Requirements: ES6+, localStorage enabled, camera permissions for photo capture.
 
 ```
 STEWRD Heritage CareLog — Condition Report Digitizer v2
-https://github.com/mightytonylun/heritage-condition-report-copilot
+https://github.com/mightytonylun/stewrd-heritage-carelog
 ```
 
 ## License

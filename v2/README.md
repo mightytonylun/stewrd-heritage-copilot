@@ -20,7 +20,7 @@ A non-expert fills a guided 10-section assessment form covering electrical, plum
 No installation, no server, no build step required. Everything runs locally — all data is stored in the browser's localStorage, nothing is sent anywhere.
 
 ### iPad / iPhone / Android (Recommended)
-1. Download `heritage-copilot-v2.html` from the [release page](https://github.com/mightytonylun/heritage-condition-report-copilot/releases/tag/v2.0-agent2-demo) in **Chrome or Edge**
+1. Download `heritage-copilot-v2.html` from the [release page](https://github.com/mightytonylun/stewrd-heritage-carelog/releases/tag/v2.0-agent2-demo) in **Chrome or Edge**
 2. The file opens directly in the browser — ready to use immediately
 
 > Safari on iOS does not support opening local HTML files easily. Use Chrome or Edge on all mobile devices.
@@ -151,7 +151,7 @@ Single `.html` file — no build tools, no dependencies, no server required.
 
 ```
 STEWRD Heritage CareLog — Condition Report Digitizer v2
-https://github.com/mightytonylun/heritage-condition-report-copilot
+https://github.com/mightytonylun/stewrd-heritage-carelog
 ```
 
 MIT License — see [LICENSE](../LICENSE)
