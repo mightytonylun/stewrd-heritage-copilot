@@ -18,7 +18,7 @@
 2. Open in any modern browser
 3. Click **▶ Load Demo Assessment** to explore a pre-populated example
 
-**iPad / Android Tablet / Phone:** Download using **Chrome or Edge** from the release page — it opens directly in the browser. For PWA installation: Android users tap Menu → Add to Home Screen in Chrome/Edge; iPad/iPhone users must use Safari (Share → Add to Home Screen). Opening a local HTML file in Safari on iOS is not straightforward, so Chrome or Edge is the recommended starting point on all mobile devices.
+**iPad / iPhone / Android:** Open in **Chrome or Edge** — Safari on iOS does not support opening local HTML files easily. Download the file from the release page and it opens directly in Chrome or Edge, ready to use.
 
 ---
 

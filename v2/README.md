@@ -19,14 +19,11 @@ A non-expert fills a guided 10-section assessment form covering electrical, plum
 
 No installation, no server, no build step required. Everything runs locally — all data is stored in the browser's localStorage, nothing is sent anywhere.
 
-### iPad / Android Tablet / Phone (Recommended)
-1. Download `heritage-copilot-v2.html` from the [release page](https://github.com/mightytonylun/heritage-condition-report-copilot/releases/tag/v2.0-agent2-demo) using **Chrome or Edge** — it opens directly in the browser, ready to use
+### iPad / iPhone / Android (Recommended)
+1. Download `heritage-copilot-v2.html` from the [release page](https://github.com/mightytonylun/heritage-condition-report-copilot/releases/tag/v2.0-agent2-demo) in **Chrome or Edge**
+2. The file opens directly in the browser — ready to use immediately
 
-**To install as a PWA (optional, works offline with app icon):**
-- **Android:** In Chrome or Edge, tap Menu (⋮) → **Add to Home Screen**
-- **iPad / iPhone:** Open the file in **Safari** (required for iOS PWA) → Share → **Add to Home Screen**
-
-> Opening a local HTML file in Safari on iPad/iPhone is not straightforward. The easiest approach on any mobile device is to download directly from the release page in Chrome or Edge.
+> Safari on iOS does not support opening local HTML files easily. Use Chrome or Edge on all mobile devices.
 
 ### Desktop
 Open in Chrome, Edge, Firefox, or Safari. The sidebar layout activates automatically at ≥ 900px wide.
