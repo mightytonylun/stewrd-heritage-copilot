@@ -18,7 +18,7 @@
 2. Open in any modern browser
 3. Click **▶ Load Demo Assessment** to explore a pre-populated example
 
-**iPad / Tablet (recommended):** Open in Safari → Share → Add to Home Screen → installs as a PWA, works offline.
+**iPad / Android Tablet / Phone:** Download using **Chrome or Edge** from the release page — it opens directly in the browser. For PWA installation: Android users tap Menu → Add to Home Screen in Chrome/Edge; iPad/iPhone users must use Safari (Share → Add to Home Screen). Opening a local HTML file in Safari on iOS is not straightforward, so Chrome or Edge is the recommended starting point on all mobile devices.
 
 ---
 
@@ -129,7 +129,7 @@ Single `.html` file — no build tools, no dependencies, no server required.
 |---------|---------|
 | Chrome | Full |
 | Firefox | Full |
-| Safari | Full (PWA on iOS) |
+| Safari | Full (iOS PWA via Add to Home Screen only) |
 | Edge | Full |
 
 Requirements: ES6+, localStorage enabled, camera permissions for photo capture.
