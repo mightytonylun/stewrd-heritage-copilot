@@ -111,21 +111,28 @@
     .sidebar-logo {
       padding: var(--s-5) var(--s-5) var(--s-4);
       border-bottom: 1px solid var(--line);
-      display: flex; flex-direction: column; gap: 3px;
+      display: flex; flex-direction: column; gap: 0;
     }
-    .sidebar-logo-eyebrow {
-      font-size: 10px; letter-spacing: 0.10em; text-transform: uppercase;
-      color: var(--accent); font-weight: 600; display: flex;
-      align-items: center; gap: 6px;
+    .sidebar-brand {
+      display: flex; align-items: center; gap: 10px;
+      margin-bottom: 10px;
     }
-    .sidebar-logo-eyebrow svg { flex-shrink: 0; color: var(--accent); }
+    .sidebar-brand-text { display: flex; flex-direction: column; gap: 2px; }
+    .sidebar-brand-name {
+      font-family: var(--font-serif); font-weight: 500; font-size: 16px;
+      letter-spacing: -0.015em; color: var(--ink); line-height: 1;
+    }
+    .sidebar-brand-sub {
+      font-size: 9.5px; font-weight: 600;
+      letter-spacing: 0.13em; text-transform: uppercase; color: var(--ink-3);
+    }
     .sidebar-logo h1 {
       font-family: var(--font-serif);
-      font-size: 17px; font-weight: 500; letter-spacing: -0.01em;
-      color: var(--ink); line-height: 1.15; margin-top: 2px;
+      font-size: 15px; font-weight: 500; letter-spacing: -0.01em;
+      color: var(--ink-2); line-height: 1.2;
     }
     .sidebar-logo .tagline {
-      font-size: 11px; color: var(--ink-3); letter-spacing: 0.01em;
+      font-size: 11px; color: var(--ink-3); letter-spacing: 0.01em; margin-top: 3px;
     }
     .v-badge {
       display: inline-block;
@@ -306,6 +313,12 @@
     }
     .sec-icon { flex-shrink: 0; color: var(--ink-3); }
     .section-hdr p { font-size: 15px; color: var(--ink-3); margin-top: 4px; }
+    .sec-eyebrow {
+      font-family: var(--font-mono);
+      font-size: 10px; font-weight: 600; letter-spacing: 0.12em;
+      text-transform: uppercase; color: var(--accent);
+      margin-bottom: var(--s-2);
+    }
 
     /* ═══════════════════════════════════════════════════
        CARDS
@@ -321,7 +334,7 @@
     .card-title {
       font-size: 11px; font-weight: 600;
       text-transform: uppercase; letter-spacing: 0.10em;
-      color: var(--accent); margin-bottom: var(--s-4);
+      color: var(--moss); margin-bottom: var(--s-4);
     }
 
     /* ═══════════════════════════════════════════════════
@@ -914,9 +927,19 @@
 ═══════════════════════════════════════════════════ -->
 <aside class="sidebar" id="sidebar">
   <div class="sidebar-logo">
-    <div class="sidebar-logo-eyebrow"><svg width="16" height="14" viewBox="0 0 16 14" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="M1 13 C1 13 1 6 8 2 C15 6 15 13 15 13" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><path d="M4.5 13 L4.5 9 Q4.5 6 8 5 Q11.5 6 11.5 9 L11.5 13" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg> STEWRD Heritage Copilot</div>
-    <h1>Condition Digitizer <span class="v-badge">v2</span></h1>
-    <div class="tagline">Agent 2 of 5 — Field Assessment Tool</div>
+    <div class="sidebar-brand">
+      <svg width="20" height="20" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+        <path d="M6 28 V16 a10 10 0 0 1 20 0 V28" stroke="var(--ink)" stroke-width="2" stroke-linecap="round"/>
+        <path d="M14 28 V19 a2 2 0 0 1 4 0 V28" stroke="var(--ink)" stroke-width="2" stroke-linecap="round"/>
+        <circle cx="16" cy="14" r="1.4" fill="var(--ink)"/>
+      </svg>
+      <div class="sidebar-brand-text">
+        <div class="sidebar-brand-name">STEWRD</div>
+        <div class="sidebar-brand-sub">Heritage Copilot</div>
+      </div>
+    </div>
+    <h1>Condition Report Digitizer</h1>
+    <div class="tagline">Agent 2 · On-site field tool</div>
   </div>
 
   <div class="sidebar-session">
@@ -1529,6 +1552,7 @@ function renderSection(id) {
     </div>` : '';
 
   let html = demoBannerHtml + `<div class="section-hdr">
+    <div class="sec-eyebrow">Section ${sec.id} of ${SECTIONS.length}</div>
     <h2>${sec.icon} ${sec.title}</h2>
     <p>${sec.desc}</p>
   </div>`;
@@ -2283,21 +2307,28 @@ function exportWord() {
     .sidebar-logo {
       padding: var(--s-5) var(--s-5) var(--s-4);
       border-bottom: 1px solid var(--line);
-      display: flex; flex-direction: column; gap: 3px;
+      display: flex; flex-direction: column; gap: 0;
     }
-    .sidebar-logo-eyebrow {
-      font-size: 10px; letter-spacing: 0.10em; text-transform: uppercase;
-      color: var(--accent); font-weight: 600; display: flex;
-      align-items: center; gap: 6px;
+    .sidebar-brand {
+      display: flex; align-items: center; gap: 10px;
+      margin-bottom: 10px;
     }
-    .sidebar-logo-eyebrow svg { flex-shrink: 0; color: var(--accent); }
+    .sidebar-brand-text { display: flex; flex-direction: column; gap: 2px; }
+    .sidebar-brand-name {
+      font-family: var(--font-serif); font-weight: 500; font-size: 16px;
+      letter-spacing: -0.015em; color: var(--ink); line-height: 1;
+    }
+    .sidebar-brand-sub {
+      font-size: 9.5px; font-weight: 600;
+      letter-spacing: 0.13em; text-transform: uppercase; color: var(--ink-3);
+    }
     .sidebar-logo h1 {
       font-family: var(--font-serif);
-      font-size: 17px; font-weight: 500; letter-spacing: -0.01em;
-      color: var(--ink); line-height: 1.15; margin-top: 2px;
+      font-size: 15px; font-weight: 500; letter-spacing: -0.01em;
+      color: var(--ink-2); line-height: 1.2;
     }
     .sidebar-logo .tagline {
-      font-size: 11px; color: var(--ink-3); letter-spacing: 0.01em;
+      font-size: 11px; color: var(--ink-3); letter-spacing: 0.01em; margin-top: 3px;
     }
     .v-badge {
       display: inline-block;
@@ -2478,6 +2509,12 @@ function exportWord() {
     }
     .sec-icon { flex-shrink: 0; color: var(--ink-3); }
     .section-hdr p { font-size: 15px; color: var(--ink-3); margin-top: 4px; }
+    .sec-eyebrow {
+      font-family: var(--font-mono);
+      font-size: 10px; font-weight: 600; letter-spacing: 0.12em;
+      text-transform: uppercase; color: var(--accent);
+      margin-bottom: var(--s-2);
+    }
 
     /* ═══════════════════════════════════════════════════
        CARDS
@@ -2493,7 +2530,7 @@ function exportWord() {
     .card-title {
       font-size: 11px; font-weight: 600;
       text-transform: uppercase; letter-spacing: 0.10em;
-      color: var(--accent); margin-bottom: var(--s-4);
+      color: var(--moss); margin-bottom: var(--s-4);
     }
 
     /* ═══════════════════════════════════════════════════
