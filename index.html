@@ -37,13 +37,14 @@
     }
     .topbar svg { flex-shrink:0; }
     .topbar-name {
-      font-family: var(--font-sans); font-weight: 600; font-size: 14px;
-      letter-spacing: 0.01em; color: var(--ink);
-      line-height: 1.2;
+      font-family: var(--font-serif); font-weight: 500; font-size: 17px;
+      letter-spacing: -0.015em; color: var(--ink);
+      line-height: 1;
     }
     .topbar-name span {
-      display: block; font-weight: 400; font-size: 11px;
-      letter-spacing: 0.12em; text-transform: uppercase; color: var(--ink-3);
+      display: block; font-family: var(--font-sans); font-weight: 510; font-size: 10px;
+      letter-spacing: 0.14em; text-transform: uppercase; color: var(--ink-3);
+      margin-top: 3px;
     }
 
     /* ── Hero ── */
@@ -142,11 +143,10 @@
 <body>
 
   <div class="topbar">
-    <svg width="28" height="28" viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg">
-      <rect x="1" y="14" width="26" height="13" rx="2" stroke="var(--ink)" stroke-width="1.5"/>
-      <path d="M7 14 V8 Q7 2 14 2 Q21 2 21 8 V14" stroke="var(--ink)" stroke-width="1.5" stroke-linecap="round"/>
-      <path d="M1 24 L27 24" stroke="var(--ink)" stroke-width="1.5" stroke-linecap="round"/>
-      <path d="M11 24 L11 17 Q11 14 14 14 Q17 14 17 17 L17 24" stroke="var(--ink)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+    <svg width="28" height="28" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path d="M6 28 V16 a10 10 0 0 1 20 0 V28" stroke="var(--ink)" stroke-width="2" stroke-linecap="round"/>
+      <path d="M14 28 V19 a2 2 0 0 1 4 0 V28" stroke="var(--ink)" stroke-width="2" stroke-linecap="round"/>
+      <circle cx="16" cy="14" r="1.4" fill="var(--ink)"/>
     </svg>
     <div class="topbar-name">
       STEWRD
