@@ -1,0 +1,3408 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Heritage Copilot">
+  <meta name="theme-color" content="#8b3a2f">
+  <title>Heritage Copilot — Agent 2</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=Inter:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+  <style>
+    /* ═══════════════════════════════════════════════════
+       STEWRD DESIGN TOKENS — Custodian Theme
+    ═══════════════════════════════════════════════════ */
+    :root {
+      /* Families */
+      --font-serif: "Fraunces", "Source Serif 4", ui-serif, Georgia, serif;
+      --font-sans:  "Inter", ui-sans-serif, -apple-system, system-ui, sans-serif;
+      --font-mono:  "JetBrains Mono", ui-monospace, "SF Mono", Menlo, monospace;
+
+      /* Spacing (4 px base) */
+      --s-1: 4px;  --s-2: 8px;   --s-3: 12px; --s-4: 16px; --s-5: 20px;
+      --s-6: 24px; --s-7: 32px;  --s-8: 40px; --s-9: 56px;
+
+      /* Radius */
+      --r-xs: 2px; --r-sm: 4px; --r-md: 6px; --r-lg: 10px;
+      --r-xl: 16px; --r-2xl: 22px; --r-full: 9999px;
+
+      /* Condition hues — theme-independent */
+      --cond-good-ink:   #3a6b4a; --cond-good-fill:   #d9e5d4;
+      --cond-fair-ink:   #8a6a2c; --cond-fair-fill:   #efe4cc;
+      --cond-poor-ink:   #a05321; --cond-poor-fill:   #efd9c6;
+      --cond-crit-ink:   #8c2e22; --cond-crit-fill:   #ecd0c9;
+
+      /* Layout */
+      --sidebar-w:    260px;
+      --topbar-h:     56px;
+      --pills-h:      52px;
+      --bottomnav-h:  60px;
+    }
+
+    /* ── Custodian palette ──────────────────── */
+    .theme-custodian {
+      --bg:          #f4efe6;
+      --bg-sunk:     #ebe4d6;
+      --surface:     #fbf8f2;
+      --surface-2:   #f8f3e8;
+      --surface-3:   #ffffff;
+      --ink:         #1a1f2e;
+      --ink-2:       #3b3f4a;
+      --ink-3:       #6b6f78;
+      --ink-4:       #9a9992;
+      --accent:      #8b3a2f;
+      --accent-hi:   #a24937;
+      --accent-lo:   #6e2b22;
+      --accent-wash: rgba(139,58,47,0.08);
+      --moss:        #6b705c;  --moss-wash: rgba(107, 112, 92, 0.10);
+      --line:        rgba(26,31,46,0.10);
+      --line-strong: rgba(26,31,46,0.18);
+      --line-soft:   rgba(26,31,46,0.05);
+      --shadow-sm:   0 1px 2px rgba(40,28,20,0.05);
+      --shadow-md:   0 4px 14px rgba(40,28,20,0.08), 0 1px 2px rgba(40,28,20,0.04);
+      --shadow-lg:   0 18px 40px rgba(40,28,20,0.10), 0 2px 6px rgba(40,28,20,0.06);
+      --focus-ring:  0 0 0 3px rgba(139,58,47,0.18);
+      --cond-good-bg:  var(--cond-good-fill); --cond-good-fg:  var(--cond-good-ink);
+      --cond-fair-bg:  var(--cond-fair-fill); --cond-fair-fg:  var(--cond-fair-ink);
+      --cond-poor-bg:  var(--cond-poor-fill); --cond-poor-fg:  var(--cond-poor-ink);
+      --cond-crit-bg:  var(--cond-crit-fill); --cond-crit-fg:  var(--cond-crit-ink);
+    }
+
+    /* ═══════════════════════════════════════════════════
+       RESET & BASE
+    ═══════════════════════════════════════════════════ */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    html, body {
+      font-feature-settings: "cv01","ss03","ss01";
+      -webkit-font-smoothing: antialiased;
+    }
+
+    body {
+      font-family: var(--font-sans);
+      background: var(--bg);
+      color: var(--ink);
+      line-height: 1.55;
+      min-height: 100vh;
+    }
+
+    button { font-family: inherit; cursor: pointer; }
+    input, select, textarea { font-family: inherit; }
+    a { color: inherit; }
+
+    /* ═══════════════════════════════════════════════════
+       SIDEBAR — Custodian: warm parchment, ink text
+    ═══════════════════════════════════════════════════ */
+    .sidebar {
+      position: fixed; top: 0; left: 0; bottom: 0;
+      width: var(--sidebar-w);
+      background: var(--bg-sunk);
+      color: var(--ink);
+      border-right: 1px solid var(--line-strong);
+      display: flex; flex-direction: column;
+      z-index: 100;
+      overflow-y: auto;
+    }
+
+    .sidebar-logo {
+      padding: var(--s-5) var(--s-5) var(--s-4);
+      border-bottom: 1px solid var(--line);
+      display: flex; flex-direction: column; gap: 3px;
+    }
+    .sidebar-logo-eyebrow {
+      font-size: 10px; letter-spacing: 0.10em; text-transform: uppercase;
+      color: var(--accent); font-weight: 600; display: flex;
+      align-items: center; gap: 6px;
+    }
+    .sidebar-logo-eyebrow svg { flex-shrink: 0; color: var(--accent); }
+    .sidebar-logo h1 {
+      font-family: var(--font-serif);
+      font-size: 17px; font-weight: 500; letter-spacing: -0.01em;
+      color: var(--ink); line-height: 1.15; margin-top: 2px;
+    }
+    .sidebar-logo .tagline {
+      font-size: 11px; color: var(--ink-3); letter-spacing: 0.01em;
+    }
+    .v-badge {
+      display: inline-block;
+      font-family: var(--font-mono);
+      font-size: 10px; background: var(--accent-wash);
+      padding: 1px 6px; border-radius: var(--r-full);
+      margin-left: 4px; vertical-align: middle;
+      font-weight: 400; color: var(--accent);
+      border: 1px solid rgba(139,58,47,0.18);
+    }
+
+    /* Session strip */
+    .sidebar-session {
+      padding: var(--s-3) var(--s-5);
+      border-bottom: 1px solid var(--line);
+    }
+    .session-meta-label {
+      font-size: 10px; text-transform: uppercase; letter-spacing: 0.08em;
+      font-weight: 600; color: var(--ink-4); margin-bottom: 4px;
+    }
+    .session-meta-name {
+      font-size: 13px; font-weight: 590; color: var(--ink);
+      margin-bottom: 8px;
+      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    }
+    .session-btns { display: flex; gap: 6px; }
+    .btn-sess {
+      flex: 1; padding: 5px 8px; font-size: 11px; font-weight: 500;
+      border: 1px solid var(--line-strong);
+      background: var(--surface); color: var(--ink-2);
+      border-radius: var(--r-sm); transition: all .15s;
+    }
+    .btn-sess:hover { background: var(--surface-2); color: var(--ink); border-color: var(--accent); }
+
+    /* Nav items */
+    .sidebar-nav { flex: 1; padding: var(--s-2) 0; overflow-y: auto; }
+    .nav-group-label {
+      font-size: 10px; text-transform: uppercase; letter-spacing: 0.08em;
+      color: var(--ink-4); padding: 10px var(--s-5) 4px; font-weight: 600;
+    }
+    .nav-item {
+      display: flex; align-items: center; gap: var(--s-2);
+      padding: 8px var(--s-4); cursor: pointer;
+      transition: background .12s; position: relative;
+      margin: 1px var(--s-2); border-radius: var(--r-md);
+    }
+    .nav-item:hover  { background: var(--line); }
+    .nav-item.active { background: var(--accent-wash); }
+
+    .nav-num {
+      width: 22px; height: 22px; border-radius: var(--r-sm);
+      background: var(--surface);
+      font-family: var(--font-mono);
+      font-size: 10px; font-weight: 500;
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0;
+      border: 1px solid var(--line-strong);
+      color: var(--ink-3);
+      transition: background .15s;
+    }
+    .nav-item.active  .nav-num { background: var(--accent); border-color: var(--accent); color: var(--surface); }
+    .nav-item.has-data .nav-num { background: var(--surface-2); border-color: var(--line-strong); color: var(--ink-2); }
+
+    .nav-item-text { flex: 1; font-size: 13px; color: var(--ink-2); }
+    .nav-item.active   .nav-item-text { color: var(--accent); font-weight: 600; }
+    .nav-item.has-data .nav-item-text { color: var(--ink); }
+
+    .nav-rating-badge {
+      font-size: 10px; padding: 1px 7px; border-radius: var(--r-full); font-weight: 600;
+    }
+
+    /* Save indicator + export */
+    .sidebar-bottom {
+      padding: var(--s-3) var(--s-4);
+      border-top: 1px solid var(--line);
+    }
+    .save-indicator {
+      font-size: 11px; font-family: var(--font-mono); color: var(--ink-4);
+      text-align: center; margin-bottom: 10px; min-height: 16px;
+      transition: color .3s;
+    }
+    .save-indicator.saved { color: var(--moss); }
+
+    .btn-export-main {
+      display: flex; align-items: center; justify-content: center; gap: 8px;
+      width: 100%; padding: 10px;
+      background: var(--accent); color: var(--surface-3);
+      border: none; border-radius: var(--r-md);
+      font-size: 13px; font-weight: 600;
+      transition: background .15s;
+    }
+    .btn-export-main:hover { background: var(--accent-hi); }
+
+    /* ═══════════════════════════════════════════════════
+       TOPBAR (tablet / mobile)
+    ═══════════════════════════════════════════════════ */
+    .topbar {
+      display: none;
+      position: fixed; top: 0; left: 0; right: 0;
+      height: var(--topbar-h);
+      background: var(--surface);
+      border-bottom: 1px solid var(--line);
+      z-index: 60;
+      align-items: center; justify-content: space-between;
+      padding: 0 var(--s-4);
+    }
+    .topbar-left { display: flex; align-items: center; gap: 10px; }
+    .topbar-logo {
+      font-family: var(--font-serif);
+      font-size: 20px; font-weight: 500; letter-spacing: -0.01em; color: var(--ink);
+    }
+    .topbar-session-name {
+      font-size: 12px; color: var(--ink-3);
+      max-width: 120px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+    }
+    .topbar-actions { display: flex; gap: 8px; }
+    .btn-topbar {
+      padding: 7px 14px; border-radius: var(--r-md);
+      border: none; font-size: 13px; font-weight: 600;
+      transition: all .15s;
+    }
+    .btn-topbar.primary { background: var(--accent); color: var(--surface-3); }
+    .btn-topbar.ghost   { background: var(--bg); color: var(--ink-2); border: 1px solid var(--line-strong); }
+
+    /* ═══════════════════════════════════════════════════
+       PILL STRIP (tablet / mobile)
+    ═══════════════════════════════════════════════════ */
+    .pill-strip-wrap {
+      display: none;
+      position: fixed; top: var(--topbar-h); left: 0; right: 0;
+      z-index: 55;
+      background: var(--surface);
+      border-bottom: 1px solid var(--line);
+      overflow-x: auto; scrollbar-width: none;
+    }
+    .pill-strip-wrap::-webkit-scrollbar { display: none; }
+    .pill-strip { display: flex; gap: 6px; padding: 9px var(--s-4); width: max-content; }
+
+    .pill {
+      padding: 5px 12px; border-radius: var(--r-full);
+      font-size: 12px; font-weight: 510; letter-spacing: 0.01em;
+      background: var(--bg); color: var(--ink-3);
+      border: 1px solid var(--line-strong);
+      transition: all .12s;
+      white-space: nowrap; display: flex; align-items: center; gap: 5px;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .pill.active     { background: var(--accent); border-color: var(--accent); color: var(--surface-3); }
+    .pill.has-data   { border-color: var(--ink-3); color: var(--ink-2); }
+    .pill.active.has-data { background: var(--accent); border-color: var(--accent); color: var(--surface-3); }
+    .pill-dot { width: 5px; height: 5px; border-radius: 50%; background: currentColor; }
+
+    /* ═══════════════════════════════════════════════════
+       MAIN CONTENT
+    ═══════════════════════════════════════════════════ */
+    .main {
+      margin-left: var(--sidebar-w);
+      padding: var(--s-7) var(--s-7) var(--s-8);
+      min-height: 100vh;
+    }
+
+    .section-hdr {
+      margin-bottom: var(--s-5);
+      padding-bottom: var(--s-4);
+      border-bottom: 1px solid var(--line);
+    }
+    .section-hdr h2 {
+      font-family: var(--font-serif);
+      font-size: 28px; font-weight: 500; letter-spacing: -0.02em;
+      color: var(--ink); line-height: 1.1;
+      display: flex; align-items: center; gap: var(--s-3);
+    }
+    .sec-icon { flex-shrink: 0; color: var(--ink-3); }
+    .section-hdr p { font-size: 15px; color: var(--ink-3); margin-top: 4px; }
+
+    /* ═══════════════════════════════════════════════════
+       CARDS
+    ═══════════════════════════════════════════════════ */
+    .card {
+      background: var(--surface);
+      border-radius: var(--r-xl);
+      border: 1px solid var(--line);
+      box-shadow: var(--shadow-sm);
+      padding: var(--s-6);
+      margin-bottom: var(--s-4);
+    }
+    .card-title {
+      font-size: 11px; font-weight: 600;
+      text-transform: uppercase; letter-spacing: 0.10em;
+      color: var(--accent); margin-bottom: var(--s-4);
+    }
+
+    /* ═══════════════════════════════════════════════════
+       FORM FIELDS
+    ═══════════════════════════════════════════════════ */
+    .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: var(--s-4); }
+    .form-grid.cols-1 { grid-template-columns: 1fr; }
+    .form-grid.cols-3 { grid-template-columns: 1fr 1fr 1fr; }
+    .col-span-2 { grid-column: span 2; }
+
+    .field { display: flex; flex-direction: column; gap: 5px; }
+    .field-label {
+      font-size: 12px; font-weight: 510;
+      letter-spacing: 0.01em;
+      color: var(--ink-2);
+    }
+    .field-label .req { color: var(--cond-crit-fg); margin-left: 2px; }
+
+    .field-input, .field-select, .field-textarea {
+      padding: 10px 12px;
+      border: 1px solid var(--line-strong);
+      border-radius: var(--r-md);
+      font-size: 15px; color: var(--ink);
+      background: var(--surface);
+      transition: border-color .15s, box-shadow .15s;
+    }
+    .field-input:focus, .field-select:focus, .field-textarea:focus {
+      outline: none;
+      border-color: var(--accent);
+      box-shadow: var(--focus-ring);
+    }
+    .field-textarea { resize: vertical; min-height: 80px; line-height: 1.55; }
+    .field-select {
+      appearance: none;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' fill='none'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%236b6f78' stroke-width='1.5' stroke-linecap='round'/%3E%3C/svg%3E");
+      background-repeat: no-repeat; background-position: right 12px center; padding-right: 32px;
+    }
+
+    /* Radio & checkbox */
+    .radio-row { display: flex; gap: var(--s-4); flex-wrap: wrap; margin-top: 2px; }
+    .radio-item { display: flex; align-items: center; gap: 7px; cursor: pointer; }
+    .radio-item input { accent-color: var(--accent); width: 16px; height: 16px; }
+    .radio-item label { font-size: 15px; color: var(--ink-2); }
+
+    .check-list { display: flex; flex-direction: column; gap: 10px; margin-top: 2px; }
+    .check-item { display: flex; align-items: center; gap: 10px; cursor: pointer; }
+    .check-item input { accent-color: var(--accent); width: 17px; height: 17px; }
+    .check-item label { font-size: 15px; color: var(--ink-2); }
+
+    /* ═══════════════════════════════════════════════════
+       CONDITION RATING
+    ═══════════════════════════════════════════════════ */
+    .condition-group { margin-bottom: var(--s-5); }
+    .condition-label {
+      font-size: 11px; font-weight: 600;
+      text-transform: uppercase; letter-spacing: 0.07em;
+      color: var(--ink-3); margin-bottom: 10px;
+    }
+    .condition-pills { display: flex; gap: 8px; flex-wrap: wrap; }
+
+    .cond-pill {
+      padding: 7px 14px; border-radius: var(--r-full);
+      border: 1px solid var(--line-strong);
+      font-size: 12px; font-weight: 600; letter-spacing: 0.02em;
+      text-transform: uppercase;
+      background: var(--bg); color: var(--ink-3);
+      transition: border-color .12s, background .12s, color .12s;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .cond-pill:hover            { border-color: var(--accent); color: var(--accent); }
+    .cond-pill.sel-good         { background: var(--cond-good-bg); border-color: var(--cond-good-fg); color: var(--cond-good-fg); }
+    .cond-pill.sel-fair         { background: var(--cond-fair-bg); border-color: var(--cond-fair-fg); color: var(--cond-fair-fg); }
+    .cond-pill.sel-poor         { background: var(--cond-poor-bg); border-color: var(--cond-poor-fg); color: var(--cond-poor-fg); }
+    .cond-pill.sel-critical     { background: var(--cond-crit-bg); border-color: var(--cond-crit-fg); color: var(--cond-crit-fg); }
+    .cond-pill.sel-na           { background: var(--surface-2); border-color: var(--ink-4); color: var(--ink-4); }
+
+    .cond-badge {
+      display: inline-flex; align-items: center; gap: 4px;
+      padding: 2px 10px;
+      border-radius: var(--r-full); font-size: 11px; font-weight: 600;
+    }
+    .cond-badge.good     { background: var(--cond-good-bg); color: var(--cond-good-fg); }
+    .cond-badge.fair     { background: var(--cond-fair-bg); color: var(--cond-fair-fg); }
+    .cond-badge.poor     { background: var(--cond-poor-bg); color: var(--cond-poor-fg); }
+    .cond-badge.critical { background: var(--cond-crit-bg); color: var(--cond-crit-fg); }
+    .cond-badge.na       { background: var(--surface-2); color: var(--ink-4); }
+
+    /* ═══════════════════════════════════════════════════
+       ENTRIES CARD
+    ═══════════════════════════════════════════════════ */
+    .entries-card {
+      background: var(--surface);
+      border-radius: var(--r-xl);
+      border: 1px solid var(--line);
+      box-shadow: var(--shadow-sm);
+      overflow: hidden;
+      margin-bottom: var(--s-4);
+    }
+    .entries-head {
+      padding: var(--s-4) var(--s-6);
+      border-bottom: 1px solid var(--line);
+      background: var(--surface-2);
+      display: flex; align-items: center; justify-content: space-between; gap: 12px;
+    }
+    .entries-head-left { display: flex; align-items: center; gap: 10px; }
+    .entries-head-title { font-size: 14px; font-weight: 590; color: var(--ink); }
+    .entries-count-badge {
+      font-size: 11px; background: var(--bg);
+      padding: 2px 9px; border-radius: var(--r-full); color: var(--ink-3);
+      font-weight: 510; border: 1px solid var(--line);
+    }
+    .btn-add {
+      display: flex; align-items: center; gap: 6px;
+      padding: 7px 13px;
+      background: var(--accent); color: var(--surface-3);
+      border: none; border-radius: var(--r-md);
+      font-size: 12px; font-weight: 600;
+      transition: background .15s;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .btn-add:hover { background: var(--accent-hi); }
+
+    .entry-row {
+      padding: var(--s-4) var(--s-6);
+      border-bottom: 1px solid var(--line-soft);
+      display: flex; align-items: flex-start; gap: 12px;
+      transition: background .4s;
+    }
+    .entry-row:last-child { border-bottom: none; }
+    .entry-row.flash-new  { background: var(--accent-wash); }
+
+    .entry-ref-tag {
+      font-size: 11px; font-weight: 500; font-family: var(--font-mono);
+      background: var(--bg-sunk); padding: 3px 8px;
+      border-radius: var(--r-sm); color: var(--ink-3);
+      flex-shrink: 0; margin-top: 2px;
+      border: 1px solid var(--line);
+    }
+    .entry-body { flex: 1; min-width: 0; }
+    .entry-location { font-size: 13px; font-weight: 590; margin-bottom: 2px; color: var(--ink); }
+    .entry-notes-text {
+      font-size: 13px; color: var(--ink-3); line-height: 1.45; margin-bottom: 6px;
+      display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
+    }
+    .entry-tags { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
+    .entry-photo-strip { display: flex; gap: 5px; margin-top: 8px; flex-wrap: wrap; }
+    .entry-photo-thumb {
+      width: 52px; height: 52px; object-fit: cover;
+      border-radius: var(--r-sm); border: 1px solid var(--line); cursor: pointer;
+    }
+    .entry-photo-more {
+      width: 52px; height: 52px; background: var(--bg);
+      border-radius: var(--r-sm); border: 1px solid var(--line);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 11px; font-weight: 600; color: var(--ink-3); cursor: pointer;
+    }
+
+    .entry-actions { display: flex; gap: 4px; flex-shrink: 0; }
+    .btn-icon {
+      width: 32px; height: 32px;
+      border: 1px solid var(--line); background: var(--surface);
+      border-radius: var(--r-sm);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 14px; transition: background .15s; color: var(--ink-3);
+    }
+    .btn-icon:hover     { background: var(--surface-2); }
+    .btn-icon.del:hover { background: var(--cond-crit-bg); color: var(--cond-crit-fg); }
+
+    .entries-empty {
+      padding: 40px var(--s-6); text-align: center;
+    }
+    .entries-empty-icon { font-size: 36px; margin-bottom: 10px; }
+    .entries-empty p    { font-size: 14px; color: var(--ink-3); }
+
+    .entries-cost-footer {
+      padding: 12px var(--s-6);
+      border-top: 1px solid var(--line);
+      background: var(--bg);
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    .cost-footer-label { font-size: 12px; color: var(--ink-3); }
+    .cost-footer-value {
+      font-family: var(--font-serif);
+      font-size: 20px; font-weight: 500; color: var(--ink);
+    }
+
+    /* Priority badge */
+    .prio-badge {
+      display: inline-block; padding: 2px 9px;
+      border-radius: var(--r-full); font-size: 11px; font-weight: 600;
+    }
+    .prio-badge.urgent    { background: var(--cond-crit-bg); color: var(--cond-crit-fg); }
+    .prio-badge.important { background: var(--cond-fair-bg); color: var(--cond-fair-fg); }
+    .prio-badge.routine   { background: var(--cond-good-bg); color: var(--cond-good-fg); }
+
+    /* ═══════════════════════════════════════════════════
+       SECTION NAV FOOTER
+    ═══════════════════════════════════════════════════ */
+    .sec-nav-footer {
+      display: flex; align-items: center; justify-content: space-between;
+      margin-top: var(--s-7); padding-top: var(--s-5);
+      border-top: 1px solid var(--line);
+    }
+    .btn-nav-step {
+      display: flex; align-items: center; gap: 6px;
+      padding: 9px 18px;
+      background: var(--surface);
+      border: 1px solid var(--line-strong);
+      border-radius: var(--r-md);
+      font-size: 13px; font-weight: 600;
+      color: var(--ink-2); transition: all .15s;
+    }
+    .btn-nav-step:hover             { border-color: var(--accent); color: var(--accent); }
+    .btn-nav-step.fwd               { background: var(--accent); border-color: var(--accent); color: var(--surface-3); }
+    .btn-nav-step.fwd:hover         { background: var(--accent-hi); }
+    .btn-nav-step:disabled          { opacity: 0.35; cursor: not-allowed; pointer-events: none; }
+    .nav-progress-text              { font-size: 12px; color: var(--ink-3); font-weight: 510; }
+
+    /* ═══════════════════════════════════════════════════
+       SUMMARY SECTION
+    ═══════════════════════════════════════════════════ */
+    .summary-stats {
+      display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-bottom: var(--s-4);
+    }
+    .stat-box {
+      background: var(--surface-2); border-radius: var(--r-lg);
+      padding: var(--s-4); text-align: center; border: 1px solid var(--line);
+    }
+    .stat-value {
+      font-family: var(--font-serif);
+      font-size: 34px; font-weight: 500; line-height: 1; color: var(--ink);
+    }
+    .stat-label {
+      font-size: 11px; color: var(--ink-3); margin-top: 5px;
+      text-transform: uppercase; letter-spacing: 0.08em; font-weight: 600;
+    }
+
+    /* ═══════════════════════════════════════════════════
+       DRAWER OVERLAY & ENTRY DRAWER
+    ═══════════════════════════════════════════════════ */
+    .drawer-overlay {
+      position: fixed; inset: 0; background: rgba(0,0,0,0.4);
+      z-index: 200; opacity: 0; pointer-events: none; transition: opacity .3s;
+    }
+    .drawer-overlay.on { opacity: 1; pointer-events: all; }
+
+    .entry-drawer {
+      position: fixed; bottom: 0; left: 0; right: 0;
+      background: var(--surface);
+      border-top: 2px solid var(--accent);
+      box-shadow: var(--shadow-lg);
+      z-index: 201; max-height: 92vh; overflow-y: auto;
+      transform: translateY(100%);
+      transition: transform .3s cubic-bezier(0.32,0.72,0,1);
+      padding-bottom: env(safe-area-inset-bottom, 20px);
+    }
+    .entry-drawer.open { transform: translateY(0); }
+
+    .drawer-handle {
+      width: 40px; height: 4px; background: var(--line-strong);
+      border-radius: var(--r-full); margin: 12px auto 0;
+    }
+    .drawer-hdr {
+      padding: var(--s-4) var(--s-5);
+      border-bottom: 1px solid var(--line);
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    .drawer-hdr-title {
+      font-family: var(--font-serif);
+      font-size: 20px; font-weight: 500; color: var(--ink);
+    }
+    .btn-drawer-close {
+      width: 30px; height: 30px;
+      background: var(--bg); border: 1px solid var(--line);
+      border-radius: 50%;
+      font-size: 14px; color: var(--ink-3);
+      display: flex; align-items: center; justify-content: center;
+    }
+
+    .drawer-body { padding: var(--s-5); }
+    .drawer-ref-hint { font-size: 12px; color: var(--ink-3); margin-bottom: 4px; }
+    .drawer-ref-display {
+      font-family: var(--font-mono);
+      font-size: 22px; font-weight: 500;
+      color: var(--ink-2); margin-bottom: var(--s-5);
+    }
+
+    .drawer-footer {
+      padding: var(--s-4) var(--s-5);
+      border-top: 1px solid var(--line);
+      display: flex; gap: 10px;
+    }
+    .btn-drawer-save {
+      flex: 1; padding: 13px;
+      background: var(--accent); color: var(--surface-3);
+      border: none; border-radius: var(--r-md);
+      font-size: 15px; font-weight: 600;
+      transition: background .15s;
+    }
+    .btn-drawer-save:hover { background: var(--accent-hi); }
+    .btn-drawer-cancel {
+      padding: 13px var(--s-5);
+      background: var(--bg);
+      border: 1px solid var(--line-strong);
+      border-radius: var(--r-md);
+      font-size: 15px; font-weight: 510;
+      color: var(--ink-2);
+    }
+
+    /* ═══════════════════════════════════════════════════
+       CAMERA
+    ═══════════════════════════════════════════════════ */
+    .camera-zone { margin-bottom: var(--s-5); }
+    .camera-zone .field-label { margin-bottom: 8px; }
+    .camera-btns { display: flex; gap: 8px; }
+    .btn-cam {
+      flex: 1; padding: 10px 8px;
+      border: 1px dashed var(--line-strong);
+      background: var(--bg); border-radius: var(--r-md);
+      font-size: 13px; color: var(--ink-3);
+      transition: all .15s;
+      display: flex; align-items: center; justify-content: center; gap: 6px;
+    }
+    .btn-cam:hover { border-color: var(--accent); color: var(--accent); }
+    .photo-strip-preview { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 10px; }
+    .photo-thumb-wrap { position: relative; }
+    .photo-thumb {
+      width: 72px; height: 72px; object-fit: cover;
+      border-radius: var(--r-sm); border: 1px solid var(--line); display: block;
+    }
+    .photo-remove-btn {
+      position: absolute; top: -5px; right: -5px;
+      width: 18px; height: 18px;
+      background: var(--cond-crit-fg); color: var(--surface-3);
+      border: none; border-radius: 50%; font-size: 10px;
+      display: flex; align-items: center; justify-content: center;
+    }
+
+    .camera-modal {
+      position: fixed; inset: 0; background: #000;
+      z-index: 300; display: none; flex-direction: column; align-items: stretch;
+    }
+    .camera-modal.open { display: flex; }
+    .camera-video { flex: 1; width: 100%; object-fit: cover; }
+    .camera-controls-bar {
+      padding: 20px 30px; background: rgba(0,0,0,0.85);
+      display: flex; align-items: center; justify-content: space-between;
+      padding-bottom: calc(20px + env(safe-area-inset-bottom, 0px));
+    }
+    .btn-cam-action {
+      padding: 10px 20px; background: rgba(255,255,255,0.2);
+      color: #fff; border: none; border-radius: var(--r-md); font-size: 14px;
+    }
+    .btn-shutter {
+      width: 66px; height: 66px; border-radius: 50%;
+      background: var(--surface-3); border: 5px solid rgba(255,255,255,0.4);
+      transition: transform .1s;
+    }
+    .btn-shutter:active { transform: scale(0.9); }
+
+    /* ═══════════════════════════════════════════════════
+       MODALS
+    ═══════════════════════════════════════════════════ */
+    .modal-overlay {
+      position: fixed; inset: 0; background: rgba(0,0,0,0.4);
+      z-index: 400; display: none;
+      align-items: center; justify-content: center; padding: 20px;
+    }
+    .modal-overlay.open { display: flex; }
+
+    .modal-box {
+      background: var(--surface);
+      border-radius: var(--r-xl); padding: var(--s-6);
+      max-width: 380px; width: 100%;
+      box-shadow: var(--shadow-lg);
+      border: 1px solid var(--line);
+    }
+    .modal-box h3 {
+      font-family: var(--font-serif);
+      font-size: 20px; font-weight: 500; margin-bottom: 8px; color: var(--ink);
+    }
+    .modal-box p  { font-size: 14px; color: var(--ink-3); margin-bottom: var(--s-5); }
+    .modal-actions { display: flex; gap: 10px; justify-content: flex-end; }
+    .btn-modal-cancel {
+      padding: 9px 18px; background: var(--bg);
+      border: 1px solid var(--line-strong);
+      border-radius: var(--r-md); font-size: 14px; color: var(--ink-2);
+    }
+    .btn-modal-ok {
+      padding: 9px 18px; background: var(--cond-crit-fg);
+      color: var(--surface-3); border: none; border-radius: var(--r-md);
+      font-size: 14px; font-weight: 600;
+    }
+    .btn-modal-ok.safe { background: var(--accent); }
+
+    .session-modal-box { max-width: 440px; }
+    .session-list-wrap {
+      border: 1px solid var(--line); border-radius: var(--r-md); overflow: hidden;
+      max-height: 280px; overflow-y: auto; margin-bottom: var(--s-4);
+    }
+    .sess-item {
+      display: flex; align-items: center; gap: 10px;
+      padding: 12px var(--s-4); border-bottom: 1px solid var(--line);
+      transition: background .15s;
+    }
+    .sess-item:last-child { border-bottom: none; }
+    .sess-item:hover { background: var(--bg); }
+    .sess-item-info { flex: 1; }
+    .sess-item-name { font-size: 14px; font-weight: 590; color: var(--ink); }
+    .sess-item-date {
+      font-family: var(--font-mono);
+      font-size: 11px; color: var(--ink-3); margin-top: 1px;
+    }
+    .btn-sess-del {
+      width: 26px; height: 26px; background: none; border: none;
+      color: var(--ink-4); border-radius: var(--r-sm); font-size: 14px;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .btn-sess-del:hover { background: var(--cond-crit-bg); color: var(--cond-crit-fg); }
+    .sess-modal-btns { display: flex; gap: 8px; }
+    .btn-sess-action {
+      flex: 1; padding: 10px;
+      border: 1px solid var(--line-strong); border-radius: var(--r-md);
+      background: var(--bg); font-size: 13px; font-weight: 600;
+      transition: all .15s; color: var(--ink-2);
+    }
+    .btn-sess-action:hover { border-color: var(--accent); color: var(--accent); }
+    .btn-sess-action.new-sess { background: var(--accent); color: var(--surface-3); border-color: var(--accent); }
+    .btn-sess-action.new-sess:hover { background: var(--accent-hi); }
+
+    .export-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: var(--s-4); }
+    .export-opt {
+      padding: var(--s-4); border: 1px solid var(--line);
+      border-radius: var(--r-lg); text-align: center;
+      transition: all .15s; background: var(--surface);
+    }
+    .export-opt:hover { border-color: var(--accent); background: var(--accent-wash); }
+    .export-opt-icon  { font-size: 26px; margin-bottom: 6px; }
+    .export-opt-label { font-size: 13px; font-weight: 590; color: var(--ink); }
+    .export-opt-desc  { font-size: 11px; color: var(--ink-3); margin-top: 2px; }
+
+    /* ═══════════════════════════════════════════════════
+       TOAST
+    ═══════════════════════════════════════════════════ */
+    .toast {
+      position: fixed; bottom: 80px; left: 50%;
+      transform: translateX(-50%) translateY(16px);
+      background: var(--ink); color: var(--surface-3);
+      padding: 11px 24px; border-radius: var(--r-full);
+      font-size: 14px; font-weight: 510;
+      opacity: 0; transition: all .3s;
+      z-index: 600; white-space: nowrap; pointer-events: none;
+    }
+    .toast.success { background: var(--ink); }
+    .toast.warn    { background: var(--cond-fair-fg); }
+    .toast.show    { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+    /* Cost prefix */
+    .cost-wrap { position: relative; }
+    .cost-wrap::before {
+      content: '$'; position: absolute; left: 12px;
+      top: 50%; transform: translateY(-50%);
+      font-size: 14px; color: var(--ink-3); pointer-events: none;
+    }
+    .cost-wrap input { padding-left: 26px; }
+
+    /* ═══════════════════════════════════════════════════
+       DEMO BANNER
+    ═══════════════════════════════════════════════════ */
+    .demo-banner {
+      background: var(--accent-wash);
+      border: 1px solid rgba(139,58,47,0.15);
+      border-left: 3px solid var(--accent);
+      color: var(--ink);
+      padding: var(--s-3) var(--s-5);
+      display: flex; align-items: center; justify-content: space-between;
+      gap: 12px; margin-bottom: var(--s-5);
+      border-radius: var(--r-lg);
+    }
+    .demo-banner-left { display: flex; align-items: center; gap: 10px; }
+    .demo-badge {
+      font-family: var(--font-mono);
+      font-size: 10px; font-weight: 500; letter-spacing: 0.05em;
+      background: var(--accent); color: var(--surface-3);
+      padding: 2px 8px; border-radius: var(--r-xs);
+    }
+    .demo-banner-text { font-size: 13px; line-height: 1.4; color: var(--ink-2); }
+    .demo-banner-text strong { font-weight: 600; color: var(--ink); }
+    .demo-banner-text span   { font-size: 12px; color: var(--ink-3); }
+    .btn-demo-dismiss {
+      background: var(--surface); border: 1px solid var(--line-strong);
+      color: var(--ink-2); padding: 5px 12px; border-radius: var(--r-sm);
+      font-size: 12px; font-weight: 500;
+      white-space: nowrap; flex-shrink: 0;
+    }
+    .btn-demo-dismiss:hover { border-color: var(--accent); color: var(--accent); }
+    .btn-load-demo {
+      background: var(--accent); border: none;
+      color: var(--surface-3); padding: 5px 12px; border-radius: var(--r-sm);
+      font-size: 12px; font-weight: 600;
+      white-space: nowrap; flex-shrink: 0;
+    }
+    .btn-load-demo:hover { background: var(--accent-hi); }
+
+    /* ═══════════════════════════════════════════════════
+       STEWRD PIPELINE
+    ═══════════════════════════════════════════════════ */
+    .stewrd-pipeline {
+      padding: var(--s-3) var(--s-4) var(--s-4);
+      border-top: 1px solid var(--line-soft);
+    }
+    .pipeline-label {
+      font-size: 10px; text-transform: uppercase; letter-spacing: 0.10em;
+      color: var(--ink-4); margin-bottom: 8px; font-weight: 600;
+    }
+    .pipeline-steps { display: flex; flex-direction: column; gap: 3px; }
+    .pipeline-step {
+      display: flex; align-items: center; gap: 8px;
+      font-size: 11px; color: var(--ink-4); padding: 4px 0;
+    }
+    .pipeline-step.current { color: var(--ink); font-weight: 600; }
+    .pipeline-step.done    { color: var(--moss); }
+    .pipeline-step-num {
+      width: 16px; height: 16px; border-radius: var(--r-xs);
+      background: var(--surface); border: 1px solid var(--line);
+      font-family: var(--font-mono); font-size: 9px; font-weight: 500;
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0; color: var(--ink-4);
+    }
+    .pipeline-step.current .pipeline-step-num {
+      background: var(--accent); border-color: var(--accent); color: var(--surface-3);
+    }
+    .pipeline-step.done .pipeline-step-num {
+      background: var(--moss-wash); border-color: var(--moss); color: var(--moss);
+    }
+    .pipeline-connector {
+      width: 1px; height: 6px; background: var(--line); margin-left: 7px;
+    }
+
+    /* ═══════════════════════════════════════════════════
+       RESPONSIVE
+    ═══════════════════════════════════════════════════ */
+    @media (max-width: 900px) {
+      .sidebar          { display: none; }
+      .topbar           { display: flex; }
+      .pill-strip-wrap  { display: block; }
+
+      .main {
+        margin-left: 0; padding: var(--s-4);
+        padding-top: calc(var(--topbar-h) + var(--pills-h) + var(--s-4));
+        padding-bottom: calc(var(--bottomnav-h) + var(--s-4));
+      }
+
+      .sec-nav-footer {
+        position: fixed; bottom: 0; left: 0; right: 0;
+        background: var(--surface); border-top: 1px solid var(--line);
+        padding: 10px var(--s-4);
+        padding-bottom: calc(10px + env(safe-area-inset-bottom, 0px));
+        margin-top: 0; z-index: 50;
+      }
+
+      .form-grid       { grid-template-columns: 1fr; }
+      .col-span-2      { grid-column: span 1; }
+      .form-grid.cols-3 { grid-template-columns: 1fr 1fr; }
+      .summary-stats   { grid-template-columns: 1fr 1fr; }
+      .export-grid     { grid-template-columns: 1fr; }
+    }
+    @media (max-width: 480px) {
+      .form-grid.cols-3 { grid-template-columns: 1fr; }
+      .condition-pills  { gap: 6px; }
+      .cond-pill        { padding: 7px 13px; font-size: 12px; }
+    }
+
+    /* ═══════════════════════════════════════════════════
+       PRINT
+    ═══════════════════════════════════════════════════ */
+    @media print {
+      .sidebar, .topbar, .pill-strip-wrap, .sec-nav-footer,
+      .btn-add, .entry-actions, .drawer-overlay, .entry-drawer,
+      .modal-overlay, .camera-modal, .toast { display: none !important; }
+      .main { margin: 0; padding: var(--s-4); }
+      .card, .entries-card { break-inside: avoid; page-break-inside: avoid; }
+    }
+  </style>
+</head>
+<body class="theme-custodian">
+
+<!-- ═══════════════════════════════════════════════════
+     SIDEBAR (desktop)
+═══════════════════════════════════════════════════ -->
+<aside class="sidebar" id="sidebar">
+  <div class="sidebar-logo">
+    <div class="sidebar-logo-eyebrow"><svg width="16" height="14" viewBox="0 0 16 14" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="M1 13 C1 13 1 6 8 2 C15 6 15 13 15 13" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><path d="M4.5 13 L4.5 9 Q4.5 6 8 5 Q11.5 6 11.5 9 L11.5 13" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg> STEWRD Heritage Copilot</div>
+    <h1>Condition Digitizer <span class="v-badge">v2</span></h1>
+    <div class="tagline">Agent 2 of 5 — Field Assessment Tool</div>
+  </div>
+
+  <div class="sidebar-session">
+    <div class="session-meta-label">Current Assessment</div>
+    <div class="session-meta-name" id="sidebarSessionName">Untitled Assessment</div>
+    <div class="session-btns">
+      <button class="btn-sess" onclick="openSessionModal()"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg> Sessions</button>
+      <button class="btn-sess" onclick="saveSessionAs()"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19 21H5a2 2 0 01-2-2V5a2 2 0 012-2h11l5 5v11a2 2 0 01-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg> Save As</button>
+    </div>
+    <div style="margin-top:8px;">
+      <button class="btn-sess" style="width:100%;justify-content:center;display:flex;border-color:var(--accent-lo);color:var(--accent);" onclick="loadSampleData()"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polygon points="5 3 19 12 5 21 5 3"/></svg> Load Demo</button>
+    </div>
+  </div>
+
+  <nav class="sidebar-nav" id="sidebarNav"></nav>
+
+  <div class="sidebar-bottom">
+    <div class="save-indicator" id="saveIndicator">—</div>
+    <button class="btn-export-main" onclick="openExportModal()"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg> Export Report</button>
+  </div>
+
+  <!-- STEWRD Pipeline -->
+  <div class="stewrd-pipeline">
+    <div class="pipeline-label">STEWRD Pipeline</div>
+    <div class="pipeline-steps">
+      <div class="pipeline-step current">
+        <div class="pipeline-step-num">2</div>
+        Condition Digitizer
+      </div>
+      <div class="pipeline-connector"></div>
+      <div class="pipeline-step">
+        <div class="pipeline-step-num">1</div>
+        Condition Assessor (AI)
+      </div>
+      <div class="pipeline-connector"></div>
+      <div class="pipeline-step">
+        <div class="pipeline-step-num">3</div>
+        Urgency Ranker
+      </div>
+      <div class="pipeline-connector"></div>
+      <div class="pipeline-step">
+        <div class="pipeline-step-num">4</div>
+        Archive Organiser
+      </div>
+      <div class="pipeline-connector"></div>
+      <div class="pipeline-step">
+        <div class="pipeline-step-num">5</div>
+        Narrative Generator
+      </div>
+    </div>
+  </div>
+</aside>
+
+<!-- ═══════════════════════════════════════════════════
+     TOPBAR (tablet/mobile)
+═══════════════════════════════════════════════════ -->
+<header class="topbar" id="topbar">
+  <div class="topbar-left">
+    <div class="topbar-logo">STEWRD</div>
+    <div class="topbar-session-name" id="topbarSessionName">Untitled</div>
+  </div>
+  <div class="topbar-actions">
+    <button class="btn-topbar ghost" onclick="loadSampleData()">Demo</button>
+    <button class="btn-topbar ghost" onclick="openSessionModal()">Sessions</button>
+    <button class="btn-topbar primary" onclick="openExportModal()">Export</button>
+  </div>
+</header>
+
+<!-- ═══════════════════════════════════════════════════
+     PILL STRIP (tablet/mobile)
+═══════════════════════════════════════════════════ -->
+<div class="pill-strip-wrap" id="pillStripWrap">
+  <div class="pill-strip" id="pillStrip"></div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════
+     MAIN CONTENT
+═══════════════════════════════════════════════════ -->
+<main class="main" id="mainContent">
+  <!-- Rendered by JS -->
+</main>
+
+<!-- ═══════════════════════════════════════════════════
+     ENTRY DRAWER (slide-up)
+═══════════════════════════════════════════════════ -->
+<div class="drawer-overlay" id="drawerOverlay" onclick="closeDrawer()"></div>
+<div class="entry-drawer" id="entryDrawer">
+  <div class="drawer-handle"></div>
+  <div class="drawer-hdr">
+    <div class="drawer-hdr-title" id="drawerTitle">Add Entry</div>
+    <button class="btn-drawer-close" onclick="closeDrawer()">✕</button>
+  </div>
+  <div class="drawer-body" id="drawerBody"></div>
+  <div class="drawer-footer">
+    <button class="btn-drawer-cancel" onclick="closeDrawer()">Cancel</button>
+    <button class="btn-drawer-save" id="drawerSaveBtn" onclick="saveDrawerEntry()">Save Entry</button>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════
+     CAMERA MODAL
+═══════════════════════════════════════════════════ -->
+<div class="camera-modal" id="cameraModal">
+  <video class="camera-video" id="cameraVideo" autoplay playsinline muted></video>
+  <div class="camera-controls-bar">
+    <button class="btn-cam-action" onclick="closeCamera()">Cancel</button>
+    <button class="btn-shutter" id="shutterBtn" onclick="capturePhoto()"></button>
+    <button class="btn-cam-action" onclick="switchCamera()">Flip</button>
+  </div>
+  <canvas id="cameraCanvas" style="display:none"></canvas>
+</div>
+
+<!-- ═══════════════════════════════════════════════════
+     CONFIRM MODAL
+═══════════════════════════════════════════════════ -->
+<div class="modal-overlay" id="confirmModal">
+  <div class="modal-box">
+    <h3 id="confirmTitle">Are you sure?</h3>
+    <p id="confirmMsg">This action cannot be undone.</p>
+    <div class="modal-actions">
+      <button class="btn-modal-cancel" onclick="resolveConfirm(false)">Cancel</button>
+      <button class="btn-modal-ok" id="confirmOkBtn" onclick="resolveConfirm(true)">Confirm</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════
+     SESSION MODAL
+═══════════════════════════════════════════════════ -->
+<div class="modal-overlay" id="sessionModal">
+  <div class="modal-box session-modal-box">
+    <h3>Saved Assessments</h3>
+    <div class="session-list-wrap" id="sessionListWrap"></div>
+    <div class="sess-modal-btns">
+      <button class="btn-sess-action new-sess" onclick="newSession()">+ New Assessment</button>
+      <button class="btn-sess-action" onclick="saveSessionAs()">Save Current As…</button>
+      <button class="btn-modal-cancel" onclick="closeSessionModal()">Close</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════
+     EXPORT MODAL
+═══════════════════════════════════════════════════ -->
+<div class="modal-overlay" id="exportModal">
+  <div class="modal-box">
+    <h3>Export Report</h3>
+    <p>Choose a format to export your assessment data.</p>
+    <div class="export-grid">
+      <div class="export-opt" onclick="exportWord(); closeExportModal();">
+        <div class="export-opt-icon"><svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg></div>
+        <div class="export-opt-label">Word / HTML</div>
+        <div class="export-opt-desc">Copy tables into Word</div>
+      </div>
+      <div class="export-opt" onclick="exportJSON(); closeExportModal();">
+        <div class="export-opt-icon"><svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/><line x1="12" y1="2" x2="12" y2="22" opacity="0.4"/></svg></div>
+        <div class="export-opt-label">JSON</div>
+        <div class="export-opt-desc">Full data backup</div>
+      </div>
+      <div class="export-opt" onclick="exportCSV(); closeExportModal();">
+        <div class="export-opt-icon"><svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="3" y1="15" x2="21" y2="15"/><line x1="9" y1="3" x2="9" y2="21"/><line x1="15" y1="3" x2="15" y2="21"/></svg></div>
+        <div class="export-opt-label">CSV</div>
+        <div class="export-opt-desc">Entries spreadsheet</div>
+      </div>
+      <div class="export-opt" onclick="window.print(); closeExportModal();">
+        <div class="export-opt-icon"><svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 01-2-2v-5a2 2 0 012-2h16a2 2 0 012 2v5a2 2 0 01-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg></div>
+        <div class="export-opt-label">Print / PDF</div>
+        <div class="export-opt-desc">Browser print dialog</div>
+      </div>
+    </div>
+    <div class="modal-actions">
+      <button class="btn-modal-cancel" onclick="closeExportModal()">Close</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════
+     PHOTO LIGHTBOX
+═══════════════════════════════════════════════════ -->
+<div class="modal-overlay" id="lightboxModal" onclick="closeLightbox()" style="background:rgba(0,0,0,0.88);">
+  <img id="lightboxImg" src="" alt="Photo" style="max-width:90vw;max-height:90vh;border-radius:8px;display:block;">
+</div>
+
+<!-- Toast -->
+<div class="toast" id="toast"></div>
+
+<!-- Hidden file input for gallery upload -->
+<input type="file" id="filePhotoInput" accept="image/*" multiple style="display:none">
+
+<!-- ═══════════════════════════════════════════════════
+     JAVASCRIPT
+═══════════════════════════════════════════════════ -->
+<script>
+'use strict';
+
+/* ═══════════════════════════════════════════════════
+   SECTION DEFINITIONS
+═══════════════════════════════════════════════════ */
+const SECTIONS = [
+  {
+    id: 1, title: 'Property Details', icon: '<svg class="sec-icon" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 9.5L12 3l9 6.5V20a1 1 0 01-1 1H4a1 1 0 01-1-1V9.5z"/><path d="M9 21V12h6v9"/></svg>',
+    type: 'form', desc: 'Basic property and inspection information',
+    fields: [
+      { key: 'address',          label: 'Property Address',       type: 'textarea',  span: 2, req: true },
+      { key: 'date',             label: 'Inspection Date',        type: 'date',      req: true },
+      { key: 'inspector',        label: 'Inspector Name',         type: 'text',      req: true },
+      { key: 'client',           label: 'Client / Owner',         type: 'text' },
+      { key: 'buildingType',     label: 'Building Type',          type: 'select',    options: ['—', 'Residential', 'Commercial', 'Industrial', 'Institutional', 'Religious', 'Other'] },
+      { key: 'heritageOverlay',  label: 'Heritage Overlay / HO',  type: 'text',      placeholder: 'e.g. HO102' },
+      { key: 'constructionYear', label: 'Year Built (approx.)',    type: 'text',      placeholder: 'e.g. 1920' },
+      { key: 'storeys',          label: 'No. of Storeys',         type: 'number',    placeholder: '2' },
+      { key: 'occupancy',        label: 'Current Occupancy',      type: 'select',    options: ['—', 'Owner-occupied', 'Tenanted', 'Vacant', 'Commercial use', 'Mixed use'] },
+      { key: 'constructionType', label: 'Primary Construction',   type: 'text',      placeholder: 'e.g. Brick, Timber frame' },
+      { key: 'roofType',         label: 'Roof Type',              type: 'text',      placeholder: 'e.g. Terracotta tile, Corrugated iron' },
+      { key: 'notes',            label: 'General Notes',          type: 'textarea',  span: 2 },
+    ]
+  },
+  {
+    id: 2, title: 'Electrical', icon: '<svg class="sec-icon" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M13 2L4 14h7l-1 8 9.5-12H13L13 2z"/></svg>',
+    type: 'form+condition', desc: 'Electrical systems condition and notes',
+    condKey: 'overallCondition',
+    fields: [
+      { key: 'rcdPresent',      label: 'RCD / Safety Switch',     type: 'radio', options: ['Yes', 'No', 'Unknown'] },
+      { key: 'meterboard',      label: 'Meterboard Condition',    type: 'text', placeholder: 'e.g. Original fuse board, modern CB panel' },
+      { key: 'wiringType',      label: 'Wiring Type',             type: 'text', placeholder: 'e.g. Cloth-sheathed, TPS, conduit' },
+      { key: 'lastTestDate',    label: 'Last Electrical Test',    type: 'text', placeholder: 'e.g. 2022 or Unknown' },
+      { key: 'externalServices',label: 'External Services',       type: 'text', placeholder: 'Overhead / underground' },
+      { key: 'notes',           label: 'Notes & Observations',    type: 'textarea', span: 2 },
+    ]
+  },
+  {
+    id: 3, title: 'Plumbing', icon: '<svg class="sec-icon" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 2c0 0-7 8-7 13a7 7 0 0014 0c0-5-7-13-7-13z"/></svg>',
+    type: 'form+condition', desc: 'Plumbing and drainage systems',
+    condKey: 'overallCondition',
+    fields: [
+      { key: 'waterPressure',   label: 'Water Pressure',          type: 'radio', options: ['Good', 'Low', 'Inconsistent', 'Unknown'] },
+      { key: 'mainMaterial',    label: 'Pipe Material',           type: 'text', placeholder: 'e.g. Copper, galvanised, PVC' },
+      { key: 'hotWaterSystem',  label: 'Hot Water System',        type: 'text', placeholder: 'e.g. Gas storage, electric, solar' },
+      { key: 'drainageType',    label: 'Drainage',                type: 'text', placeholder: 'e.g. Sewer, septic' },
+      { key: 'visibleLeaks',    label: 'Visible Leaks / Stains',  type: 'radio', options: ['Yes', 'No'] },
+      { key: 'notes',           label: 'Notes & Observations',    type: 'textarea', span: 2 },
+    ]
+  },
+  {
+    id: 4, title: 'Moisture & Ventilation', icon: '<svg class="sec-icon" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 2c0 0-6 7-6 12a6 6 0 0012 0c0-5-6-12-6-12z"/><path d="M9 14c0 1.66 1.34 3 3 3"/></svg>',
+    type: 'form+condition', desc: 'Dampness, condensation and ventilation assessment',
+    condKey: 'overallCondition',
+    fields: [
+      { key: 'dampnessPresent', label: 'Dampness Present',        type: 'radio', options: ['Yes', 'No', 'Suspected'] },
+      { key: 'dampnessType',    label: 'Type of Dampness',        type: 'text', placeholder: 'e.g. Rising damp, condensation, penetrating' },
+      { key: 'ventilationType', label: 'Ventilation Type',        type: 'text', placeholder: 'e.g. Natural, mechanical, passive' },
+      { key: 'subfloorVent',    label: 'Sub-floor Ventilation',   type: 'radio', options: ['Adequate', 'Inadequate', 'N/A'] },
+      { key: 'mouldPresent',    label: 'Mould Present',           type: 'radio', options: ['Yes', 'No'] },
+      { key: 'notes',           label: 'Notes & Observations',    type: 'textarea', span: 2 },
+    ]
+  },
+  {
+    id: 5, title: 'Hazardous Materials', icon: '<svg class="sec-icon" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>',
+    type: 'form+condition', desc: 'Identification of hazardous materials on site',
+    condKey: 'riskLevel',
+    condOptions: ['Low', 'Medium', 'High', 'Critical'],
+    condLabel: 'Overall Risk Level',
+    fields: [
+      { key: 'asbestos',        label: 'Asbestos / ACM',          type: 'radio', options: ['Present', 'Suspected', 'Not identified', 'Unknown'] },
+      { key: 'asbestosNotes',   label: 'Asbestos Notes',          type: 'text', placeholder: 'Location, condition, type if known' },
+      { key: 'leadPaint',       label: 'Lead Paint',              type: 'radio', options: ['Present', 'Suspected', 'Not identified', 'Unknown'] },
+      { key: 'leadNotes',       label: 'Lead Paint Notes',        type: 'text', placeholder: 'Locations, condition' },
+      { key: 'otherHazards',    label: 'Other Hazardous Materials', type: 'text', placeholder: 'e.g. Urea formaldehyde foam, chemical storage' },
+      { key: 'remediationReq',  label: 'Remediation Required',    type: 'radio', options: ['Yes — urgent', 'Yes — planned', 'No', 'Further assessment needed'] },
+      { key: 'notes',           label: 'Notes & Observations',    type: 'textarea', span: 2 },
+    ]
+  },
+  {
+    id: 6, title: 'Structural', icon: '<svg class="sec-icon" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 21h18M3 18h18M5 18V8M9 18V8M15 18V8M19 18V8M3 8l9-4 9 4"/></svg>',
+    type: 'form+condition', desc: 'Structural integrity and movement assessment',
+    condKey: 'overallCondition',
+    fields: [
+      { key: 'foundationType',  label: 'Foundation Type',         type: 'text', placeholder: 'e.g. Bluestone, concrete slab, stumps' },
+      { key: 'foundationCond',  label: 'Foundation Condition',    type: 'radio', options: ['Good', 'Fair', 'Poor', 'Critical'] },
+      { key: 'wallConstruction',label: 'Wall Construction',       type: 'text', placeholder: 'e.g. Double brick, timber stud, rendered' },
+      { key: 'cracksPresent',   label: 'Cracking Present',        type: 'radio', options: ['None', 'Minor', 'Moderate', 'Significant'] },
+      { key: 'crackNotes',      label: 'Crack Description',       type: 'text', placeholder: 'Location, type, width if known' },
+      { key: 'movement',        label: 'Evidence of Movement',    type: 'radio', options: ['None', 'Historic / Stable', 'Active'] },
+      { key: 'floorCondition',  label: 'Floor Structure',         type: 'radio', options: ['Good', 'Fair', 'Poor', 'Critical', 'N/A'] },
+      { key: 'roofStructure',   label: 'Roof Structure',          type: 'radio', options: ['Good', 'Fair', 'Poor', 'Critical'] },
+      { key: 'notes',           label: 'Notes & Observations',    type: 'textarea', span: 2 },
+    ]
+  },
+  {
+    id: 7, title: 'Exterior Elements', icon: '<svg class="sec-icon" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>',
+    type: 'complex', desc: 'Grouped assessment of roof, elevations and external fabric',
+    refPrefix: 'EE', locationLabel: 'Location / Element',
+    locationPlaceholder: 'e.g. North Elevation, Roof, East Chimney',
+  },
+  {
+    id: 8, title: 'Interior Spaces', icon: '<svg class="sec-icon" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polygon points="12 2 2 7 12 12 22 7 12 2"/><polyline points="2 17 12 22 22 17"/><polyline points="2 12 12 17 22 12"/></svg>',
+    type: 'complex', desc: 'Room-by-room interior assessment',
+    refPrefix: 'RM', locationLabel: 'Room / Space',
+    locationPlaceholder: 'e.g. Main Bedroom, Kitchen, Hallway',
+  },
+  {
+    id: 9, title: 'Defects & Repairs', icon: '<svg class="sec-icon" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>',
+    type: 'defects', desc: 'Prioritised defect register with repair recommendations',
+    refPrefix: 'D', locationLabel: 'Building Element',
+    locationPlaceholder: 'e.g. Roof, South Wall, Window 03',
+  },
+  {
+    id: 10, title: 'Overall Summary', icon: '<svg class="sec-icon" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 19.5A2.5 2.5 0 016.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 014 19.5v-15A2.5 2.5 0 016.5 2z"/></svg>',
+    type: 'summary', desc: 'Final condition overview and recommendations',
+    condKey: 'overallCondition',
+    fields: [
+      { key: 'overallNotes',    label: 'Summary of Findings',     type: 'textarea', span: 2 },
+      { key: 'recommendations', label: 'Recommendations',         type: 'textarea', span: 2 },
+      { key: 'urgentWorks',     label: 'Urgent Works Required',   type: 'textarea', span: 2 },
+      { key: 'nextInspection',  label: 'Recommended Next Inspection', type: 'text', placeholder: 'e.g. 12 months, 5 years' },
+      { key: 'reportedBy',      label: 'Report Prepared By',      type: 'text' },
+      { key: 'reportDate',      label: 'Report Date',             type: 'date' },
+    ]
+  },
+];
+
+const CONDITIONS = ['Good', 'Fair', 'Poor', 'Critical', 'N/A'];
+const PRIORITIES  = ['Urgent', 'Important', 'Routine'];
+
+/* ═══════════════════════════════════════════════════
+   DATA LAYER
+═══════════════════════════════════════════════════ */
+let formData    = {};   // { sectionId: { fieldKey: value, ... } }
+let complexData = { 7: [], 8: [], 9: [] };
+let photoData   = {};   // { entryId: [dataURL, ...] }
+let sessions    = {};   // { name: { formData, complexData, photoData, savedAt } }
+let currentSessionName = 'Untitled Assessment';
+
+let autoSaveTimer   = null;
+let confirmCallback = null;
+let currentSection  = 1;
+
+// Drawer state
+let drawerSection   = null;
+let drawerEditIndex = null;   // null = new, number = editing
+let drawerPhotos    = [];     // photos staged in current drawer
+
+// Camera state
+let cameraStream    = null;
+let cameraFacingMode = 'environment';
+
+/* ── Persistence keys ─────────────────────────── */
+const LS_FORM    = 'hcl_v2_formData';
+const LS_COMPLEX = 'hcl_v2_complexData';
+const LS_PHOTOS  = 'hcl_v2_photoData';
+const LS_SESS    = 'hcl_v2_sessions';
+const LS_CURSESS = 'hcl_v2_currentSession';
+
+function saveAll() {
+  try {
+    localStorage.setItem(LS_FORM,    JSON.stringify(formData));
+    localStorage.setItem(LS_COMPLEX, JSON.stringify(complexData));
+    localStorage.setItem(LS_PHOTOS,  JSON.stringify(photoData));
+    localStorage.setItem(LS_CURSESS, currentSessionName);
+    showSaveIndicator();
+    debouncedAutoSave();
+  } catch(e) { console.warn('Storage write failed', e); }
+}
+
+function loadAll() {
+  try {
+    const fd = localStorage.getItem(LS_FORM);
+    const cd = localStorage.getItem(LS_COMPLEX);
+    const pd = localStorage.getItem(LS_PHOTOS);
+    const sn = localStorage.getItem(LS_CURSESS);
+    if (fd) formData    = JSON.parse(fd);
+    if (cd) complexData = { ...{ 7:[], 8:[], 9:[] }, ...JSON.parse(cd) };
+    if (pd) photoData   = JSON.parse(pd);
+    if (sn) currentSessionName = sn;
+    sessions = JSON.parse(localStorage.getItem(LS_SESS) || '{}');
+  } catch(e) { console.warn('Storage read failed', e); }
+}
+
+function debouncedAutoSave() {
+  clearTimeout(autoSaveTimer);
+  autoSaveTimer = setTimeout(() => persistCurrentSession(), 1200);
+}
+
+function persistCurrentSession() {
+  if (currentSessionName === 'Untitled Assessment') return;
+  sessions[currentSessionName] = {
+    formData: JSON.parse(JSON.stringify(formData)),
+    complexData: JSON.parse(JSON.stringify(complexData)),
+    photoData: JSON.parse(JSON.stringify(photoData)),
+    savedAt: new Date().toISOString(),
+  };
+  try { localStorage.setItem(LS_SESS, JSON.stringify(sessions)); } catch(e) {}
+}
+
+/* ── Field access helpers ─────────────────────── */
+function getField(sectionId, key) {
+  return (formData[sectionId] || {})[key] || '';
+}
+function setField(sectionId, key, value) {
+  if (!formData[sectionId]) formData[sectionId] = {};
+  formData[sectionId][key] = value;
+  saveAll();
+  updateNav();
+}
+
+/* ─────────────────────────────────────────────────
+   SAVE INDICATOR
+───────────────────────────────────────────────── */
+function showSaveIndicator() {
+  const el = document.getElementById('saveIndicator');
+  if (!el) return;
+  const t = new Date();
+  const hh = t.getHours().toString().padStart(2,'0');
+  const mm = t.getMinutes().toString().padStart(2,'0');
+  el.textContent = `Saved ${hh}:${mm}`;
+  el.classList.add('saved');
+  setTimeout(() => { el.classList.remove('saved'); }, 3000);
+}
+
+/* ═══════════════════════════════════════════════════
+   SESSION MANAGEMENT
+═══════════════════════════════════════════════════ */
+function openSessionModal() {
+  renderSessionList();
+  document.getElementById('sessionModal').classList.add('open');
+}
+function closeSessionModal() {
+  document.getElementById('sessionModal').classList.remove('open');
+}
+
+function renderSessionList() {
+  const wrap = document.getElementById('sessionListWrap');
+  const names = Object.keys(sessions).sort((a, b) => {
+    return new Date(sessions[b].savedAt) - new Date(sessions[a].savedAt);
+  });
+  if (!names.length) {
+    wrap.innerHTML = '<div style="padding:20px;text-align:center;color:var(--color-muted);font-size:14px;">No saved assessments yet.</div>';
+    return;
+  }
+  wrap.innerHTML = names.map(name => {
+    const d = new Date(sessions[name].savedAt);
+    const dateStr = d.toLocaleDateString() + ' ' + d.toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'});
+    const isCurrent = name === currentSessionName ? ' (current)' : '';
+    return `<div class="sess-item">
+      <div class="sess-item-info" onclick="loadSession('${esc(name)}')">
+        <div class="sess-item-name">${esc(name)}${isCurrent}</div>
+        <div class="sess-item-date">${dateStr}</div>
+      </div>
+      <button class="btn-sess-del" onclick="deleteSessionConfirm('${esc(name)}')" title="Delete"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 01-2 2H8a2 2 0 01-2-2L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4a1 1 0 011-1h4a1 1 0 011 1v2"/></svg></button>
+    </div>`;
+  }).join('');
+}
+
+function loadSession(name) {
+  const s = sessions[name];
+  if (!s) return;
+  formData    = JSON.parse(JSON.stringify(s.formData || {}));
+  complexData = { ...{ 7:[], 8:[], 9:[] }, ...JSON.parse(JSON.stringify(s.complexData || {})) };
+  photoData   = JSON.parse(JSON.stringify(s.photoData || {}));
+  currentSessionName = name;
+  saveAll();
+  closeSessionModal();
+  renderSection(currentSection);
+  updateNav();
+  updateSessionLabels();
+  showToast(`Loaded: ${name}`, 'success');
+}
+
+function newSession() {
+  showConfirm(
+    'New Assessment',
+    'Start a new assessment? Unsaved changes will be lost.',
+    () => {
+      formData    = {};
+      complexData = { 7:[], 8:[], 9:[] };
+      photoData   = {};
+      currentSessionName = 'Untitled Assessment';
+      saveAll();
+      closeSessionModal();
+      renderSection(1);
+      updateNav();
+      updateSessionLabels();
+    },
+    'Start New'
+  );
+}
+
+function saveSessionAs() {
+  const name = prompt('Save assessment as:', currentSessionName === 'Untitled Assessment' ? '' : currentSessionName);
+  if (!name || !name.trim()) return;
+  currentSessionName = name.trim();
+  persistCurrentSession();
+  saveAll();
+  updateSessionLabels();
+  closeSessionModal();
+  showToast(`Saved: ${currentSessionName}`, 'success');
+}
+
+function deleteSessionConfirm(name) {
+  showConfirm('Delete Assessment', `Delete "${name}"? This cannot be undone.`, () => {
+    delete sessions[name];
+    try { localStorage.setItem(LS_SESS, JSON.stringify(sessions)); } catch(e) {}
+    renderSessionList();
+  });
+}
+
+function updateSessionLabels() {
+  const els = ['sidebarSessionName', 'topbarSessionName'];
+  els.forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.textContent = currentSessionName;
+  });
+}
+
+/* ═══════════════════════════════════════════════════
+   NAV — sidebar + pill strip
+═══════════════════════════════════════════════════ */
+function updateNav() {
+  renderSidebarNav();
+  renderPillStrip();
+}
+
+function renderSidebarNav() {
+  const nav = document.getElementById('sidebarNav');
+  if (!nav) return;
+  nav.innerHTML = SECTIONS.map(s => {
+    const hasData   = sectionHasData(s.id);
+    const isActive  = s.id === currentSection;
+    const rating    = getConditionForSection(s);
+    const cls = [
+      'nav-item',
+      isActive  ? 'active'   : '',
+      hasData   ? 'has-data' : '',
+    ].filter(Boolean).join(' ');
+
+    const ratingHtml = rating ?
+      `<span class="nav-rating-badge cond-badge ${rating.toLowerCase()}">${rating}</span>` : '';
+
+    return `<div class="${cls}" onclick="showSection(${s.id})">
+      <div class="nav-num">${s.id}</div>
+      <div class="nav-item-text">${s.title}</div>
+      ${ratingHtml}
+    </div>`;
+  }).join('');
+}
+
+function renderPillStrip() {
+  const strip = document.getElementById('pillStrip');
+  if (!strip) return;
+  strip.innerHTML = SECTIONS.map(s => {
+    const hasData  = sectionHasData(s.id);
+    const isActive = s.id === currentSection;
+    const cls = ['pill', isActive ? 'active' : '', hasData ? 'has-data' : ''].filter(Boolean).join(' ');
+    const dot = hasData ? '<span class="pill-dot"></span>' : '';
+    return `<button class="${cls}" onclick="showSection(${s.id})">${dot}${s.id}. ${s.title}</button>`;
+  }).join('');
+
+  // Scroll active pill into view
+  setTimeout(() => {
+    const active = strip.querySelector('.pill.active');
+    if (active) active.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
+  }, 50);
+}
+
+function sectionHasData(id) {
+  const fd = formData[id];
+  if (fd && Object.values(fd).some(v => v && v !== '' && v !== '—')) return true;
+  const cd = complexData[id];
+  if (cd && cd.length > 0) return true;
+  return false;
+}
+
+function getConditionForSection(sec) {
+  if (sec.condKey) return (formData[sec.id] || {})[sec.condKey] || null;
+  return null;
+}
+
+/* ═══════════════════════════════════════════════════
+   SECTION RENDERING
+═══════════════════════════════════════════════════ */
+function showSection(id) {
+  currentSection = id;
+  renderSection(id);
+  updateNav();
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function renderSection(id) {
+  const sec = SECTIONS.find(s => s.id === id);
+  if (!sec) return;
+  const main = document.getElementById('mainContent');
+
+  // Demo banner — shown only when demo data is loaded
+  const isDemoBanner = currentSessionName === 'Thornton Cottage — Demo';
+  const demoBannerHtml = isDemoBanner ? `
+    <div class="demo-banner" id="demoBanner">
+      <div class="demo-banner-left">
+        <span class="demo-badge">Demo</span>
+        <div class="demo-banner-text">
+          <strong>Thornton Cottage, Ballarat VIC</strong><br>
+          <span>Sample assessment — STEWRD Agent 2: Condition Report Digitizer</span>
+        </div>
+      </div>
+      <button class="btn-demo-dismiss" onclick="dismissDemo()">Clear Demo</button>
+    </div>` : '';
+
+  let html = demoBannerHtml + `<div class="section-hdr">
+    <h2>${sec.icon} ${sec.title}</h2>
+    <p>${sec.desc}</p>
+  </div>`;
+
+  if (sec.type === 'form') {
+    html += renderFormSection(sec);
+  } else if (sec.type === 'form+condition') {
+    html += renderFormConditionSection(sec);
+  } else if (sec.type === 'complex') {
+    html += renderComplexSection(sec);
+  } else if (sec.type === 'defects') {
+    html += renderDefectsSection(sec);
+  } else if (sec.type === 'summary') {
+    html += renderSummarySection(sec);
+  }
+
+  html += renderNavFooter(id);
+  main.innerHTML = html;
+  bindFormListeners(sec);
+}
+
+/* ── Simple form ─────────────────────────────── */
+function renderFormSection(sec) {
+  return `<div class="card">
+    <div class="card-title">Section ${sec.id} of ${SECTIONS.length}</div>
+    <div class="form-grid">${sec.fields.map(f => renderField(sec.id, f)).join('')}</div>
+  </div>`;
+}
+
+/* ── Form + Condition Rating ──────────────────── */
+function renderFormConditionSection(sec) {
+  const currentCond = getField(sec.id, sec.condKey || 'overallCondition');
+  const opts = sec.condOptions || CONDITIONS;
+  const condLabel = sec.condLabel || 'Overall Condition';
+  return `<div class="card">
+    <div class="card-title">Section ${sec.id} of ${SECTIONS.length}</div>
+    <div class="condition-group">
+      <div class="condition-label">${condLabel}</div>
+      <div class="condition-pills" id="condPills_${sec.id}">
+        ${opts.map(c => {
+          const key = c.toLowerCase().replace(/[^a-z]/g, '');
+          const selCls = currentCond === c ? `sel-${key}` : '';
+          return `<button class="cond-pill ${selCls}" data-cond="${c}" data-section="${sec.id}">${c}</button>`;
+        }).join('')}
+      </div>
+    </div>
+    <div class="form-grid">${sec.fields.map(f => renderField(sec.id, f)).join('')}</div>
+  </div>`;
+}
+
+/* ── Complex (exterior / interior) ──────────── */
+function renderComplexSection(sec) {
+  const entries = complexData[sec.id] || [];
+  return `<div class="entries-card" id="entriesCard_${sec.id}">
+    <div class="entries-head">
+      <div class="entries-head-left">
+        <div class="entries-head-title">${sec.title}</div>
+        <span class="entries-count-badge" id="count_${sec.id}">${entries.length}</span>
+      </div>
+      <button class="btn-add" onclick="openDrawer(${sec.id})">+ Add Entry</button>
+    </div>
+    <div id="entriesList_${sec.id}">${renderEntryList(sec.id, entries)}</div>
+  </div>`;
+}
+
+/* ── Defects ────────────────────────────────── */
+function renderDefectsSection(sec) {
+  const entries = complexData[9] || [];
+  const totalCost = entries.reduce((sum, e) => sum + (parseFloat(e.estimatedCost) || 0), 0);
+  const costHtml = totalCost > 0 ?
+    `<div class="entries-cost-footer">
+      <div class="cost-footer-label">Estimated Total Repair Cost</div>
+      <div class="cost-footer-value">$${totalCost.toLocaleString()}</div>
+    </div>` : '';
+
+  return `<div class="entries-card">
+    <div class="entries-head">
+      <div class="entries-head-left">
+        <div class="entries-head-title">Defect Register</div>
+        <span class="entries-count-badge" id="count_9">${entries.length}</span>
+      </div>
+      <button class="btn-add" onclick="openDrawer(9)">+ Add Defect</button>
+    </div>
+    <div id="entriesList_9">${renderDefectList(entries)}</div>
+    ${costHtml}
+  </div>`;
+}
+
+/* ── Summary ────────────────────────────────── */
+function renderSummarySection(sec) {
+  const allEntries = [
+    ...(complexData[7] || []),
+    ...(complexData[8] || []),
+    ...(complexData[9] || []),
+  ];
+  const defects    = complexData[9] || [];
+  const totalCost  = defects.reduce((sum, e) => sum + (parseFloat(e.estimatedCost) || 0), 0);
+  const urgentCount = defects.filter(d => d.priority === 'Urgent').length;
+
+  // Condition summary across form sections
+  const condCounts = {};
+  [2,3,4,5,6].forEach(id => {
+    const c = getField(id, 'overallCondition') || getField(id, 'riskLevel');
+    if (c) condCounts[c] = (condCounts[c] || 0) + 1;
+  });
+
+  const currentCond = getField(10, 'overallCondition');
+
+  return `
+  <div class="card">
+    <div class="card-title">Assessment Overview</div>
+    <div class="summary-stats">
+      <div class="stat-box">
+        <div class="stat-value">${allEntries.length}</div>
+        <div class="stat-label">Total Entries</div>
+      </div>
+      <div class="stat-box">
+        <div class="stat-value" style="color:var(--cond-crit-fg)">${urgentCount}</div>
+        <div class="stat-label">Urgent Defects</div>
+      </div>
+      <div class="stat-box">
+        <div class="stat-value">${totalCost > 0 ? '$' + totalCost.toLocaleString() : '—'}</div>
+        <div class="stat-label">Est. Repair Cost</div>
+      </div>
+    </div>
+    <div class="condition-group">
+      <div class="condition-label">Overall Property Condition</div>
+      <div class="condition-pills" id="condPills_10">
+        ${CONDITIONS.map(c => {
+          const key = c.toLowerCase().replace(/[^a-z]/g, '');
+          const selCls = currentCond === c ? `sel-${key}` : '';
+          return `<button class="cond-pill ${selCls}" data-cond="${c}" data-section="10">${c}</button>`;
+        }).join('')}
+      </div>
+    </div>
+  </div>
+  <div class="card">
+    <div class="card-title">Final Notes</div>
+    <div class="form-grid">${sec.fields.map(f => renderField(10, f)).join('')}</div>
+  </div>`;
+}
+
+/* ── Field renderer ────────────────────────── */
+function renderField(sectionId, f) {
+  const val  = getField(sectionId, f.key);
+  const span = f.span === 2 ? 'col-span-2' : '';
+  let inputHtml = '';
+
+  if (f.type === 'text' || f.type === 'number' || f.type === 'date') {
+    inputHtml = `<input class="field-input" type="${f.type}"
+      id="f_${sectionId}_${f.key}"
+      data-section="${sectionId}" data-key="${f.key}"
+      value="${esc(val)}"
+      placeholder="${esc(f.placeholder || '')}"
+      oninput="handleFieldInput(this)">`;
+  } else if (f.type === 'textarea') {
+    inputHtml = `<textarea class="field-textarea"
+      id="f_${sectionId}_${f.key}"
+      data-section="${sectionId}" data-key="${f.key}"
+      placeholder="${esc(f.placeholder || '')}"
+      oninput="handleFieldInput(this)">${esc(val)}</textarea>`;
+  } else if (f.type === 'select') {
+    const opts = (f.options || []).map(o =>
+      `<option value="${esc(o)}" ${val === o ? 'selected' : ''}>${esc(o)}</option>`
+    ).join('');
+    inputHtml = `<select class="field-select"
+      id="f_${sectionId}_${f.key}"
+      data-section="${sectionId}" data-key="${f.key}"
+      onchange="handleFieldInput(this)">${opts}</select>`;
+  } else if (f.type === 'radio') {
+    const opts = (f.options || []).map(o =>
+      `<label class="radio-item">
+        <input type="radio" name="r_${sectionId}_${f.key}" value="${esc(o)}"
+          data-section="${sectionId}" data-key="${f.key}"
+          ${val === o ? 'checked' : ''}
+          onchange="handleFieldInput(this)">
+        <label>${esc(o)}</label>
+      </label>`
+    ).join('');
+    inputHtml = `<div class="radio-row">${opts}</div>`;
+  }
+
+  const reqStar = f.req ? '<span class="req">*</span>' : '';
+  return `<div class="field ${span}">
+    <div class="field-label">${esc(f.label)}${reqStar}</div>
+    ${inputHtml}
+  </div>`;
+}
+
+/* ── Entry list renderers ───────────────────── */
+function renderEntryList(secId, entries) {
+  if (!entries.length) return emptyState('No entries yet', 'Tap "+ Add Entry" to document this area.');
+  return entries.map((e, i) => renderEntryRow(secId, e, i)).join('');
+}
+
+function renderEntryRow(secId, e, i) {
+  const condKey = e.condition ? e.condition.toLowerCase().replace(/[^a-z]/g, '') : '';
+  const condBadge = e.condition ? `<span class="cond-badge ${condKey}">${e.condition}</span>` : '';
+  const photos = (photoData[e.id] || []);
+  const photoHtml = photos.length > 0 ? `<div class="entry-photo-strip">
+    ${photos.slice(0,3).map(p => `<img class="entry-photo-thumb" src="${p}" onclick="openLightbox('${p}')" alt="photo">`).join('')}
+    ${photos.length > 3 ? `<div class="entry-photo-more">+${photos.length - 3}</div>` : ''}
+  </div>` : '';
+
+  return `<div class="entry-row" id="erow_${e.id}">
+    <div class="entry-ref-tag">${e.ref}</div>
+    <div class="entry-body">
+      <div class="entry-location">${esc(e.location)}</div>
+      ${e.notes ? `<div class="entry-notes-text">${esc(e.notes)}</div>` : ''}
+      <div class="entry-tags">${condBadge}</div>
+      ${photoHtml}
+    </div>
+    <div class="entry-actions">
+      <button class="btn-icon" onclick="editEntry(${secId}, ${i})" title="Edit">✏</button>
+      <button class="btn-icon del" onclick="deleteEntry(${secId}, ${i})" title="Delete"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 01-2 2H8a2 2 0 01-2-2L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4a1 1 0 011-1h4a1 1 0 011 1v2"/></svg></button>
+    </div>
+  </div>`;
+}
+
+function renderDefectList(entries) {
+  if (!entries.length) return emptyState('No defects recorded', 'Tap "+ Add Defect" to log a defect.');
+  return entries.map((e, i) => renderDefectRow(e, i)).join('');
+}
+
+function renderDefectRow(e, i) {
+  const condKey  = e.condition ? e.condition.toLowerCase().replace(/[^a-z]/g, '') : '';
+  const prioKey  = e.priority  ? e.priority.toLowerCase()  : '';
+  const condBadge = e.condition ? `<span class="cond-badge ${condKey}">${e.condition}</span>` : '';
+  const prioBadge = e.priority  ? `<span class="prio-badge ${prioKey}">${e.priority}</span>`  : '';
+  const costTxt   = e.estimatedCost ? `<span style="font-size:11px;color:var(--color-muted)">Est. $${parseFloat(e.estimatedCost).toLocaleString()}</span>` : '';
+  const photos    = (photoData[e.id] || []);
+  const photoHtml = photos.length > 0 ? `<div class="entry-photo-strip">
+    ${photos.slice(0,3).map(p => `<img class="entry-photo-thumb" src="${p}" onclick="openLightbox('${p}')" alt="photo">`).join('')}
+    ${photos.length > 3 ? `<div class="entry-photo-more">+${photos.length - 3}</div>` : ''}
+  </div>` : '';
+
+  return `<div class="entry-row" id="erow_${e.id}">
+    <div class="entry-ref-tag">${e.ref}</div>
+    <div class="entry-body">
+      <div class="entry-location">${esc(e.location)}</div>
+      ${e.notes ? `<div class="entry-notes-text">${esc(e.notes)}</div>` : ''}
+      ${e.suggestedWork ? `<div class="entry-notes-text" style="font-style:italic;margin-top:3px">→ ${esc(e.suggestedWork)}</div>` : ''}
+      <div class="entry-tags">${condBadge}${prioBadge}${costTxt}</div>
+      ${photoHtml}
+    </div>
+    <div class="entry-actions">
+      <button class="btn-icon" onclick="editEntry(9, ${i})" title="Edit">✏</button>
+      <button class="btn-icon del" onclick="deleteEntry(9, ${i})" title="Delete"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 01-2 2H8a2 2 0 01-2-2L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4a1 1 0 011-1h4a1 1 0 011 1v2"/></svg></button>
+    </div>
+  </div>`;
+}
+
+function emptyState(title, sub) {
+  return `<div class="entries-empty">
+    <div class="entries-empty-icon"><svg class="sec-icon" width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2"/><rect x="9" y="3" width="6" height="4" rx="1"/><line x1="9" y1="12" x2="15" y2="12"/><line x1="9" y1="16" x2="13" y2="16"/></svg></div>
+    <p><strong>${title}</strong></p>
+    <p style="margin-top:4px;font-size:13px;">${sub}</p>
+  </div>`;
+}
+
+/* ── Nav footer ─────────────────────────────── */
+function renderNavFooter(id) {
+  const prev = id > 1;
+  const next = id < SECTIONS.length;
+  return `<div class="sec-nav-footer">
+    <button class="btn-nav-step" onclick="showSection(${id - 1})" ${!prev ? 'disabled' : ''}>← Previous</button>
+    <div class="nav-progress-text">${id} / ${SECTIONS.length}</div>
+    <button class="btn-nav-step fwd" onclick="showSection(${id + 1})" ${!next ? 'disabled' : ''}>${next ? 'Next →' : 'Done ✓'}</button>
+  </div>`;
+}
+
+/* ═══════════════════════════════════════════════════
+   FIELD INPUT BINDING
+═══════════════════════════════════════════════════ */
+function bindFormListeners(sec) {
+  // Condition pills
+  document.querySelectorAll('.cond-pill').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const sid  = parseInt(btn.dataset.section);
+      const cond = btn.dataset.cond;
+      const key  = sec.condKey || 'overallCondition';
+      setField(sid, key, cond);
+
+      // Update pill appearances
+      const container = btn.closest('.condition-pills');
+      container.querySelectorAll('.cond-pill').forEach(b => {
+        b.className = 'cond-pill';
+        if (b.dataset.cond === cond) {
+          b.classList.add('sel-' + cond.toLowerCase().replace(/[^a-z]/g, ''));
+        }
+      });
+      updateNav();
+    });
+  });
+}
+
+function handleFieldInput(el) {
+  const sid = parseInt(el.dataset.section);
+  const key = el.dataset.key;
+  setField(sid, key, el.value);
+}
+
+/* ═══════════════════════════════════════════════════
+   ENTRY DRAWER
+═══════════════════════════════════════════════════ */
+function nextRef(secId) {
+  const entries = complexData[secId] || [];
+  const sec     = SECTIONS.find(s => s.id === secId);
+  const prefix  = sec.refPrefix || 'X';
+  const nums    = entries
+    .map(e => parseInt((e.ref || '').replace(/\D/g, '')) || 0)
+    .filter(n => !isNaN(n));
+  const next = nums.length ? Math.max(...nums) + 1 : 1;
+  return `${prefix}-${String(next).padStart(2, '0')}`;
+}
+
+function openDrawer(secId, editIndex = null) {
+  drawerSection   = secId;
+  drawerEditIndex = editIndex;
+  drawerPhotos    = [];
+
+  const sec = SECTIONS.find(s => s.id === secId);
+  const isEdit = editIndex !== null;
+  const entry  = isEdit ? (complexData[secId] || [])[editIndex] : null;
+
+  document.getElementById('drawerTitle').textContent =
+    isEdit ? `Edit Entry — ${entry.ref}` : `Add ${sec.title} Entry`;
+
+  if (isEdit && entry && photoData[entry.id]) {
+    drawerPhotos = [...photoData[entry.id]];
+  }
+
+  const ref = isEdit ? entry.ref : nextRef(secId);
+  const isDefect = secId === 9;
+
+  const locationLabel = sec.locationLabel || 'Location';
+  const locationPH    = sec.locationPlaceholder || '';
+  const loc   = isEdit ? (entry.location || '') : '';
+  const notes = isEdit ? (entry.notes || '')    : '';
+  const cond  = isEdit ? (entry.condition || '') : '';
+
+  // Priority & cost for defects
+  const prio     = isEdit ? (entry.priority || '') : '';
+  const sugWork  = isEdit ? (entry.suggestedWork || '') : '';
+  const estCost  = isEdit ? (entry.estimatedCost || '') : '';
+
+  let html = `
+    <div class="drawer-ref-hint">Auto-assigned reference</div>
+    <div class="drawer-ref-display" id="drawerRefDisplay">${ref}</div>
+
+    <div class="form-grid cols-1" style="margin-bottom:16px;">
+      <div class="field">
+        <div class="field-label">${locationLabel} <span class="req">*</span></div>
+        <input class="field-input" id="d_location" value="${esc(loc)}" placeholder="${esc(locationPH)}">
+      </div>
+    </div>
+
+    <div class="condition-group">
+      <div class="condition-label">Condition Rating</div>
+      <div class="condition-pills" id="drawerCondPills">
+        ${CONDITIONS.map(c => {
+          const key = c.toLowerCase().replace(/[^a-z]/g, '');
+          const sel = cond === c ? `sel-${key}` : '';
+          return `<button class="cond-pill ${sel}" data-cond="${c}" onclick="selectDrawerCond(this)">${c}</button>`;
+        }).join('')}
+      </div>
+    </div>
+
+    <div class="form-grid cols-1" style="margin-bottom:16px;">
+      <div class="field">
+        <div class="field-label">Notes / Observations</div>
+        <textarea class="field-textarea" id="d_notes" placeholder="Describe findings…">${esc(notes)}</textarea>
+      </div>
+    </div>`;
+
+  if (isDefect) {
+    const prioOpts = PRIORITIES.map(p =>
+      `<button class="cond-pill ${prio === p ? 'sel-' + p.toLowerCase() : ''}"
+        data-prio="${p}" onclick="selectDrawerPrio(this)">${p}</button>`
+    ).join('');
+
+    html += `
+    <div class="condition-group">
+      <div class="condition-label">Priority</div>
+      <div class="condition-pills" id="drawerPrioPills">${prioOpts}</div>
+    </div>
+    <div class="form-grid cols-1" style="margin-bottom:16px;">
+      <div class="field">
+        <div class="field-label">Suggested Works / Repairs</div>
+        <textarea class="field-textarea" id="d_sugWork" placeholder="Describe recommended repair works…">${esc(sugWork)}</textarea>
+      </div>
+    </div>
+    <div class="form-grid cols-1" style="margin-bottom:16px;">
+      <div class="field">
+        <div class="field-label">Estimated Cost (AUD)</div>
+        <div class="cost-wrap">
+          <input class="field-input" type="number" id="d_cost" value="${esc(estCost)}" placeholder="0">
+        </div>
+      </div>
+    </div>`;
+  }
+
+  html += `
+    <div class="camera-zone">
+      <div class="field-label">Photos</div>
+      <div class="camera-btns">
+        <button class="btn-cam" onclick="openCamera()">📷 Take Photo</button>
+        <button class="btn-cam" onclick="openGallery()">🖼 From Gallery</button>
+      </div>
+      <div class="photo-strip-preview" id="drawerPhotoStrip"></div>
+    </div>`;
+
+  document.getElementById('drawerBody').innerHTML = html;
+  renderDrawerPhotos();
+
+  document.getElementById('drawerOverlay').classList.add('on');
+  document.getElementById('entryDrawer').classList.add('open');
+}
+
+function selectDrawerCond(btn) {
+  document.querySelectorAll('#drawerCondPills .cond-pill').forEach(b => {
+    b.className = 'cond-pill';
+  });
+  const key = btn.dataset.cond.toLowerCase().replace(/[^a-z]/g, '');
+  btn.classList.add(`sel-${key}`);
+}
+
+function selectDrawerPrio(btn) {
+  document.querySelectorAll('#drawerPrioPills .cond-pill').forEach(b => {
+    b.className = 'cond-pill';
+  });
+  btn.classList.add('sel-' + btn.dataset.prio.toLowerCase());
+}
+
+function closeDrawer() {
+  document.getElementById('drawerOverlay').classList.remove('on');
+  document.getElementById('entryDrawer').classList.remove('open');
+  drawerSection   = null;
+  drawerEditIndex = null;
+  drawerPhotos    = [];
+}
+
+function saveDrawerEntry() {
+  const loc   = (document.getElementById('d_location')?.value || '').trim();
+  const notes = (document.getElementById('d_notes')?.value     || '').trim();
+
+  if (!loc) { showToast('Location is required.', 'warn'); return; }
+
+  const condBtn = document.querySelector('#drawerCondPills .cond-pill[class*="sel-"]');
+  const cond    = condBtn ? condBtn.dataset.cond : '';
+
+  const secId = drawerSection;
+  const isNew = drawerEditIndex === null;
+  const isDefect = secId === 9;
+
+  // Build entry object
+  const entry = {
+    ref: isNew ? nextRef(secId) : (complexData[secId] || [])[drawerEditIndex].ref,
+    id:  isNew ? genId()        : (complexData[secId] || [])[drawerEditIndex].id,
+    location: loc,
+    notes,
+    condition: cond,
+  };
+
+  // Carry over the id if editing (to preserve photos link)
+  if (!isNew) {
+    entry.id = (complexData[secId] || [])[drawerEditIndex].id;
+  }
+
+  if (isDefect) {
+    const prioBtn = document.querySelector('#drawerPrioPills .cond-pill[class*="sel-"]');
+    entry.priority      = prioBtn ? prioBtn.dataset.prio : '';
+    entry.suggestedWork = (document.getElementById('d_sugWork')?.value || '').trim();
+    entry.estimatedCost = document.getElementById('d_cost')?.value || '';
+  }
+
+  // Save photos
+  if (drawerPhotos.length > 0) {
+    photoData[entry.id] = [...drawerPhotos];
+  } else if (isNew) {
+    // no photos
+  } else {
+    // editing, if they cleared all photos
+    if (drawerPhotos.length === 0 && photoData[entry.id]) {
+      delete photoData[entry.id];
+    }
+  }
+
+  if (isNew) {
+    if (!complexData[secId]) complexData[secId] = [];
+    complexData[secId].push(entry);
+  } else {
+    complexData[secId][drawerEditIndex] = entry;
+  }
+
+  saveAll();
+  closeDrawer();
+
+  // Re-render section in-place
+  renderSection(currentSection);
+  updateNav();
+
+  showToast(isNew ? `Entry ${entry.ref} added ✓` : `Entry ${entry.ref} updated ✓`, 'success');
+
+  // Flash new row
+  if (isNew) {
+    setTimeout(() => {
+      const row = document.getElementById(`erow_${entry.id}`);
+      if (row) {
+        row.classList.add('flash-new');
+        setTimeout(() => row.classList.remove('flash-new'), 2000);
+        row.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+      }
+    }, 100);
+  }
+}
+
+function editEntry(secId, index) {
+  openDrawer(secId, index);
+}
+
+function deleteEntry(secId, index) {
+  const entry = (complexData[secId] || [])[index];
+  if (!entry) return;
+  showConfirm('Delete Entry', `Delete entry ${entry.ref}? This cannot be undone.`, () => {
+    delete photoData[entry.id];
+    complexData[secId].splice(index, 1);
+    saveAll();
+    renderSection(currentSection);
+    updateNav();
+    showToast('Entry deleted.', 'warn');
+  });
+}
+
+/* ═══════════════════════════════════════════════════
+   CAMERA
+═══════════════════════════════════════════════════ */
+function openCamera() {
+  if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+    openGallery();
+    return;
+  }
+  const constraints = { video: { facingMode: cameraFacingMode }, audio: false };
+  navigator.mediaDevices.getUserMedia(constraints)
+    .then(stream => {
+      cameraStream = stream;
+      const video = document.getElementById('cameraVideo');
+      video.srcObject = stream;
+      document.getElementById('cameraModal').classList.add('open');
+    })
+    .catch(() => {
+      showToast('Camera unavailable — opening gallery.', 'warn');
+      openGallery();
+    });
+}
+
+function closeCamera() {
+  if (cameraStream) {
+    cameraStream.getTracks().forEach(t => t.stop());
+    cameraStream = null;
+  }
+  document.getElementById('cameraModal').classList.remove('open');
+}
+
+function capturePhoto() {
+  const video  = document.getElementById('cameraVideo');
+  const canvas = document.getElementById('cameraCanvas');
+  canvas.width  = video.videoWidth;
+  canvas.height = video.videoHeight;
+  canvas.getContext('2d').drawImage(video, 0, 0);
+  const dataURL = canvas.toDataURL('image/jpeg', 0.8);
+  drawerPhotos.push(dataURL);
+  renderDrawerPhotos();
+  closeCamera();
+}
+
+function switchCamera() {
+  cameraFacingMode = cameraFacingMode === 'environment' ? 'user' : 'environment';
+  closeCamera();
+  setTimeout(openCamera, 300);
+}
+
+function openGallery() {
+  const input = document.getElementById('filePhotoInput');
+  input.onchange = (e) => {
+    const files = Array.from(e.target.files);
+    let loaded = 0;
+    files.forEach(file => {
+      const reader = new FileReader();
+      reader.onload = (ev) => {
+        drawerPhotos.push(ev.target.result);
+        loaded++;
+        if (loaded === files.length) renderDrawerPhotos();
+      };
+      reader.readAsDataURL(file);
+    });
+    input.value = '';
+  };
+  input.click();
+}
+
+function renderDrawerPhotos() {
+  const strip = document.getElementById('drawerPhotoStrip');
+  if (!strip) return;
+  strip.innerHTML = drawerPhotos.map((p, i) =>
+    `<div class="photo-thumb-wrap">
+      <img class="photo-thumb" src="${p}" alt="photo ${i+1}">
+      <button class="photo-remove-btn" onclick="removeDrawerPhoto(${i})">✕</button>
+    </div>`
+  ).join('');
+}
+
+function removeDrawerPhoto(i) {
+  drawerPhotos.splice(i, 1);
+  renderDrawerPhotos();
+}
+
+/* ═══════════════════════════════════════════════════
+   EXPORT FUNCTIONS
+═══════════════════════════════════════════════════ */
+function openExportModal()  { document.getElementById('exportModal').classList.add('open'); }
+function closeExportModal() { document.getElementById('exportModal').classList.remove('open'); }
+
+function exportJSON() {
+  const data = {
+    exportDate: new Date().toISOString(),
+    sessionName: currentSessionName,
+    formData, complexData,
+    photoData: Object.fromEntries(
+      Object.entries(photoData).map(([k, v]) => [k, v.length + ' photos'])
+    ),
+  };
+  const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+  downloadBlob(blob, `heritage-carelog-${datestamp()}.json`);
+}
+
+function exportCSV() {
+  const rows = [['Section', 'Ref', 'Location', 'Condition', 'Priority', 'Notes', 'Suggested Work', 'Est. Cost', 'Photos']];
+  [7, 8, 9].forEach(id => {
+    const sec = SECTIONS.find(s => s.id === id);
+    (complexData[id] || []).forEach(e => {
+      rows.push([
+        sec.title, e.ref, e.location, e.condition || '',
+        e.priority || '', e.notes || '', e.suggestedWork || '',
+        e.estimatedCost || '', (photoData[e.id] || []).length,
+      ]);
+    });
+  });
+  const csv = rows.map(r => r.map(c => `"${String(c).replace(/"/g, '""')}"`).join(',')).join('\n');
+  const blob = new Blob([csv], { type: 'text/csv' });
+  downloadBlob(blob, `heritage-entries-${datestamp()}.csv`);
+}
+
+function exportWord() {
+  let html = `<html><head><meta charset="UTF-8">
+  <style>
+    /* ═══════════════════════════════════════════════════
+       STEWRD DESIGN TOKENS — Custodian Theme
+    ═══════════════════════════════════════════════════ */
+    :root {
+      /* Families */
+      --font-serif: "Fraunces", "Source Serif 4", ui-serif, Georgia, serif;
+      --font-sans:  "Inter", ui-sans-serif, -apple-system, system-ui, sans-serif;
+      --font-mono:  "JetBrains Mono", ui-monospace, "SF Mono", Menlo, monospace;
+
+      /* Spacing (4 px base) */
+      --s-1: 4px;  --s-2: 8px;   --s-3: 12px; --s-4: 16px; --s-5: 20px;
+      --s-6: 24px; --s-7: 32px;  --s-8: 40px; --s-9: 56px;
+
+      /* Radius */
+      --r-xs: 2px; --r-sm: 4px; --r-md: 6px; --r-lg: 10px;
+      --r-xl: 16px; --r-2xl: 22px; --r-full: 9999px;
+
+      /* Condition hues — theme-independent */
+      --cond-good-ink:   #3a6b4a; --cond-good-fill:   #d9e5d4;
+      --cond-fair-ink:   #8a6a2c; --cond-fair-fill:   #efe4cc;
+      --cond-poor-ink:   #a05321; --cond-poor-fill:   #efd9c6;
+      --cond-crit-ink:   #8c2e22; --cond-crit-fill:   #ecd0c9;
+
+      /* Layout */
+      --sidebar-w:    260px;
+      --topbar-h:     56px;
+      --pills-h:      52px;
+      --bottomnav-h:  60px;
+    }
+
+    /* ── Custodian palette ──────────────────── */
+    .theme-custodian {
+      --bg:          #f4efe6;
+      --bg-sunk:     #ebe4d6;
+      --surface:     #fbf8f2;
+      --surface-2:   #f8f3e8;
+      --surface-3:   #ffffff;
+      --ink:         #1a1f2e;
+      --ink-2:       #3b3f4a;
+      --ink-3:       #6b6f78;
+      --ink-4:       #9a9992;
+      --accent:      #8b3a2f;
+      --accent-hi:   #a24937;
+      --accent-lo:   #6e2b22;
+      --accent-wash: rgba(139,58,47,0.08);
+      --moss:        #6b705c;  --moss-wash: rgba(107, 112, 92, 0.10);
+      --line:        rgba(26,31,46,0.10);
+      --line-strong: rgba(26,31,46,0.18);
+      --line-soft:   rgba(26,31,46,0.05);
+      --shadow-sm:   0 1px 2px rgba(40,28,20,0.05);
+      --shadow-md:   0 4px 14px rgba(40,28,20,0.08), 0 1px 2px rgba(40,28,20,0.04);
+      --shadow-lg:   0 18px 40px rgba(40,28,20,0.10), 0 2px 6px rgba(40,28,20,0.06);
+      --focus-ring:  0 0 0 3px rgba(139,58,47,0.18);
+      --cond-good-bg:  var(--cond-good-fill); --cond-good-fg:  var(--cond-good-ink);
+      --cond-fair-bg:  var(--cond-fair-fill); --cond-fair-fg:  var(--cond-fair-ink);
+      --cond-poor-bg:  var(--cond-poor-fill); --cond-poor-fg:  var(--cond-poor-ink);
+      --cond-crit-bg:  var(--cond-crit-fill); --cond-crit-fg:  var(--cond-crit-ink);
+    }
+
+    /* ═══════════════════════════════════════════════════
+       RESET & BASE
+    ═══════════════════════════════════════════════════ */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    html, body {
+      font-feature-settings: "cv01","ss03","ss01";
+      -webkit-font-smoothing: antialiased;
+    }
+
+    body {
+      font-family: var(--font-sans);
+      background: var(--bg);
+      color: var(--ink);
+      line-height: 1.55;
+      min-height: 100vh;
+    }
+
+    button { font-family: inherit; cursor: pointer; }
+    input, select, textarea { font-family: inherit; }
+    a { color: inherit; }
+
+    /* ═══════════════════════════════════════════════════
+       SIDEBAR — Custodian: warm parchment, ink text
+    ═══════════════════════════════════════════════════ */
+    .sidebar {
+      position: fixed; top: 0; left: 0; bottom: 0;
+      width: var(--sidebar-w);
+      background: var(--bg-sunk);
+      color: var(--ink);
+      border-right: 1px solid var(--line-strong);
+      display: flex; flex-direction: column;
+      z-index: 100;
+      overflow-y: auto;
+    }
+
+    .sidebar-logo {
+      padding: var(--s-5) var(--s-5) var(--s-4);
+      border-bottom: 1px solid var(--line);
+      display: flex; flex-direction: column; gap: 3px;
+    }
+    .sidebar-logo-eyebrow {
+      font-size: 10px; letter-spacing: 0.10em; text-transform: uppercase;
+      color: var(--accent); font-weight: 600; display: flex;
+      align-items: center; gap: 6px;
+    }
+    .sidebar-logo-eyebrow svg { flex-shrink: 0; color: var(--accent); }
+    .sidebar-logo h1 {
+      font-family: var(--font-serif);
+      font-size: 17px; font-weight: 500; letter-spacing: -0.01em;
+      color: var(--ink); line-height: 1.15; margin-top: 2px;
+    }
+    .sidebar-logo .tagline {
+      font-size: 11px; color: var(--ink-3); letter-spacing: 0.01em;
+    }
+    .v-badge {
+      display: inline-block;
+      font-family: var(--font-mono);
+      font-size: 10px; background: var(--accent-wash);
+      padding: 1px 6px; border-radius: var(--r-full);
+      margin-left: 4px; vertical-align: middle;
+      font-weight: 400; color: var(--accent);
+      border: 1px solid rgba(139,58,47,0.18);
+    }
+
+    /* Session strip */
+    .sidebar-session {
+      padding: var(--s-3) var(--s-5);
+      border-bottom: 1px solid var(--line);
+    }
+    .session-meta-label {
+      font-size: 10px; text-transform: uppercase; letter-spacing: 0.08em;
+      font-weight: 600; color: var(--ink-4); margin-bottom: 4px;
+    }
+    .session-meta-name {
+      font-size: 13px; font-weight: 590; color: var(--ink);
+      margin-bottom: 8px;
+      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    }
+    .session-btns { display: flex; gap: 6px; }
+    .btn-sess {
+      flex: 1; padding: 5px 8px; font-size: 11px; font-weight: 500;
+      border: 1px solid var(--line-strong);
+      background: var(--surface); color: var(--ink-2);
+      border-radius: var(--r-sm); transition: all .15s;
+    }
+    .btn-sess:hover { background: var(--surface-2); color: var(--ink); border-color: var(--accent); }
+
+    /* Nav items */
+    .sidebar-nav { flex: 1; padding: var(--s-2) 0; overflow-y: auto; }
+    .nav-group-label {
+      font-size: 10px; text-transform: uppercase; letter-spacing: 0.08em;
+      color: var(--ink-4); padding: 10px var(--s-5) 4px; font-weight: 600;
+    }
+    .nav-item {
+      display: flex; align-items: center; gap: var(--s-2);
+      padding: 8px var(--s-4); cursor: pointer;
+      transition: background .12s; position: relative;
+      margin: 1px var(--s-2); border-radius: var(--r-md);
+    }
+    .nav-item:hover  { background: var(--line); }
+    .nav-item.active { background: var(--accent-wash); }
+
+    .nav-num {
+      width: 22px; height: 22px; border-radius: var(--r-sm);
+      background: var(--surface);
+      font-family: var(--font-mono);
+      font-size: 10px; font-weight: 500;
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0;
+      border: 1px solid var(--line-strong);
+      color: var(--ink-3);
+      transition: background .15s;
+    }
+    .nav-item.active  .nav-num { background: var(--accent); border-color: var(--accent); color: var(--surface); }
+    .nav-item.has-data .nav-num { background: var(--surface-2); border-color: var(--line-strong); color: var(--ink-2); }
+
+    .nav-item-text { flex: 1; font-size: 13px; color: var(--ink-2); }
+    .nav-item.active   .nav-item-text { color: var(--accent); font-weight: 600; }
+    .nav-item.has-data .nav-item-text { color: var(--ink); }
+
+    .nav-rating-badge {
+      font-size: 10px; padding: 1px 7px; border-radius: var(--r-full); font-weight: 600;
+    }
+
+    /* Save indicator + export */
+    .sidebar-bottom {
+      padding: var(--s-3) var(--s-4);
+      border-top: 1px solid var(--line);
+    }
+    .save-indicator {
+      font-size: 11px; font-family: var(--font-mono); color: var(--ink-4);
+      text-align: center; margin-bottom: 10px; min-height: 16px;
+      transition: color .3s;
+    }
+    .save-indicator.saved { color: var(--moss); }
+
+    .btn-export-main {
+      display: flex; align-items: center; justify-content: center; gap: 8px;
+      width: 100%; padding: 10px;
+      background: var(--accent); color: var(--surface-3);
+      border: none; border-radius: var(--r-md);
+      font-size: 13px; font-weight: 600;
+      transition: background .15s;
+    }
+    .btn-export-main:hover { background: var(--accent-hi); }
+
+    /* ═══════════════════════════════════════════════════
+       TOPBAR (tablet / mobile)
+    ═══════════════════════════════════════════════════ */
+    .topbar {
+      display: none;
+      position: fixed; top: 0; left: 0; right: 0;
+      height: var(--topbar-h);
+      background: var(--surface);
+      border-bottom: 1px solid var(--line);
+      z-index: 60;
+      align-items: center; justify-content: space-between;
+      padding: 0 var(--s-4);
+    }
+    .topbar-left { display: flex; align-items: center; gap: 10px; }
+    .topbar-logo {
+      font-family: var(--font-serif);
+      font-size: 20px; font-weight: 500; letter-spacing: -0.01em; color: var(--ink);
+    }
+    .topbar-session-name {
+      font-size: 12px; color: var(--ink-3);
+      max-width: 120px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+    }
+    .topbar-actions { display: flex; gap: 8px; }
+    .btn-topbar {
+      padding: 7px 14px; border-radius: var(--r-md);
+      border: none; font-size: 13px; font-weight: 600;
+      transition: all .15s;
+    }
+    .btn-topbar.primary { background: var(--accent); color: var(--surface-3); }
+    .btn-topbar.ghost   { background: var(--bg); color: var(--ink-2); border: 1px solid var(--line-strong); }
+
+    /* ═══════════════════════════════════════════════════
+       PILL STRIP (tablet / mobile)
+    ═══════════════════════════════════════════════════ */
+    .pill-strip-wrap {
+      display: none;
+      position: fixed; top: var(--topbar-h); left: 0; right: 0;
+      z-index: 55;
+      background: var(--surface);
+      border-bottom: 1px solid var(--line);
+      overflow-x: auto; scrollbar-width: none;
+    }
+    .pill-strip-wrap::-webkit-scrollbar { display: none; }
+    .pill-strip { display: flex; gap: 6px; padding: 9px var(--s-4); width: max-content; }
+
+    .pill {
+      padding: 5px 12px; border-radius: var(--r-full);
+      font-size: 12px; font-weight: 510; letter-spacing: 0.01em;
+      background: var(--bg); color: var(--ink-3);
+      border: 1px solid var(--line-strong);
+      transition: all .12s;
+      white-space: nowrap; display: flex; align-items: center; gap: 5px;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .pill.active     { background: var(--accent); border-color: var(--accent); color: var(--surface-3); }
+    .pill.has-data   { border-color: var(--ink-3); color: var(--ink-2); }
+    .pill.active.has-data { background: var(--accent); border-color: var(--accent); color: var(--surface-3); }
+    .pill-dot { width: 5px; height: 5px; border-radius: 50%; background: currentColor; }
+
+    /* ═══════════════════════════════════════════════════
+       MAIN CONTENT
+    ═══════════════════════════════════════════════════ */
+    .main {
+      margin-left: var(--sidebar-w);
+      padding: var(--s-7) var(--s-7) var(--s-8);
+      min-height: 100vh;
+    }
+
+    .section-hdr {
+      margin-bottom: var(--s-5);
+      padding-bottom: var(--s-4);
+      border-bottom: 1px solid var(--line);
+    }
+    .section-hdr h2 {
+      font-family: var(--font-serif);
+      font-size: 28px; font-weight: 500; letter-spacing: -0.02em;
+      color: var(--ink); line-height: 1.1;
+      display: flex; align-items: center; gap: var(--s-3);
+    }
+    .sec-icon { flex-shrink: 0; color: var(--ink-3); }
+    .section-hdr p { font-size: 15px; color: var(--ink-3); margin-top: 4px; }
+
+    /* ═══════════════════════════════════════════════════
+       CARDS
+    ═══════════════════════════════════════════════════ */
+    .card {
+      background: var(--surface);
+      border-radius: var(--r-xl);
+      border: 1px solid var(--line);
+      box-shadow: var(--shadow-sm);
+      padding: var(--s-6);
+      margin-bottom: var(--s-4);
+    }
+    .card-title {
+      font-size: 11px; font-weight: 600;
+      text-transform: uppercase; letter-spacing: 0.10em;
+      color: var(--accent); margin-bottom: var(--s-4);
+    }
+
+    /* ═══════════════════════════════════════════════════
+       FORM FIELDS
+    ═══════════════════════════════════════════════════ */
+    .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: var(--s-4); }
+    .form-grid.cols-1 { grid-template-columns: 1fr; }
+    .form-grid.cols-3 { grid-template-columns: 1fr 1fr 1fr; }
+    .col-span-2 { grid-column: span 2; }
+
+    .field { display: flex; flex-direction: column; gap: 5px; }
+    .field-label {
+      font-size: 12px; font-weight: 510;
+      letter-spacing: 0.01em;
+      color: var(--ink-2);
+    }
+    .field-label .req { color: var(--cond-crit-fg); margin-left: 2px; }
+
+    .field-input, .field-select, .field-textarea {
+      padding: 10px 12px;
+      border: 1px solid var(--line-strong);
+      border-radius: var(--r-md);
+      font-size: 15px; color: var(--ink);
+      background: var(--surface);
+      transition: border-color .15s, box-shadow .15s;
+    }
+    .field-input:focus, .field-select:focus, .field-textarea:focus {
+      outline: none;
+      border-color: var(--accent);
+      box-shadow: var(--focus-ring);
+    }
+    .field-textarea { resize: vertical; min-height: 80px; line-height: 1.55; }
+    .field-select {
+      appearance: none;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' fill='none'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%236b6f78' stroke-width='1.5' stroke-linecap='round'/%3E%3C/svg%3E");
+      background-repeat: no-repeat; background-position: right 12px center; padding-right: 32px;
+    }
+
+    /* Radio & checkbox */
+    .radio-row { display: flex; gap: var(--s-4); flex-wrap: wrap; margin-top: 2px; }
+    .radio-item { display: flex; align-items: center; gap: 7px; cursor: pointer; }
+    .radio-item input { accent-color: var(--accent); width: 16px; height: 16px; }
+    .radio-item label { font-size: 15px; color: var(--ink-2); }
+
+    .check-list { display: flex; flex-direction: column; gap: 10px; margin-top: 2px; }
+    .check-item { display: flex; align-items: center; gap: 10px; cursor: pointer; }
+    .check-item input { accent-color: var(--accent); width: 17px; height: 17px; }
+    .check-item label { font-size: 15px; color: var(--ink-2); }
+
+    /* ═══════════════════════════════════════════════════
+       CONDITION RATING
+    ═══════════════════════════════════════════════════ */
+    .condition-group { margin-bottom: var(--s-5); }
+    .condition-label {
+      font-size: 11px; font-weight: 600;
+      text-transform: uppercase; letter-spacing: 0.07em;
+      color: var(--ink-3); margin-bottom: 10px;
+    }
+    .condition-pills { display: flex; gap: 8px; flex-wrap: wrap; }
+
+    .cond-pill {
+      padding: 7px 14px; border-radius: var(--r-full);
+      border: 1px solid var(--line-strong);
+      font-size: 12px; font-weight: 600; letter-spacing: 0.02em;
+      text-transform: uppercase;
+      background: var(--bg); color: var(--ink-3);
+      transition: border-color .12s, background .12s, color .12s;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .cond-pill:hover            { border-color: var(--accent); color: var(--accent); }
+    .cond-pill.sel-good         { background: var(--cond-good-bg); border-color: var(--cond-good-fg); color: var(--cond-good-fg); }
+    .cond-pill.sel-fair         { background: var(--cond-fair-bg); border-color: var(--cond-fair-fg); color: var(--cond-fair-fg); }
+    .cond-pill.sel-poor         { background: var(--cond-poor-bg); border-color: var(--cond-poor-fg); color: var(--cond-poor-fg); }
+    .cond-pill.sel-critical     { background: var(--cond-crit-bg); border-color: var(--cond-crit-fg); color: var(--cond-crit-fg); }
+    .cond-pill.sel-na           { background: var(--surface-2); border-color: var(--ink-4); color: var(--ink-4); }
+
+    .cond-badge {
+      display: inline-flex; align-items: center; gap: 4px;
+      padding: 2px 10px;
+      border-radius: var(--r-full); font-size: 11px; font-weight: 600;
+    }
+    .cond-badge.good     { background: var(--cond-good-bg); color: var(--cond-good-fg); }
+    .cond-badge.fair     { background: var(--cond-fair-bg); color: var(--cond-fair-fg); }
+    .cond-badge.poor     { background: var(--cond-poor-bg); color: var(--cond-poor-fg); }
+    .cond-badge.critical { background: var(--cond-crit-bg); color: var(--cond-crit-fg); }
+    .cond-badge.na       { background: var(--surface-2); color: var(--ink-4); }
+
+    /* ═══════════════════════════════════════════════════
+       ENTRIES CARD
+    ═══════════════════════════════════════════════════ */
+    .entries-card {
+      background: var(--surface);
+      border-radius: var(--r-xl);
+      border: 1px solid var(--line);
+      box-shadow: var(--shadow-sm);
+      overflow: hidden;
+      margin-bottom: var(--s-4);
+    }
+    .entries-head {
+      padding: var(--s-4) var(--s-6);
+      border-bottom: 1px solid var(--line);
+      background: var(--surface-2);
+      display: flex; align-items: center; justify-content: space-between; gap: 12px;
+    }
+    .entries-head-left { display: flex; align-items: center; gap: 10px; }
+    .entries-head-title { font-size: 14px; font-weight: 590; color: var(--ink); }
+    .entries-count-badge {
+      font-size: 11px; background: var(--bg);
+      padding: 2px 9px; border-radius: var(--r-full); color: var(--ink-3);
+      font-weight: 510; border: 1px solid var(--line);
+    }
+    .btn-add {
+      display: flex; align-items: center; gap: 6px;
+      padding: 7px 13px;
+      background: var(--accent); color: var(--surface-3);
+      border: none; border-radius: var(--r-md);
+      font-size: 12px; font-weight: 600;
+      transition: background .15s;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .btn-add:hover { background: var(--accent-hi); }
+
+    .entry-row {
+      padding: var(--s-4) var(--s-6);
+      border-bottom: 1px solid var(--line-soft);
+      display: flex; align-items: flex-start; gap: 12px;
+      transition: background .4s;
+    }
+    .entry-row:last-child { border-bottom: none; }
+    .entry-row.flash-new  { background: var(--accent-wash); }
+
+    .entry-ref-tag {
+      font-size: 11px; font-weight: 500; font-family: var(--font-mono);
+      background: var(--bg-sunk); padding: 3px 8px;
+      border-radius: var(--r-sm); color: var(--ink-3);
+      flex-shrink: 0; margin-top: 2px;
+      border: 1px solid var(--line);
+    }
+    .entry-body { flex: 1; min-width: 0; }
+    .entry-location { font-size: 13px; font-weight: 590; margin-bottom: 2px; color: var(--ink); }
+    .entry-notes-text {
+      font-size: 13px; color: var(--ink-3); line-height: 1.45; margin-bottom: 6px;
+      display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
+    }
+    .entry-tags { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
+    .entry-photo-strip { display: flex; gap: 5px; margin-top: 8px; flex-wrap: wrap; }
+    .entry-photo-thumb {
+      width: 52px; height: 52px; object-fit: cover;
+      border-radius: var(--r-sm); border: 1px solid var(--line); cursor: pointer;
+    }
+    .entry-photo-more {
+      width: 52px; height: 52px; background: var(--bg);
+      border-radius: var(--r-sm); border: 1px solid var(--line);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 11px; font-weight: 600; color: var(--ink-3); cursor: pointer;
+    }
+
+    .entry-actions { display: flex; gap: 4px; flex-shrink: 0; }
+    .btn-icon {
+      width: 32px; height: 32px;
+      border: 1px solid var(--line); background: var(--surface);
+      border-radius: var(--r-sm);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 14px; transition: background .15s; color: var(--ink-3);
+    }
+    .btn-icon:hover     { background: var(--surface-2); }
+    .btn-icon.del:hover { background: var(--cond-crit-bg); color: var(--cond-crit-fg); }
+
+    .entries-empty {
+      padding: 40px var(--s-6); text-align: center;
+    }
+    .entries-empty-icon { font-size: 36px; margin-bottom: 10px; }
+    .entries-empty p    { font-size: 14px; color: var(--ink-3); }
+
+    .entries-cost-footer {
+      padding: 12px var(--s-6);
+      border-top: 1px solid var(--line);
+      background: var(--bg);
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    .cost-footer-label { font-size: 12px; color: var(--ink-3); }
+    .cost-footer-value {
+      font-family: var(--font-serif);
+      font-size: 20px; font-weight: 500; color: var(--ink);
+    }
+
+    /* Priority badge */
+    .prio-badge {
+      display: inline-block; padding: 2px 9px;
+      border-radius: var(--r-full); font-size: 11px; font-weight: 600;
+    }
+    .prio-badge.urgent    { background: var(--cond-crit-bg); color: var(--cond-crit-fg); }
+    .prio-badge.important { background: var(--cond-fair-bg); color: var(--cond-fair-fg); }
+    .prio-badge.routine   { background: var(--cond-good-bg); color: var(--cond-good-fg); }
+
+    /* ═══════════════════════════════════════════════════
+       SECTION NAV FOOTER
+    ═══════════════════════════════════════════════════ */
+    .sec-nav-footer {
+      display: flex; align-items: center; justify-content: space-between;
+      margin-top: var(--s-7); padding-top: var(--s-5);
+      border-top: 1px solid var(--line);
+    }
+    .btn-nav-step {
+      display: flex; align-items: center; gap: 6px;
+      padding: 9px 18px;
+      background: var(--surface);
+      border: 1px solid var(--line-strong);
+      border-radius: var(--r-md);
+      font-size: 13px; font-weight: 600;
+      color: var(--ink-2); transition: all .15s;
+    }
+    .btn-nav-step:hover             { border-color: var(--accent); color: var(--accent); }
+    .btn-nav-step.fwd               { background: var(--accent); border-color: var(--accent); color: var(--surface-3); }
+    .btn-nav-step.fwd:hover         { background: var(--accent-hi); }
+    .btn-nav-step:disabled          { opacity: 0.35; cursor: not-allowed; pointer-events: none; }
+    .nav-progress-text              { font-size: 12px; color: var(--ink-3); font-weight: 510; }
+
+    /* ═══════════════════════════════════════════════════
+       SUMMARY SECTION
+    ═══════════════════════════════════════════════════ */
+    .summary-stats {
+      display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-bottom: var(--s-4);
+    }
+    .stat-box {
+      background: var(--surface-2); border-radius: var(--r-lg);
+      padding: var(--s-4); text-align: center; border: 1px solid var(--line);
+    }
+    .stat-value {
+      font-family: var(--font-serif);
+      font-size: 34px; font-weight: 500; line-height: 1; color: var(--ink);
+    }
+    .stat-label {
+      font-size: 11px; color: var(--ink-3); margin-top: 5px;
+      text-transform: uppercase; letter-spacing: 0.08em; font-weight: 600;
+    }
+
+    /* ═══════════════════════════════════════════════════
+       DRAWER OVERLAY & ENTRY DRAWER
+    ═══════════════════════════════════════════════════ */
+    .drawer-overlay {
+      position: fixed; inset: 0; background: rgba(0,0,0,0.4);
+      z-index: 200; opacity: 0; pointer-events: none; transition: opacity .3s;
+    }
+    .drawer-overlay.on { opacity: 1; pointer-events: all; }
+
+    .entry-drawer {
+      position: fixed; bottom: 0; left: 0; right: 0;
+      background: var(--surface);
+      border-top: 2px solid var(--accent);
+      box-shadow: var(--shadow-lg);
+      z-index: 201; max-height: 92vh; overflow-y: auto;
+      transform: translateY(100%);
+      transition: transform .3s cubic-bezier(0.32,0.72,0,1);
+      padding-bottom: env(safe-area-inset-bottom, 20px);
+    }
+    .entry-drawer.open { transform: translateY(0); }
+
+    .drawer-handle {
+      width: 40px; height: 4px; background: var(--line-strong);
+      border-radius: var(--r-full); margin: 12px auto 0;
+    }
+    .drawer-hdr {
+      padding: var(--s-4) var(--s-5);
+      border-bottom: 1px solid var(--line);
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    .drawer-hdr-title {
+      font-family: var(--font-serif);
+      font-size: 20px; font-weight: 500; color: var(--ink);
+    }
+    .btn-drawer-close {
+      width: 30px; height: 30px;
+      background: var(--bg); border: 1px solid var(--line);
+      border-radius: 50%;
+      font-size: 14px; color: var(--ink-3);
+      display: flex; align-items: center; justify-content: center;
+    }
+
+    .drawer-body { padding: var(--s-5); }
+    .drawer-ref-hint { font-size: 12px; color: var(--ink-3); margin-bottom: 4px; }
+    .drawer-ref-display {
+      font-family: var(--font-mono);
+      font-size: 22px; font-weight: 500;
+      color: var(--ink-2); margin-bottom: var(--s-5);
+    }
+
+    .drawer-footer {
+      padding: var(--s-4) var(--s-5);
+      border-top: 1px solid var(--line);
+      display: flex; gap: 10px;
+    }
+    .btn-drawer-save {
+      flex: 1; padding: 13px;
+      background: var(--accent); color: var(--surface-3);
+      border: none; border-radius: var(--r-md);
+      font-size: 15px; font-weight: 600;
+      transition: background .15s;
+    }
+    .btn-drawer-save:hover { background: var(--accent-hi); }
+    .btn-drawer-cancel {
+      padding: 13px var(--s-5);
+      background: var(--bg);
+      border: 1px solid var(--line-strong);
+      border-radius: var(--r-md);
+      font-size: 15px; font-weight: 510;
+      color: var(--ink-2);
+    }
+
+    /* ═══════════════════════════════════════════════════
+       CAMERA
+    ═══════════════════════════════════════════════════ */
+    .camera-zone { margin-bottom: var(--s-5); }
+    .camera-zone .field-label { margin-bottom: 8px; }
+    .camera-btns { display: flex; gap: 8px; }
+    .btn-cam {
+      flex: 1; padding: 10px 8px;
+      border: 1px dashed var(--line-strong);
+      background: var(--bg); border-radius: var(--r-md);
+      font-size: 13px; color: var(--ink-3);
+      transition: all .15s;
+      display: flex; align-items: center; justify-content: center; gap: 6px;
+    }
+    .btn-cam:hover { border-color: var(--accent); color: var(--accent); }
+    .photo-strip-preview { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 10px; }
+    .photo-thumb-wrap { position: relative; }
+    .photo-thumb {
+      width: 72px; height: 72px; object-fit: cover;
+      border-radius: var(--r-sm); border: 1px solid var(--line); display: block;
+    }
+    .photo-remove-btn {
+      position: absolute; top: -5px; right: -5px;
+      width: 18px; height: 18px;
+      background: var(--cond-crit-fg); color: var(--surface-3);
+      border: none; border-radius: 50%; font-size: 10px;
+      display: flex; align-items: center; justify-content: center;
+    }
+
+    .camera-modal {
+      position: fixed; inset: 0; background: #000;
+      z-index: 300; display: none; flex-direction: column; align-items: stretch;
+    }
+    .camera-modal.open { display: flex; }
+    .camera-video { flex: 1; width: 100%; object-fit: cover; }
+    .camera-controls-bar {
+      padding: 20px 30px; background: rgba(0,0,0,0.85);
+      display: flex; align-items: center; justify-content: space-between;
+      padding-bottom: calc(20px + env(safe-area-inset-bottom, 0px));
+    }
+    .btn-cam-action {
+      padding: 10px 20px; background: rgba(255,255,255,0.2);
+      color: #fff; border: none; border-radius: var(--r-md); font-size: 14px;
+    }
+    .btn-shutter {
+      width: 66px; height: 66px; border-radius: 50%;
+      background: var(--surface-3); border: 5px solid rgba(255,255,255,0.4);
+      transition: transform .1s;
+    }
+    .btn-shutter:active { transform: scale(0.9); }
+
+    /* ═══════════════════════════════════════════════════
+       MODALS
+    ═══════════════════════════════════════════════════ */
+    .modal-overlay {
+      position: fixed; inset: 0; background: rgba(0,0,0,0.4);
+      z-index: 400; display: none;
+      align-items: center; justify-content: center; padding: 20px;
+    }
+    .modal-overlay.open { display: flex; }
+
+    .modal-box {
+      background: var(--surface);
+      border-radius: var(--r-xl); padding: var(--s-6);
+      max-width: 380px; width: 100%;
+      box-shadow: var(--shadow-lg);
+      border: 1px solid var(--line);
+    }
+    .modal-box h3 {
+      font-family: var(--font-serif);
+      font-size: 20px; font-weight: 500; margin-bottom: 8px; color: var(--ink);
+    }
+    .modal-box p  { font-size: 14px; color: var(--ink-3); margin-bottom: var(--s-5); }
+    .modal-actions { display: flex; gap: 10px; justify-content: flex-end; }
+    .btn-modal-cancel {
+      padding: 9px 18px; background: var(--bg);
+      border: 1px solid var(--line-strong);
+      border-radius: var(--r-md); font-size: 14px; color: var(--ink-2);
+    }
+    .btn-modal-ok {
+      padding: 9px 18px; background: var(--cond-crit-fg);
+      color: var(--surface-3); border: none; border-radius: var(--r-md);
+      font-size: 14px; font-weight: 600;
+    }
+    .btn-modal-ok.safe { background: var(--accent); }
+
+    .session-modal-box { max-width: 440px; }
+    .session-list-wrap {
+      border: 1px solid var(--line); border-radius: var(--r-md); overflow: hidden;
+      max-height: 280px; overflow-y: auto; margin-bottom: var(--s-4);
+    }
+    .sess-item {
+      display: flex; align-items: center; gap: 10px;
+      padding: 12px var(--s-4); border-bottom: 1px solid var(--line);
+      transition: background .15s;
+    }
+    .sess-item:last-child { border-bottom: none; }
+    .sess-item:hover { background: var(--bg); }
+    .sess-item-info { flex: 1; }
+    .sess-item-name { font-size: 14px; font-weight: 590; color: var(--ink); }
+    .sess-item-date {
+      font-family: var(--font-mono);
+      font-size: 11px; color: var(--ink-3); margin-top: 1px;
+    }
+    .btn-sess-del {
+      width: 26px; height: 26px; background: none; border: none;
+      color: var(--ink-4); border-radius: var(--r-sm); font-size: 14px;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .btn-sess-del:hover { background: var(--cond-crit-bg); color: var(--cond-crit-fg); }
+    .sess-modal-btns { display: flex; gap: 8px; }
+    .btn-sess-action {
+      flex: 1; padding: 10px;
+      border: 1px solid var(--line-strong); border-radius: var(--r-md);
+      background: var(--bg); font-size: 13px; font-weight: 600;
+      transition: all .15s; color: var(--ink-2);
+    }
+    .btn-sess-action:hover { border-color: var(--accent); color: var(--accent); }
+    .btn-sess-action.new-sess { background: var(--accent); color: var(--surface-3); border-color: var(--accent); }
+    .btn-sess-action.new-sess:hover { background: var(--accent-hi); }
+
+    .export-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: var(--s-4); }
+    .export-opt {
+      padding: var(--s-4); border: 1px solid var(--line);
+      border-radius: var(--r-lg); text-align: center;
+      transition: all .15s; background: var(--surface);
+    }
+    .export-opt:hover { border-color: var(--accent); background: var(--accent-wash); }
+    .export-opt-icon  { font-size: 26px; margin-bottom: 6px; }
+    .export-opt-label { font-size: 13px; font-weight: 590; color: var(--ink); }
+    .export-opt-desc  { font-size: 11px; color: var(--ink-3); margin-top: 2px; }
+
+    /* ═══════════════════════════════════════════════════
+       TOAST
+    ═══════════════════════════════════════════════════ */
+    .toast {
+      position: fixed; bottom: 80px; left: 50%;
+      transform: translateX(-50%) translateY(16px);
+      background: var(--ink); color: var(--surface-3);
+      padding: 11px 24px; border-radius: var(--r-full);
+      font-size: 14px; font-weight: 510;
+      opacity: 0; transition: all .3s;
+      z-index: 600; white-space: nowrap; pointer-events: none;
+    }
+    .toast.success { background: var(--ink); }
+    .toast.warn    { background: var(--cond-fair-fg); }
+    .toast.show    { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+    /* Cost prefix */
+    .cost-wrap { position: relative; }
+    .cost-wrap::before {
+      content: '$'; position: absolute; left: 12px;
+      top: 50%; transform: translateY(-50%);
+      font-size: 14px; color: var(--ink-3); pointer-events: none;
+    }
+    .cost-wrap input { padding-left: 26px; }
+
+    /* ═══════════════════════════════════════════════════
+       DEMO BANNER
+    ═══════════════════════════════════════════════════ */
+    .demo-banner {
+      background: var(--accent-wash);
+      border: 1px solid rgba(139,58,47,0.15);
+      border-left: 3px solid var(--accent);
+      color: var(--ink);
+      padding: var(--s-3) var(--s-5);
+      display: flex; align-items: center; justify-content: space-between;
+      gap: 12px; margin-bottom: var(--s-5);
+      border-radius: var(--r-lg);
+    }
+    .demo-banner-left { display: flex; align-items: center; gap: 10px; }
+    .demo-badge {
+      font-family: var(--font-mono);
+      font-size: 10px; font-weight: 500; letter-spacing: 0.05em;
+      background: var(--accent); color: var(--surface-3);
+      padding: 2px 8px; border-radius: var(--r-xs);
+    }
+    .demo-banner-text { font-size: 13px; line-height: 1.4; color: var(--ink-2); }
+    .demo-banner-text strong { font-weight: 600; color: var(--ink); }
+    .demo-banner-text span   { font-size: 12px; color: var(--ink-3); }
+    .btn-demo-dismiss {
+      background: var(--surface); border: 1px solid var(--line-strong);
+      color: var(--ink-2); padding: 5px 12px; border-radius: var(--r-sm);
+      font-size: 12px; font-weight: 500;
+      white-space: nowrap; flex-shrink: 0;
+    }
+    .btn-demo-dismiss:hover { border-color: var(--accent); color: var(--accent); }
+    .btn-load-demo {
+      background: var(--accent); border: none;
+      color: var(--surface-3); padding: 5px 12px; border-radius: var(--r-sm);
+      font-size: 12px; font-weight: 600;
+      white-space: nowrap; flex-shrink: 0;
+    }
+    .btn-load-demo:hover { background: var(--accent-hi); }
+
+    /* ═══════════════════════════════════════════════════
+       STEWRD PIPELINE
+    ═══════════════════════════════════════════════════ */
+    .stewrd-pipeline {
+      padding: var(--s-3) var(--s-4) var(--s-4);
+      border-top: 1px solid var(--line-soft);
+    }
+    .pipeline-label {
+      font-size: 10px; text-transform: uppercase; letter-spacing: 0.10em;
+      color: var(--ink-4); margin-bottom: 8px; font-weight: 600;
+    }
+    .pipeline-steps { display: flex; flex-direction: column; gap: 3px; }
+    .pipeline-step {
+      display: flex; align-items: center; gap: 8px;
+      font-size: 11px; color: var(--ink-4); padding: 4px 0;
+    }
+    .pipeline-step.current { color: var(--ink); font-weight: 600; }
+    .pipeline-step.done    { color: var(--moss); }
+    .pipeline-step-num {
+      width: 16px; height: 16px; border-radius: var(--r-xs);
+      background: var(--surface); border: 1px solid var(--line);
+      font-family: var(--font-mono); font-size: 9px; font-weight: 500;
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0; color: var(--ink-4);
+    }
+    .pipeline-step.current .pipeline-step-num {
+      background: var(--accent); border-color: var(--accent); color: var(--surface-3);
+    }
+    .pipeline-step.done .pipeline-step-num {
+      background: var(--moss-wash); border-color: var(--moss); color: var(--moss);
+    }
+    .pipeline-connector {
+      width: 1px; height: 6px; background: var(--line); margin-left: 7px;
+    }
+
+    /* ═══════════════════════════════════════════════════
+       RESPONSIVE
+    ═══════════════════════════════════════════════════ */
+    @media (max-width: 900px) {
+      .sidebar          { display: none; }
+      .topbar           { display: flex; }
+      .pill-strip-wrap  { display: block; }
+
+      .main {
+        margin-left: 0; padding: var(--s-4);
+        padding-top: calc(var(--topbar-h) + var(--pills-h) + var(--s-4));
+        padding-bottom: calc(var(--bottomnav-h) + var(--s-4));
+      }
+
+      .sec-nav-footer {
+        position: fixed; bottom: 0; left: 0; right: 0;
+        background: var(--surface); border-top: 1px solid var(--line);
+        padding: 10px var(--s-4);
+        padding-bottom: calc(10px + env(safe-area-inset-bottom, 0px));
+        margin-top: 0; z-index: 50;
+      }
+
+      .form-grid       { grid-template-columns: 1fr; }
+      .col-span-2      { grid-column: span 1; }
+      .form-grid.cols-3 { grid-template-columns: 1fr 1fr; }
+      .summary-stats   { grid-template-columns: 1fr 1fr; }
+      .export-grid     { grid-template-columns: 1fr; }
+    }
+    @media (max-width: 480px) {
+      .form-grid.cols-3 { grid-template-columns: 1fr; }
+      .condition-pills  { gap: 6px; }
+      .cond-pill        { padding: 7px 13px; font-size: 12px; }
+    }
+
+    /* ═══════════════════════════════════════════════════
+       PRINT
+    ═══════════════════════════════════════════════════ */
+    @media print {
+      .sidebar, .topbar, .pill-strip-wrap, .sec-nav-footer,
+      .btn-add, .entry-actions, .drawer-overlay, .entry-drawer,
+      .modal-overlay, .camera-modal, .toast { display: none !important; }
+      .main { margin: 0; padding: var(--s-4); }
+      .card, .entries-card { break-inside: avoid; page-break-inside: avoid; }
+    }
+  </style></head><body>`;
+
+  const prop = formData[1] || {};
+  html += `<h1>Heritage Condition Report</h1>
+  <p><strong>Property:</strong> ${prop.address || '—'}</p>
+  <p><strong>Date:</strong> ${prop.date || '—'} &nbsp; <strong>Inspector:</strong> ${prop.inspector || '—'}</p>
+  <p><strong>Assessment:</strong> ${currentSessionName}</p>`;
+
+  // Form sections
+  [2,3,4,5,6].forEach(id => {
+    const sec = SECTIONS.find(s => s.id === id);
+    const fd  = formData[id] || {};
+    const cond = fd.overallCondition || fd.riskLevel || '—';
+    html += `<h2>${sec.title} — <span class="${cond.toLowerCase()}">${cond}</span></h2><table><tr><th>Field</th><th>Value</th></tr>`;
+    sec.fields.forEach(f => {
+      const v = fd[f.key] || '—';
+      html += `<tr><td>${f.label}</td><td>${v}</td></tr>`;
+    });
+    html += '</table>';
+  });
+
+  // Complex sections
+  [7, 8, 9].forEach(id => {
+    const sec     = SECTIONS.find(s => s.id === id);
+    const entries = complexData[id] || [];
+    html += `<h2>${sec.title} (${entries.length} entries)</h2>`;
+    if (!entries.length) { html += '<p>No entries recorded.</p>'; return; }
+    const isDefect = id === 9;
+    html += `<table><tr><th>Ref</th><th>${sec.locationLabel}</th><th>Condition</th>${isDefect ? '<th>Priority</th><th>Suggested Work</th><th>Est. Cost</th>' : ''}<th>Notes</th></tr>`;
+    entries.forEach(e => {
+      html += `<tr>
+        <td>${e.ref}</td>
+        <td>${e.location}</td>
+        <td class="${(e.condition||'').toLowerCase()}">${e.condition || '—'}</td>
+        ${isDefect ? `<td class="${(e.priority||'').toLowerCase()}">${e.priority || '—'}</td><td>${e.suggestedWork || '—'}</td><td>${e.estimatedCost ? '$' + parseFloat(e.estimatedCost).toLocaleString() : '—'}</td>` : ''}
+        <td>${e.notes || '—'}</td>
+      </tr>`;
+    });
+    html += '</table>';
+  });
+
+  // Summary
+  const sum = formData[10] || {};
+  html += `<h2>Overall Summary</h2>
+  <p><strong>Overall Condition:</strong> <span class="${(sum.overallCondition||'').toLowerCase()}">${sum.overallCondition || '—'}</span></p>
+  <p><strong>Summary:</strong> ${sum.overallNotes || '—'}</p>
+  <p><strong>Recommendations:</strong> ${sum.recommendations || '—'}</p>
+  <p><strong>Urgent Works:</strong> ${sum.urgentWorks || '—'}</p>`;
+
+  html += '</body></html>';
+  const blob = new Blob([html], { type: 'text/html' });
+  downloadBlob(blob, `heritage-report-${datestamp()}.html`);
+  showToast('Word/HTML report downloaded ✓', 'success');
+}
+
+function downloadBlob(blob, filename) {
+  const url = URL.createObjectURL(blob);
+  const a   = document.createElement('a');
+  a.href = url; a.download = filename;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+}
+
+function datestamp() {
+  return new Date().toISOString().slice(0, 10);
+}
+
+/* ═══════════════════════════════════════════════════
+   CONFIRM MODAL
+═══════════════════════════════════════════════════ */
+function showConfirm(title, msg, onOk, okLabel = 'Delete') {
+  document.getElementById('confirmTitle').textContent = title;
+  document.getElementById('confirmMsg').textContent   = msg;
+  document.getElementById('confirmOkBtn').textContent = okLabel;
+  document.getElementById('confirmOkBtn').className   =
+    'btn-modal-ok' + (okLabel === 'Delete' ? '' : ' safe');
+  confirmCallback = onOk;
+  document.getElementById('confirmModal').classList.add('open');
+}
+
+function resolveConfirm(ok) {
+  document.getElementById('confirmModal').classList.remove('open');
+  if (ok && confirmCallback) confirmCallback();
+  confirmCallback = null;
+}
+
+/* ═══════════════════════════════════════════════════
+   LIGHTBOX
+═══════════════════════════════════════════════════ */
+function openLightbox(src) {
+  document.getElementById('lightboxImg').src = src;
+  document.getElementById('lightboxModal').classList.add('open');
+}
+function closeLightbox() {
+  document.getElementById('lightboxModal').classList.remove('open');
+}
+
+/* ═══════════════════════════════════════════════════
+   TOAST
+═══════════════════════════════════════════════════ */
+let toastTimer = null;
+function showToast(msg, type = '') {
+  const el = document.getElementById('toast');
+  el.textContent = msg;
+  el.className   = `toast ${type}`;
+  requestAnimationFrame(() => {
+    requestAnimationFrame(() => el.classList.add('show'));
+  });
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => el.classList.remove('show'), 2800);
+}
+
+/* ═══════════════════════════════════════════════════
+   UTILITIES
+═══════════════════════════════════════════════════ */
+function esc(str) {
+  if (str == null) return '';
+  return String(str)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;');
+}
+
+function genId() {
+  return Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
+}
+
+/* ═══════════════════════════════════════════════════
+   SAMPLE / DEMO DATA
+   Property: Thornton Cottage — heritage-listed Victorian
+   worker's cottage, Ballarat VIC. Managed by a small
+   community trust, no dedicated conservation staff.
+═══════════════════════════════════════════════════ */
+const SAMPLE_FORM_DATA = {
+  1: {
+    address:          '14 Elm Street, Ballarat VIC 3350',
+    date:             '2026-04-23',
+    inspector:        'Sarah Chen',
+    client:           'Ballarat Community Heritage Trust',
+    buildingType:     'Residential',
+    heritageOverlay:  'HO47',
+    constructionYear: '1892',
+    storeys:          '1',
+    occupancy:        'Tenanted',
+    constructionType: 'Double brick, bluestone foundations',
+    roofType:         'Terracotta tile (original)',
+    notes:            'Victorian worker\'s cottage, one of three remaining on Elm Street. Heritage Overlay requires heritage permit for external changes. Property is tenanted; tenant has been cooperative with access.',
+  },
+  2: {
+    overallCondition: 'Poor',
+    rcdPresent:       'No',
+    meterboard:       'Original porcelain fuse board — no circuit breakers',
+    wiringType:       'Cloth-sheathed rubber wiring, some conduit at rear extension',
+    lastTestDate:     'Unknown — no records available',
+    externalServices: 'Overhead connection from street',
+    notes:            'Cloth wiring is a fire risk. No RCD protection. Board is original to the 1950s rewire. Urgent safety concern — licensed electrician required before any other works.',
+  },
+  3: {
+    overallCondition: 'Fair',
+    waterPressure:    'Low',
+    mainMaterial:     'Galvanised iron (mains), copper (internal partial re-pipe)',
+    hotWaterSystem:   'Gas storage, approx 15 years old',
+    drainageType:     'Council sewer',
+    visibleLeaks:     'Yes',
+    notes:            'Slow drip at kitchen waste trap and under bathroom vanity. Galvanised mains likely restricting flow. Hot water service approaching end of life. Recommend plumber assessment.',
+  },
+  4: {
+    overallCondition: 'Poor',
+    dampnessPresent:  'Yes',
+    dampnessType:     'Rising damp in north and west walls; penetrating damp at chimney breast in main bedroom',
+    ventilationType:  'Natural cross-ventilation — sash windows',
+    subfloorVent:     'Inadequate',
+    mouldPresent:     'Yes',
+    notes:            'White salt efflorescence visible on lower 400mm of north wall (internal). Sub-floor has been blocked on west side — vents partially obscured by garden bed. Mould present in bathroom and rear bedroom. Significant issue for heritage fabric.',
+  },
+  5: {
+    riskLevel:      'High',
+    asbestos:       'Suspected',
+    asbestosNotes:  'Ceiling lining in rear kitchen addition (c.1960s) — flat sheet consistent with fibrous cement. Not sampled. Treat as ACM until tested.',
+    leadPaint:      'Present',
+    leadNotes:      'XRF reading confirmed lead in external window sills and front door surround. Multiple paint layers — intact but friable at edges of south window.',
+    otherHazards:   'Sub-floor soil contamination possible — previous coal storage under front room (confirmed by tenant).',
+    remediationReq: 'Yes — planned',
+    notes:          'ACM sampling required before any ceiling works. Lead paint management plan needed for any exterior repainting. Inform occupants of lead dust risk during maintenance.',
+  },
+  6: {
+    overallCondition: 'Fair',
+    foundationType:   'Bluestone strip footing',
+    foundationCond:   'Fair',
+    wallConstruction: 'Double brick (Flemish bond) — lime mortar',
+    cracksPresent:    'Moderate',
+    crackNotes:       'Stepped cracking in east gable above window opening — approx 3mm width at widest. Hairline cracks at corners of rear extension junction (different movement behaviour).',
+    movement:         'Historic / Stable',
+    floorCondition:   'Fair',
+    roofStructure:    'Fair',
+    notes:            'East gable cracking appears historic and stable — no fresh mortar dust, no differential movement observed. Monitor annually. Rear extension has minor active cracking at junction — differential settlement expected given different foundation depth.',
+  },
+  10: {
+    overallCondition: 'Fair',
+    overallNotes:     'Thornton Cottage retains high heritage integrity and the majority of its original fabric. Key concerns are the electrical system (urgent safety), rising damp (ongoing heritage fabric damage), and the chimney (structural deterioration). The building is weathertight overall but several areas require intervention within 12 months.',
+    recommendations:  '1. Immediately engage licensed electrician — replace fuse board, install RCDs, assess cloth wiring.\n2. Commission damp investigation and remediation report.\n3. Engage mason for chimney cap replacement and repointing.\n4. Have ACM ceiling lining sampled and managed.\n5. Clear sub-floor vents — can be done by handyperson.',
+    urgentWorks:      'Electrical system — fire and safety risk. Chimney cap — structural failure and water ingress risk.',
+    nextInspection:   '12 months (or following completion of electrical works)',
+    reportedBy:       'Sarah Chen, STEWRD Heritage Copilot',
+    reportDate:       '2026-04-23',
+  },
+};
+
+const SAMPLE_COMPLEX_DATA = {
+  7: [
+    { id: 'demo_ee1', ref: 'EE-01', location: 'North Elevation',         condition: 'Fair',     notes: 'Original face brick — lime mortar joints eroded 10–15mm in lower courses. Moss growth along base. No structural cracking. Repointing required within 2 years.' },
+    { id: 'demo_ee2', ref: 'EE-02', location: 'South Elevation (Front)', condition: 'Good',     notes: 'Well-maintained facade. Original sash windows intact with intact glazing bars. Some paint failure on sill of eastern window — lead paint, treat with care. Timber in good structural condition.' },
+    { id: 'demo_ee3', ref: 'EE-03', location: 'Roof — Main Terracotta',  condition: 'Fair',     notes: 'Approx 11 cracked or slipped tiles visible from ground — concentrated at ridge and north slope. Ridge capping mortar cracked and lifting in 3 sections. Gutters blocked with leaf litter — overflow staining visible on east fascia.' },
+    { id: 'demo_ee4', ref: 'EE-04', location: 'South Chimney',           condition: 'Critical', notes: 'Chimney cap missing — open flue. Significant mortar loss in top 400mm of stack. Two bricks dislodged and resting at an angle — structural failure risk. Lead flashing intact but lifting at edges. Urgent intervention required.' },
+    { id: 'demo_ee5', ref: 'EE-05', location: 'Timber Veranda',          condition: 'Fair',     notes: 'Two of four veranda posts show base rot — eastern post most severe (probe depth approx 25mm). Fascia boards and brackets intact. Original cast iron lacework present — one section loose. Painted surface in fair condition.' },
+    { id: 'demo_ee6', ref: 'EE-06', location: 'Sub-floor / Footings',    condition: 'Fair',     notes: 'Bluestone footings visible under west elevation — intact, no significant spalling. Sub-floor vents partially blocked on west side by garden bed. Evidence of past damp treatment (bitumen painted on lower course).' },
+  ],
+  8: [
+    { id: 'demo_rm1', ref: 'RM-01', location: 'Front Parlour',   condition: 'Good', notes: 'Original Baltic pine floorboards in very good condition — recently polished. Ornate plaster ceiling rose intact. Marble fireplace (non-operational). Walls freshly painted. Heritage joinery intact — sash windows, skirtings, architraves.' },
+    { id: 'demo_rm2', ref: 'RM-02', location: 'Main Bedroom',    condition: 'Fair', notes: 'Hairline plaster cracks around window opening on east wall — consistent with EE gable cracking above. Chimney breast has damp patch approx 400 × 600mm — associated with missing chimney cap. Timber floorboards cupped near window — old damp event. Heritage joinery intact.' },
+    { id: 'demo_rm3', ref: 'RM-03', location: 'Rear Bedroom',    condition: 'Fair', notes: 'Mould growth on south wall (external corner) — condensation issue. Lino floor covering over original boards. Sash window operational but rope broken — held open with timber off-cut. No heritage fabric loss identified beyond decoration.' },
+    { id: 'demo_rm4', ref: 'RM-04', location: 'Kitchen (original)', condition: 'Fair', notes: 'Original pressed metal ceiling — intact but some sections loose and rattling. Freestanding Kooka stove present (non-functional, heritage significance). Timber joinery in fair condition. Evidence of previous water ingress at north wall.' },
+    { id: 'demo_rm5', ref: 'RM-05', location: 'Rear Kitchen Addition', condition: 'Poor', notes: 'c.1960s addition. Suspected ACM ceiling lining — not disturbed. Substandard construction visible — lightweight timber framing, no insulation. Significant damp at north-west corner (penetrating damp through addition wall junction). Not heritage significant — future removal could be considered.' },
+    { id: 'demo_rm6', ref: 'RM-06', location: 'Bathroom',        condition: 'Poor', notes: 'Shower recess has failed waterproofing — water damage to adjacent wall framing. Black mould growth at ceiling level and around shower. Original cast iron bath present (heritage value). Vanity unit modern. Slow drain. Requires urgent attention to prevent structural damage to framing.' },
+  ],
+  9: [
+    { id: 'demo_d1', ref: 'D-01', location: 'South Chimney',         condition: 'Critical', priority: 'Urgent',    suggestedWork: 'Engage heritage mason immediately. Replace chimney cap (terracotta or matching material). Repoint top 600mm of stack using lime mortar matching existing. Re-bed loose bricks. Check lead flashing and re-dress. Scaffold required.',               estimatedCost: '3500', notes: 'Two loose bricks at top of stack — structural failure risk if not addressed before winter. Active water ingress through open flue causing damp to main bedroom chimney breast.' },
+    { id: 'demo_d2', ref: 'D-02', location: 'Electrical System',      condition: 'Critical', priority: 'Urgent',    suggestedWork: 'Licensed electrician to replace fuse board with modern switchboard, install RCDs on all circuits, test and report on cloth wiring condition. Cloth wiring likely requires full replacement. Building permit may be required.',                         estimatedCost: '4200', notes: 'No RCD protection. Cloth-sheathed wiring is a fire and electrocution risk. This is a safety priority — should be actioned before any other works.' },
+    { id: 'demo_d3', ref: 'D-03', location: 'Rising Damp — N & W Walls', condition: 'Poor', priority: 'Important', suggestedWork: 'Commission specialist damp investigation (rising damp surveyor). Clear sub-floor vents on west elevation. Investigate drainage at north boundary. Avoid cement-based renders — specify breathable lime treatments if intervention required.',         estimatedCost: '1800', notes: 'Salt efflorescence damaging original lime plaster and brick face. If untreated, will cause accelerating heritage fabric loss. Clear sub-floor vents as immediate low-cost action.' },
+    { id: 'demo_d4', ref: 'D-04', location: 'Roof — Tiles & Ridge',   condition: 'Poor',     priority: 'Important', suggestedWork: 'Licensed roofer to replace cracked tiles (salvaged matching terracotta if possible). Re-bed and point ridge capping using appropriate mortar. Clear all gutters and check downpipe connections. Inspect roof sarking condition while accessible.', estimatedCost: '2800', notes: '11 cracked or slipped tiles visible from ground. Ridge capping lifting in three sections. Risk of water ingress — particularly over kitchen.' },
+    { id: 'demo_d5', ref: 'D-05', location: 'Bathroom Waterproofing', condition: 'Poor',     priority: 'Important', suggestedWork: 'Strip shower recess. Inspect and replace any damaged framing. Apply compliant waterproofing membrane and re-tile. Retain cast iron bath and original connections if possible. Treat mould in ceiling before enclosing.',                           estimatedCost: '5500', notes: 'Shower waterproofing has failed — water penetrating wall framing. If not addressed, structural timber damage will escalate costs significantly.' },
+    { id: 'demo_d6', ref: 'D-06', location: 'Veranda Posts (east)',   condition: 'Fair',     priority: 'Important', suggestedWork: 'Engage carpenter to assess extent of rot in east posts. If localised, splice repair with matching timber species (hardwood, painted). If severe, full replacement with matching profile. Maintain cast iron lacework during works.',              estimatedCost: '1200', notes: 'Base rot in two posts — east most severe. Early intervention will prevent the need for full post replacement and protect the lacework above.' },
+    { id: 'demo_d7', ref: 'D-07', location: 'North Wall Repointing',  condition: 'Fair',     priority: 'Routine',   suggestedWork: 'Heritage mason to rake out and repoint eroded joints in lower courses using NHL 3.5 lime mortar matching the original in colour and texture. Do not use Portland cement — will cause brick damage. Treat moss before repointing.',                estimatedCost: '2200', notes: 'Eroded joints allowing moisture penetration. Not urgent but should be programmed within 2 years to prevent escalation to brick face damage.' },
+    { id: 'demo_d8', ref: 'D-08', location: 'Sub-floor Ventilation',  condition: 'Fair',     priority: 'Routine',   suggestedWork: 'Clear garden bed material from sub-floor vents on west elevation. Ensure minimum 50mm clearance. Check all vents around perimeter and clear any blockages. Owner/handyperson can complete this task — no specialist required.',                 estimatedCost: '0',    notes: 'Blocked vents contributing to rising damp conditions. Low-cost, high-impact action that owner can complete immediately.' },
+  ],
+};
+
+function loadSampleData() {
+  showConfirm(
+    'Load Demo Assessment',
+    'This will replace your current data with a sample heritage property assessment (Thornton Cottage, Ballarat VIC). Continue?',
+    () => {
+      formData    = JSON.parse(JSON.stringify(SAMPLE_FORM_DATA));
+      complexData = JSON.parse(JSON.stringify(SAMPLE_COMPLEX_DATA));
+      photoData   = {};
+      currentSessionName = 'Thornton Cottage — Demo';
+      saveAll();
+      updateSessionLabels();
+      updateNav();
+      showSection(1);
+      showToast('Demo assessment loaded ✓', 'success');
+    },
+    'Load Demo'
+  );
+}
+
+function dismissDemo() {
+  showConfirm(
+    'Clear Demo Data',
+    'Start a blank assessment? The demo data will be cleared.',
+    () => {
+      formData    = {};
+      complexData = { 7: [], 8: [], 9: [] };
+      photoData   = {};
+      currentSessionName = 'Untitled Assessment';
+      saveAll();
+      updateSessionLabels();
+      updateNav();
+      showSection(1);
+    },
+    'Clear'
+  );
+}
+
+/* ═══════════════════════════════════════════════════
+   PWA SERVICE WORKER
+═══════════════════════════════════════════════════ */
+function registerServiceWorker() {
+  if (!('serviceWorker' in navigator)) return;
+  const swCode = `
+const CACHE = 'hcl-v2-cache-v1';
+self.addEventListener('install', e => {
+  e.waitUntil(caches.open(CACHE).then(c => c.addAll([location.pathname])));
+  self.skipWaiting();
+});
+self.addEventListener('activate', e => {
+  e.waitUntil(caches.keys().then(keys =>
+    Promise.all(keys.filter(k => k !== CACHE).map(k => caches.delete(k)))
+  ));
+  self.clients.claim();
+});
+self.addEventListener('fetch', e => {
+  if (e.request.method !== 'GET') return;
+  e.respondWith(
+    caches.match(e.request).then(r => r || fetch(e.request).then(resp => {
+      const clone = resp.clone();
+      caches.open(CACHE).then(c => c.put(e.request, clone));
+      return resp;
+    }))
+  );
+});`;
+  const blob = new Blob([swCode], { type: 'application/javascript' });
+  const url  = URL.createObjectURL(blob);
+  navigator.serviceWorker.register(url).catch(() => {});
+}
+
+/* ═══════════════════════════════════════════════════
+   PWA MANIFEST (injected as link tag)
+═══════════════════════════════════════════════════ */
+function injectManifest() {
+  const manifest = {
+    name: 'Heritage Copilot — Agent 2',
+    short_name: 'Copilot',
+    description: 'Heritage property condition assessment tool',
+    start_url: location.pathname,
+    display: 'standalone',
+    background_color: '#F5F2EE',
+    theme_color: '#8B5E3C',
+    icons: [
+      { src: 'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><rect width="100" height="100" rx="20" fill="%23ebe4d6"/><path d="M10 85 C10 85 10 40 50 18 C90 40 90 85 90 85" stroke="%238b3a2f" stroke-width="7" fill="none" stroke-linecap="round"/><path d="M30 85 L30 58 Q30 36 50 28 Q70 36 70 58 L70 85" stroke="%238b3a2f" stroke-width="7" fill="none" stroke-linecap="round"/></svg>', sizes: '192x192', type: 'image/svg+xml' }
+    ]
+  };
+  const blob = new Blob([JSON.stringify(manifest)], { type: 'application/manifest+json' });
+  const link = document.createElement('link');
+  link.rel  = 'manifest';
+  link.href = URL.createObjectURL(blob);
+  document.head.appendChild(link);
+}
+
+/* ═══════════════════════════════════════════════════
+   INIT
+═══════════════════════════════════════════════════ */
+document.addEventListener('DOMContentLoaded', () => {
+  loadAll();
+  injectManifest();
+  registerServiceWorker();
+  updateSessionLabels();
+  updateNav();
+  showSection(currentSection);
+});
+</script>
+</body>
+</html>
