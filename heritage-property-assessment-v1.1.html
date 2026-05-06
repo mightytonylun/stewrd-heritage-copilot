@@ -1,0 +1,4060 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Condition Report Copilot v1.1 - STEWRD Agent 2</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.31/jspdf.plugin.autotable.min.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900&display=swap" rel="stylesheet">
+    <style>
+        * { scroll-behavior: smooth; }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: rgba(61, 92, 69, 0.2);
+            border-radius: 8px;
+            transition: all 0.2s ease;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: rgba(61, 92, 69, 0.4);
+        }
+
+        /* Heritage Color Palette */
+        :root {
+            --primary: #3D5C45;
+            --cream: #F5F1E8;
+            --alert: #9B5B5B;
+            --good: #A8C9C3;
+            --text: #7A8B85;
+            --light-bg: #FAF9F6;
+            --border: #E8E4DA;
+            --text-muted: #9AA59F;
+
+            /* Spacing tokens (8px base) */
+            --space-1: 4px;
+            --space-2: 8px;
+            --space-3: 12px;
+            --space-4: 16px;
+            --space-5: 20px;
+            --space-6: 24px;
+            --space-8: 32px;
+            --space-10: 40px;
+
+            /* Border radius tokens */
+            --radius-sm: 4px;
+            --radius-md: 6px;
+            --radius-lg: 8px;
+            --radius-xl: 12px;
+            --radius-2xl: 16px;
+            --radius-pill: 9999px;
+
+            /* Shadow tokens */
+            --shadow-sm: 0 1px 3px rgba(61,92,69,0.06), 0 1px 2px rgba(61,92,69,0.04);
+            --shadow-md: 0 4px 12px rgba(61,92,69,0.08), 0 2px 4px rgba(61,92,69,0.04);
+            --shadow-lg: 0 8px 24px rgba(61,92,69,0.12), 0 4px 8px rgba(61,92,69,0.06);
+        }
+
+        body {
+            font-family: 'Inter', 'SF Pro Display', -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+            font-feature-settings: 'cv01', 'ss03';
+            background: linear-gradient(135deg, var(--cream) 0%, #f8f6f1 100%);
+            color: var(--text);
+            min-height: 100vh;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+
+        .app-container {
+            display: flex;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        /* Mobile Menu Toggle */
+        .mobile-menu-toggle {
+            display: none;
+            position: fixed;
+            top: 16px;
+            left: 16px;
+            z-index: 500;
+            background: var(--primary);
+            color: var(--cream);
+            border: none;
+            width: 44px;
+            height: 44px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 20px;
+            transition: all 0.2s ease;
+            box-shadow: 0 2px 8px rgba(61, 92, 69, 0.2);
+        }
+
+        .mobile-menu-toggle:active {
+            transform: scale(0.95);
+        }
+
+        /* SIDEBAR */
+        .sidebar {
+            width: 280px;
+            background: white;
+            border-right: 1px solid var(--border);
+            overflow-y: auto;
+            box-shadow: 4px 0 12px rgba(61, 92, 69, 0.06);
+            transition: transform 0.2s ease;
+        }
+
+        @media (max-width: 768px) {
+            .app-container {
+                position: relative;
+            }
+
+            .app-container::before {
+                content: '';
+                position: fixed;
+                top: 0;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                background: rgba(0, 0, 0, 0.5);
+                opacity: 0;
+                pointer-events: none;
+                transition: opacity 0.2s ease;
+                z-index: 350;
+            }
+
+            .app-container.sidebar-open::before {
+                opacity: 1;
+                pointer-events: auto;
+            }
+
+            .sidebar {
+                position: fixed;
+                left: 0;
+                top: 0;
+                height: 100vh;
+                z-index: 400;
+                transform: translateX(-100%);
+            }
+
+            .sidebar.open {
+                transform: translateX(0);
+            }
+
+            .mobile-menu-toggle {
+                display: flex;
+                align-items: center;
+                justify-content: center;
+            }
+        }
+
+        .sidebar-header {
+            padding: 24px 20px;
+            background: linear-gradient(135deg, var(--primary) 0%, #2d4435 100%);
+            color: var(--cream);
+            border-bottom: none;
+            box-shadow: 0 2px 8px rgba(61, 92, 69, 0.12);
+        }
+
+        .sidebar-header h1 {
+            margin: 0;
+            font-size: 19px;
+            font-weight: 600;
+            letter-spacing: -0.3px;
+        }
+
+        .sidebar-sections {
+            padding: 16px 10px;
+        }
+
+        .section-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 12px 14px;
+            margin: 4px 0;
+            border-radius: var(--radius-lg);
+            cursor: pointer;
+            transition: all 0.2s ease;
+            border: none;
+            background: var(--light-bg);
+            color: var(--text);
+            font-weight: 400;
+            font-size: 14px;
+            line-height: 1.4;
+            -webkit-tap-highlight-color: transparent;
+            min-height: 44px;
+        }
+
+        .section-item:hover {
+            background: rgba(61, 92, 69, 0.08);
+            color: var(--primary);
+        }
+
+        .section-item:active {
+            transform: translateX(0);
+        }
+
+        .section-item.active {
+            background: linear-gradient(135deg, rgba(168, 201, 195, 0.3) 0%, rgba(168, 201, 195, 0.15) 100%);
+            border: 1px solid rgba(168, 201, 195, 0.5);
+            color: var(--primary);
+            font-weight: 500;
+            box-shadow: inset 0 2px 8px rgba(168, 201, 195, 0.1);
+        }
+
+        @media (max-width: 768px) {
+            .section-item {
+                padding: 16px 14px;
+                font-size: 13px;
+            }
+
+            .section-item i {
+                font-size: 16px;
+            }
+        }
+
+        .section-badge {
+            margin-left: auto;
+            font-size: 11px;
+            background: var(--primary);
+            color: var(--cream);
+            padding: 3px 8px;
+            border-radius: var(--radius-sm);
+            font-weight: 500;
+            letter-spacing: 0;
+        }
+
+        /* MAIN CONTENT */
+        .main-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        @media (max-width: 768px) {
+            .main-content {
+                margin-top: 0;
+            }
+        }
+
+        .form-header {
+            background: linear-gradient(135deg, var(--primary) 0%, #2d4435 100%);
+            color: var(--cream);
+            border-bottom: none;
+            box-shadow: 0 4px 16px rgba(61, 92, 69, 0.12);
+            position: relative;
+            z-index: 100;
+        }
+
+        .form-header-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 24px 32px;
+            gap: 16px;
+            border-bottom: 1px solid rgba(245, 241, 232, 0.15);
+        }
+
+        .form-header h2 {
+            margin: 0;
+            font-size: 24px;
+            font-weight: 600;
+            letter-spacing: -0.5px;
+            flex: 1;
+        }
+
+        @media (max-width: 768px) {
+            .form-header-top {
+                flex-direction: column;
+                align-items: flex-start;
+                padding: 16px 16px;
+                gap: 12px;
+            }
+
+            .form-header h2 {
+                font-size: 20px;
+                margin-top: 30px;
+            }
+
+            .progress-text {
+                font-size: 11px;
+            }
+        }
+
+        .form-header-buttons-row {
+            padding: 16px 32px;
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            align-items: center;
+            border-bottom: 1px solid rgba(245, 241, 232, 0.15);
+        }
+
+        @media (max-width: 768px) {
+            .form-header-buttons-row {
+                padding: 12px 16px;
+                gap: 8px;
+                justify-content: center;
+            }
+
+            .btn-action {
+                padding: 10px 14px;
+                font-size: 12px;
+                min-height: 44px;
+                flex: 0 1 auto;
+            }
+
+            .btn-action span {
+                display: none;
+            }
+
+            .btn-action i {
+                margin: 0;
+            }
+
+            .save-indicator {
+                display: none;
+            }
+        }
+
+        .form-header h2 {
+            margin: 0;
+            font-size: 26px;
+            font-weight: 700;
+            letter-spacing: -0.8px;
+        }
+
+        .form-header-actions {
+            display: contents;
+        }
+
+        .btn-action {
+            background: rgba(168, 201, 195, 0.95);
+            color: white;
+            border: none;
+            padding: 10px 18px;
+            border-radius: var(--radius-lg);
+            cursor: pointer;
+            font-weight: 500;
+            font-size: 13px;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            box-shadow: var(--shadow-sm);
+            min-height: 44px;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        .btn-action:hover {
+            background: var(--good);
+            box-shadow: var(--shadow-md);
+        }
+
+        .btn-action:active {
+            /* no transform */
+        }
+
+        .btn-action.primary {
+            background: var(--primary);
+            box-shadow: var(--shadow-sm);
+        }
+
+        .btn-action.primary:hover {
+            background: #2d4435;
+            box-shadow: var(--shadow-md);
+        }
+
+        .form-content {
+            flex: 1;
+            overflow-y: auto;
+            padding: 40px;
+        }
+
+        .form-section {
+            background: white;
+            border-radius: var(--radius-2xl);
+            padding: 32px;
+            margin-bottom: 32px;
+            border-left: none;
+            border-top: 2px solid var(--good);
+            box-shadow: var(--shadow-md);
+            display: none;
+            transition: all 0.2s ease;
+        }
+
+        @media (max-width: 768px) {
+            .form-content {
+                padding: 16px;
+            }
+
+            .form-section {
+                border-radius: 12px;
+                padding: 20px;
+                margin-bottom: 20px;
+            }
+
+            .form-section h2 {
+                font-size: 20px;
+                margin-bottom: 16px;
+                padding-bottom: 12px;
+            }
+        }
+
+        .form-section.active {
+            display: block;
+            animation: fadeIn 0.2s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(8px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .form-section h2 {
+            color: var(--primary);
+            margin-top: 0;
+            margin-bottom: 28px;
+            font-size: 22px;
+            font-weight: 600;
+            letter-spacing: -0.4px;
+            border-bottom: 1px solid var(--border);
+            padding-bottom: 16px;
+        }
+
+        /* SECTION LAYOUT: Preview (top) | Entry + Entered (bottom) */
+        .section-layout {
+            display: flex;
+            flex-direction: column;
+            gap: 28px;
+        }
+
+        .section-layout-bottom {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 28px;
+        }
+
+        @media (max-width: 768px) {
+            .section-layout-bottom {
+                grid-template-columns: 1fr;
+                gap: 20px;
+            }
+        }
+
+        .section-part-title {
+            color: var(--primary);
+            font-weight: 700;
+            margin-bottom: 14px;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            letter-spacing: 0.2px;
+            text-transform: uppercase;
+            font-size: 12px;
+            opacity: 0.9;
+        }
+
+        .section-part-title i {
+            color: var(--good);
+            font-size: 15px;
+        }
+
+        /* FORM GROUP */
+        .form-group {
+            margin-bottom: 24px;
+        }
+
+        .form-group label {
+            display: block;
+            color: var(--primary);
+            font-weight: 600;
+            margin-bottom: 10px;
+            font-size: 14px;
+            letter-spacing: 0.2px;
+        }
+
+        @media (max-width: 768px) {
+            .form-group {
+                margin-bottom: 20px;
+            }
+
+            .form-group label {
+                font-size: 13px;
+                margin-bottom: 8px;
+            }
+        }
+
+        .required-indicator {
+            color: var(--alert);
+            font-weight: 700;
+            margin-left: 4px;
+        }
+
+        .progress-bar-container {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            padding: 12px 32px 14px 32px;
+            background: rgba(0, 0, 0, 0.1);
+        }
+
+        @media (max-width: 768px) {
+            .progress-bar-container {
+                padding: 10px 16px;
+                gap: 10px;
+            }
+        }
+
+        .progress-bar {
+            flex: 1;
+            height: 6px;
+            background: rgba(245, 241, 232, 0.3);
+            border-radius: 3px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: var(--good);
+            width: 0%;
+            transition: width 0.2s ease;
+            border-radius: 3px;
+        }
+
+        .progress-text {
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--cream);
+            white-space: nowrap;
+        }
+
+        .validation-warning {
+            background: rgba(155, 91, 91, 0.15);
+            border: 1px solid rgba(155, 91, 91, 0.3);
+            color: var(--alert);
+            padding: 12px 16px;
+            border-radius: 10px;
+            margin-bottom: 16px;
+            font-size: 13px;
+            font-weight: 500;
+        }
+
+        .validation-warning ul {
+            margin: 8px 0 0 20px;
+            padding: 0;
+            font-size: 12px;
+        }
+
+        .validation-warning li {
+            margin: 4px 0;
+        }
+
+        .form-group input,
+        .form-group textarea,
+        .form-group select {
+            width: 100%;
+            padding: 10px 12px;
+            border: 1px solid var(--border);
+            border-radius: var(--radius-lg);
+            color: var(--text);
+            font-size: 14px;
+            background: white;
+            line-height: 1.5;
+            transition: all 0.2s ease;
+            font-family: inherit;
+            min-height: 44px;
+            -webkit-appearance: none;
+            appearance: none;
+        }
+
+        .form-group textarea {
+            resize: vertical;
+            min-height: 110px;
+            font-family: inherit;
+        }
+
+        .form-group input::placeholder,
+        .form-group textarea::placeholder,
+        .form-group select::placeholder {
+            color: rgba(122, 139, 133, 0.5);
+        }
+
+        .form-group input:hover,
+        .form-group textarea:hover,
+        .form-group select:hover {
+            border-color: rgba(61, 92, 69, 0.3);
+            box-shadow: 0 2px 8px rgba(61, 92, 69, 0.05);
+        }
+
+        .form-group input:focus,
+        .form-group textarea:focus,
+        .form-group select:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(61, 92, 69, 0.12), 0 2px 8px rgba(61, 92, 69, 0.08);
+            background: white;
+        }
+
+        @media (max-width: 768px) {
+            .form-group input,
+            .form-group textarea,
+            .form-group select {
+                font-size: 16px;
+                padding: 14px 16px;
+            }
+
+            .form-group textarea {
+                min-height: 120px;
+            }
+        }
+
+        /* PHOTO UPLOAD */
+        .photo-upload-btn {
+            padding: 20px 16px;
+            border: 2px dashed var(--good);
+            border-radius: 12px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            background: rgba(168, 201, 195, 0.08);
+            color: var(--primary);
+            font-weight: 500;
+        }
+
+        .photo-upload-btn:hover {
+            border-color: var(--primary);
+            background: rgba(61, 92, 69, 0.08);
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(61, 92, 69, 0.08);
+        }
+
+        .photo-gallery {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+            gap: 14px;
+            margin-top: 16px;
+        }
+
+        @media (max-width: 768px) {
+            .photo-gallery {
+                grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+                gap: 10px;
+            }
+        }
+
+        .photo-item {
+            position: relative;
+            background: white;
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04);
+            transition: all 0.25s ease;
+        }
+
+        .photo-item:hover {
+            box-shadow: 0 4px 12px rgba(61, 92, 69, 0.08);
+            transform: translateY(-2px);
+        }
+
+        .photo-item img {
+            width: 100%;
+            height: 130px;
+            object-fit: cover;
+        }
+
+        .photo-item-caption {
+            padding: 10px;
+            font-size: 12px;
+            background: var(--light-bg);
+            word-break: break-word;
+            line-height: 1.3;
+            color: var(--text);
+        }
+
+        .photo-remove {
+            position: absolute;
+            top: 6px;
+            right: 6px;
+            background: var(--alert);
+            color: white;
+            border: none;
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s ease;
+            box-shadow: 0 2px 6px rgba(155, 91, 91, 0.3);
+        }
+
+        .photo-remove:hover {
+            background: #8a4949;
+            transform: scale(1.1);
+            box-shadow: 0 4px 10px rgba(155, 91, 91, 0.4);
+        }
+
+        /* BUTTONS */
+        .btn-add {
+            background: var(--good);
+            color: white;
+            border: none;
+            padding: 10px 18px;
+            border-radius: var(--radius-lg);
+            cursor: pointer;
+            font-weight: 500;
+            font-size: 13px;
+            margin-top: 16px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            transition: all 0.2s ease;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .btn-add:hover {
+            background: #96b7b2;
+            box-shadow: var(--shadow-md);
+        }
+
+        .btn-add:active {
+            /* no transform */
+        }
+
+        .btn-remove {
+            background: rgba(155, 91, 91, 0.1);
+            color: var(--alert);
+            border: 1px solid rgba(155, 91, 91, 0.2);
+            padding: 8px 14px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 12px;
+            font-weight: 600;
+            transition: all 0.2s ease;
+        }
+
+        .btn-remove:hover {
+            background: rgba(155, 91, 91, 0.15);
+            border-color: rgba(155, 91, 91, 0.3);
+            transform: translateY(-1px);
+        }
+
+        /* PREVIEW CARD */
+        .preview-card {
+            background: linear-gradient(135deg, rgba(61, 92, 69, 0.04) 0%, rgba(168, 201, 195, 0.04) 100%);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-xl);
+            padding: 18px;
+            box-shadow: var(--shadow-sm);
+            transition: all 0.2s ease;
+        }
+
+        .preview-card:hover {
+            box-shadow: 0 4px 12px rgba(61, 92, 69, 0.06);
+        }
+
+        .preview-header {
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px 0;
+            border-bottom: 1px solid rgba(61, 92, 69, 0.1);
+            margin-bottom: 14px;
+            user-select: none;
+            transition: all 0.2s ease;
+        }
+
+        .preview-header:hover {
+            color: var(--primary);
+        }
+
+        .preview-title {
+            color: var(--primary);
+            font-weight: 600;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .preview-content {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.2s ease;
+        }
+
+        .preview-content.open {
+            max-height: 600px;
+        }
+
+        .preview-item {
+            margin-bottom: 10px;
+            padding: 12px 10px;
+            background: white;
+            border-radius: var(--radius-md);
+            font-size: 13px;
+            border-left: 2px solid var(--good);
+        }
+
+        .preview-label {
+            display: block;
+            color: var(--primary);
+            font-weight: 600;
+            margin-bottom: 4px;
+            font-size: 12px;
+            letter-spacing: 0.2px;
+        }
+
+        .preview-value {
+            display: block;
+            color: var(--text);
+            word-break: break-word;
+            line-height: 1.4;
+        }
+
+        /* ENTERED ENTRIES */
+        .entered-entries {
+            background: white;
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 18px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.02);
+        }
+
+        .entry-item {
+            background: linear-gradient(135deg, rgba(168, 201, 195, 0.05) 0%, transparent 100%);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-lg);
+            padding: 14px;
+            margin-bottom: 12px;
+            transition: all 0.2s ease;
+        }
+
+        .entry-item:hover {
+            box-shadow: 0 2px 8px rgba(61, 92, 69, 0.06);
+            border-color: rgba(168, 201, 195, 0.3);
+        }
+
+        .entry-item:last-child {
+            margin-bottom: 0;
+        }
+
+        .entry-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .entry-title {
+            color: var(--primary);
+            font-weight: 600;
+            font-size: 14px;
+            letter-spacing: -0.2px;
+        }
+
+        .entry-content {
+            color: var(--text);
+            font-size: 13px;
+            line-height: 1.6;
+            margin-bottom: 10px;
+        }
+
+        .entry-photos {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(90px, 1fr));
+            gap: 10px;
+            margin-top: 10px;
+        }
+
+        .entry-photo {
+            width: 90px;
+            height: 90px;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04);
+            transition: all 0.25s ease;
+        }
+
+        .entry-photo:hover {
+            box-shadow: 0 4px 10px rgba(61, 92, 69, 0.08);
+            transform: translateY(-2px);
+        }
+
+        .entry-photo img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .copy-feedback {
+            position: fixed;
+            bottom: 24px;
+            right: 24px;
+            background: var(--good);
+            color: white;
+            padding: 16px 24px;
+            border-radius: 10px;
+            box-shadow: 0 12px 32px rgba(168, 201, 195, 0.4);
+            z-index: 2000;
+            display: none;
+            font-weight: 600;
+            font-size: 15px;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .copy-feedback.show {
+            display: flex;
+            animation: slideIn 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+
+        .copy-feedback i {
+            font-size: 18px;
+        }
+
+        @keyframes slideIn {
+            from { transform: translateX(420px); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+
+        .save-indicator {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 12px;
+            font-weight: 500;
+            color: var(--cream);
+            opacity: 0;
+            transition: opacity 0.2s ease;
+        }
+
+        .save-indicator.saving {
+            opacity: 1;
+        }
+
+        .save-indicator.saved {
+            opacity: 1;
+        }
+
+        .save-indicator i {
+            font-size: 14px;
+        }
+
+        .input-error {
+            border-color: var(--alert) !important;
+            background: rgba(155, 91, 91, 0.05) !important;
+        }
+
+        @media (max-width: 1024px) {
+            .form-header-top {
+                padding: 20px 24px;
+            }
+            .form-header-buttons-row {
+                padding: 12px 24px;
+            }
+            .progress-bar-container {
+                padding: 10px 24px;
+            }
+            .btn-action {
+                font-size: 12px;
+                padding: 10px 16px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .sidebar { width: 100%; border-right: none; border-bottom: 1px solid var(--border); }
+            .app-container { flex-direction: column; }
+            .section-layout { flex-direction: column; }
+            .section-layout-bottom { grid-template-columns: 1fr; }
+            .form-content { padding: 24px; }
+            .form-section { padding: 24px; }
+            .form-header-top {
+                padding: 16px 24px;
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 8px;
+            }
+            .form-header h2 {
+                font-size: 22px;
+            }
+            .form-header-buttons-row {
+                padding: 12px 24px;
+                gap: 8px;
+            }
+            .progress-bar-container {
+                padding: 10px 24px;
+                gap: 12px;
+            }
+            .btn-action {
+                font-size: 11px;
+                padding: 8px 12px;
+            }
+        }
+
+        /* ─── v1.1 NEW STYLES ─────────────────────────────── */
+
+        /* Session bar in sidebar header */
+        .session-bar {
+            padding: 10px 16px 14px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-top: 10px;
+            border-top: 1px solid rgba(245,241,232,0.15);
+        }
+
+        .session-name-label {
+            font-size: 11px;
+            color: rgba(245,241,232,0.75);
+            font-weight: 500;
+            flex: 1;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .btn-session {
+            background: rgba(168,201,195,0.18);
+            color: var(--cream);
+            border: 1px solid rgba(168,201,195,0.25);
+            padding: 5px 10px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 11px;
+            font-weight: 600;
+            white-space: nowrap;
+            transition: all 0.2s;
+            font-family: inherit;
+        }
+
+        .btn-session:hover {
+            background: rgba(168,201,195,0.3);
+            border-color: rgba(168,201,195,0.5);
+        }
+
+        /* Section completion dot */
+        .section-completion-dot {
+            width: 7px;
+            height: 7px;
+            border-radius: 50%;
+            background: rgba(122,139,133,0.25);
+            flex-shrink: 0;
+            transition: all 0.3s ease;
+            margin-right: -2px;
+        }
+
+        .section-completion-dot.complete {
+            background: var(--good);
+            box-shadow: 0 0 0 2px rgba(168,201,195,0.35);
+        }
+
+        /* Bottom section navigation */
+        .form-nav-footer {
+            padding: 12px 32px;
+            background: white;
+            border-top: 1px solid var(--border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 12px;
+            flex-shrink: 0;
+            box-shadow: 0 -2px 8px rgba(61,92,69,0.04);
+        }
+
+        @media (max-width: 768px) {
+            .form-nav-footer { padding: 10px 16px; }
+            .nav-section-label { display: none; }
+        }
+
+        .btn-nav {
+            background: white;
+            color: var(--primary);
+            border: 1px solid var(--border);
+            padding: 9px 16px;
+            border-radius: var(--radius-lg);
+            cursor: pointer;
+            font-weight: 500;
+            font-size: 13px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            transition: all 0.2s;
+            min-height: 40px;
+            font-family: inherit;
+            max-width: 180px;
+            overflow: hidden;
+        }
+
+        .btn-nav span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+        .btn-nav:hover {
+            border-color: rgba(61,92,69,0.3);
+            background: rgba(61,92,69,0.04);
+            box-shadow: var(--shadow-sm);
+        }
+
+        .btn-nav:disabled {
+            opacity: 0.3;
+            cursor: default;
+            pointer-events: none;
+        }
+
+        .nav-section-label {
+            font-size: 12px;
+            color: var(--text-muted);
+            font-weight: 500;
+            white-space: nowrap;
+        }
+
+        /* Cancel edit button */
+        .btn-cancel-edit {
+            background: rgba(155,91,91,0.08);
+            color: var(--alert);
+            border: 1px solid rgba(155,91,91,0.2);
+            padding: 10px 16px;
+            border-radius: var(--radius-lg);
+            cursor: pointer;
+            font-weight: 500;
+            font-size: 13px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            transition: all 0.2s;
+            min-height: 44px;
+            margin-top: 8px;
+            font-family: inherit;
+            width: 100%;
+            justify-content: center;
+        }
+
+        .btn-cancel-edit:hover {
+            background: rgba(155,91,91,0.14);
+            border-color: rgba(155,91,91,0.35);
+        }
+
+        /* Session modal */
+        .session-modal-content {
+            background: white;
+            border-radius: 18px;
+            box-shadow: 0 28px 56px rgba(61,92,69,0.28);
+            max-width: 540px;
+            width: 92%;
+            max-height: 80vh;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            animation: slideUp 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+
+        .session-modal-header {
+            padding: 24px 28px 18px;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-shrink: 0;
+        }
+
+        .session-modal-header h3 {
+            margin: 0;
+            font-size: 20px;
+            font-weight: 700;
+            color: var(--primary);
+            letter-spacing: -0.4px;
+        }
+
+        .session-modal-body {
+            padding: 20px 28px;
+            overflow-y: auto;
+            flex: 1;
+        }
+
+        .session-modal-footer {
+            padding: 16px 28px;
+            border-top: 1px solid var(--border);
+            display: flex;
+            gap: 10px;
+            flex-shrink: 0;
+        }
+
+        .session-list-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 14px;
+            border: 1px solid var(--border);
+            border-radius: var(--radius-lg);
+            margin-bottom: 10px;
+            background: var(--light-bg);
+            transition: all 0.2s;
+        }
+
+        .session-list-item:hover { border-color: rgba(61,92,69,0.25); }
+        .session-list-item.current { border-color: rgba(168,201,195,0.6); background: rgba(168,201,195,0.06); }
+
+        .session-item-info { flex: 1; min-width: 0; }
+
+        .session-item-name {
+            font-weight: 600;
+            font-size: 13px;
+            color: var(--primary);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .session-item-meta {
+            font-size: 11px;
+            color: var(--text-muted);
+            margin-top: 2px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        /* Custom confirm modal */
+        .confirm-modal-content {
+            background: white;
+            border-radius: 14px;
+            box-shadow: 0 20px 40px rgba(61,92,69,0.2);
+            max-width: 400px;
+            width: 90%;
+            padding: 28px;
+            animation: slideUp 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+
+        .confirm-modal-title {
+            font-size: 16px;
+            font-weight: 700;
+            color: var(--primary);
+            margin: 0 0 10px 0;
+        }
+
+        .confirm-modal-message {
+            color: var(--text);
+            font-size: 14px;
+            line-height: 1.6;
+            margin: 0 0 24px;
+        }
+
+        .confirm-modal-actions {
+            display: flex;
+            gap: 10px;
+            justify-content: flex-end;
+        }
+
+        /* ─── END v1.1 STYLES ──────────────────────────────── */
+
+        /* Focus Visible for Accessibility */
+        .section-item:focus-visible,
+        .yes-no-btn:focus-visible,
+        .btn-action:focus-visible,
+        .btn-add:focus-visible,
+        .btn-copy:focus-visible,
+        .btn-close:focus-visible {
+            outline: 2px solid var(--primary);
+            outline-offset: 2px;
+        }
+
+        /* YES/NO BUTTON STYLES */
+        .yes-no-buttons {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(110px, 1fr));
+            gap: 12px;
+            margin: 14px 0;
+        }
+
+        .yes-no-btn {
+            padding: 12px 18px;
+            border: 1px solid var(--border);
+            border-radius: var(--radius-md);
+            background: white;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-weight: 500;
+            color: var(--text);
+            font-size: 14px;
+            font-family: inherit;
+            box-shadow: var(--shadow-sm);
+            min-height: 44px;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        .yes-no-btn:hover:not(.selected) {
+            border-color: rgba(61, 92, 69, 0.3);
+            background: rgba(168, 201, 195, 0.06);
+            transform: translateY(-1px);
+            box-shadow: 0 4px 10px rgba(61, 92, 69, 0.08);
+        }
+
+        .yes-no-btn:active {
+            transform: translateY(0);
+        }
+
+        .yes-no-btn.selected {
+            background: linear-gradient(135deg, var(--primary) 0%, #2d4435 100%);
+            color: var(--cream);
+            border-color: var(--primary);
+            font-weight: 600;
+            box-shadow: var(--shadow-md);
+        }
+
+        @media (max-width: 768px) {
+            .yes-no-btn-row {
+                grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+            }
+
+            .yes-no-btn {
+                font-size: 13px;
+                padding: 12px 14px;
+            }
+        }
+
+        /* MODAL STYLES */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            backdrop-filter: blur(6px);
+            animation: fadeIn 0.25s ease;
+        }
+
+        .modal-overlay.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background: white;
+            border-radius: 18px;
+            box-shadow: 0 28px 56px rgba(61, 92, 69, 0.28);
+            max-width: 700px;
+            width: 90%;
+            max-height: 85vh;
+            overflow-y: auto;
+            padding: 36px;
+            animation: slideUp 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+
+        @media (max-width: 768px) {
+            .modal-content {
+                width: 95%;
+                max-height: 90vh;
+                padding: 20px;
+                border-radius: 14px;
+            }
+
+            .modal-header h3 {
+                font-size: 18px;
+            }
+
+            .modal-body {
+                font-size: 12px;
+                padding: 14px;
+                max-height: 50vh;
+            }
+
+            .modal-actions {
+                flex-direction: column;
+                gap: 10px;
+            }
+
+            .btn-copy,
+            .btn-close {
+                width: 100%;
+            }
+        }
+
+        @keyframes slideUp {
+            from { transform: translateY(40px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        .modal-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 24px;
+            border-bottom: 1px solid var(--border);
+            padding-bottom: 18px;
+        }
+
+        .modal-header h3 {
+            margin: 0;
+            font-size: 22px;
+            font-weight: 700;
+            color: var(--primary);
+            letter-spacing: -0.5px;
+        }
+
+        .modal-body {
+            margin: 24px 0;
+            font-family: 'Monaco', 'Courier New', monospace;
+            font-size: 13px;
+            background: var(--light-bg);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 18px;
+            overflow-x: auto;
+            line-height: 1.6;
+            color: var(--text);
+            white-space: pre-wrap;
+            word-break: break-word;
+            max-height: 400px;
+            overflow-y: auto;
+            box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.02);
+        }
+
+        .modal-actions {
+            display: flex;
+            gap: 12px;
+            margin-top: 28px;
+            justify-content: flex-end;
+        }
+
+        .btn-copy {
+            background: linear-gradient(135deg, var(--primary) 0%, #2d4435 100%);
+            color: var(--cream);
+            border: none;
+            padding: 10px 20px;
+            border-radius: var(--radius-md);
+            cursor: pointer;
+            font-weight: 500;
+            font-size: 14px;
+            transition: all 0.2s ease;
+            font-family: inherit;
+            box-shadow: var(--shadow-md);
+        }
+
+        .btn-close {
+            background: transparent;
+            color: var(--text);
+            border: 1px solid var(--border);
+            padding: 10px 20px;
+            border-radius: var(--radius-md);
+            cursor: pointer;
+            font-weight: 500;
+            font-size: 14px;
+            font-family: inherit;
+            transition: all 0.2s ease;
+        }
+
+        .btn-close:hover {
+            background: var(--light-bg);
+            border-color: var(--primary);
+            color: var(--primary);
+        }
+
+        /* Dropdown Menu Styles */
+        .dropdown-container {
+            position: relative;
+            display: inline-block;
+        }
+
+        .dropdown-toggle {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .dropdown-menu {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            background: var(--cream);
+            border: 1.5px solid var(--border);
+            border-radius: 12px;
+            box-shadow: 0 12px 32px rgba(0, 0, 0, 0.12);
+            z-index: 1000;
+            min-width: 220px;
+            display: none;
+            opacity: 0;
+            transform: translateY(-8px);
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            pointer-events: none;
+            margin-top: 8px;
+            padding: 0;
+        }
+
+        .dropdown-menu.active {
+            display: block;
+            opacity: 1;
+            transform: translateY(0);
+            pointer-events: auto;
+        }
+
+        .dropdown-group {
+            padding: 4px 0;
+        }
+
+        .dropdown-group:first-child {
+            padding-top: 0px;
+        }
+
+        .dropdown-group:last-child {
+            padding-bottom: 8px;
+        }
+
+        .dropdown-label {
+            padding: 6px 16px 4px 16px;
+            font-size: 10px;
+            font-weight: 700;
+            text-transform: uppercase;
+            color: var(--text-muted);
+            letter-spacing: 0.5px;
+            margin: 0;
+        }
+
+        .dropdown-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            width: 100%;
+            padding: 10px 16px;
+            background: transparent;
+            border: none;
+            color: var(--text);
+            cursor: pointer;
+            font-size: 13px;
+            font-weight: 500;
+            text-align: left;
+            transition: all 0.15s ease;
+            font-family: inherit;
+        }
+
+        .dropdown-item:hover {
+            background: rgba(61, 92, 69, 0.08);
+            color: var(--primary);
+            padding-left: 18px;
+        }
+
+        .dropdown-item i {
+            min-width: 16px;
+            opacity: 0.7;
+        }
+
+        .dropdown-item:hover i {
+            opacity: 1;
+        }
+
+        .dropdown-divider {
+            height: 1px;
+            background: var(--border);
+            margin: 0;
+        }
+
+        @media (max-width: 768px) {
+            .dropdown-menu {
+                min-width: 180px;
+                right: 0;
+                left: auto;
+            }
+        }
+    </style>
+</head>
+<body>
+    <button class="mobile-menu-toggle" id="mobileMenuToggle" onclick="toggleMobileMenu()">
+        <i class="fas fa-bars"></i>
+    </button>
+
+    <div class="app-container">
+        <!-- SIDEBAR -->
+        <div class="sidebar" id="sidebar">
+            <div class="sidebar-header">
+                <h1>Condition Report Copilot</h1>
+                <p style="margin: 4px 0 0 0; font-size: 12px; opacity: 0.9;">STEWRD Agent 2 · v1.1</p>
+                <div class="session-bar">
+                    <span class="session-name-label" id="currentSessionName">Untitled Assessment</span>
+                    <button class="btn-session" onclick="openSessionModal()" title="Manage saved assessments"><i class="fas fa-folder-open"></i> Sessions</button>
+                </div>
+            </div>
+            <div class="sidebar-sections" id="sidebarSections"></div>
+        </div>
+
+        <!-- MAIN CONTENT -->
+        <div class="main-content">
+            <div class="form-header">
+                <div class="form-header-top">
+                    <h2 id="currentSectionTitle">Property Information</h2>
+                    <span class="progress-text" id="progressText">0% Complete</span>
+                </div>
+                <div class="form-header-buttons-row">
+                    <button class="btn-action" onclick="copySectionData()">
+                        <i class="fas fa-copy"></i> Copy Section
+                    </button>
+                    <button class="btn-action primary" onclick="copyTableToWord()">
+                        <i class="fas fa-copy"></i> Copy to Word
+                    </button>
+
+                    <!-- Share/Export Dropdown -->
+                    <div class="dropdown-container">
+                        <button class="btn-action dropdown-toggle" onclick="toggleExportMenu()">
+                            <i class="fas fa-share-alt"></i> Share/Export <i class="fas fa-chevron-down" style="font-size: 10px; margin-left: 4px;"></i>
+                        </button>
+                        <div class="dropdown-menu" id="exportMenu">
+                            <div class="dropdown-group">
+                                <div class="dropdown-label">Export Assessment</div>
+                                <button class="dropdown-item" onclick="exportToWord()">
+                                    <i class="fas fa-file-word"></i> Export to Word
+                                </button>
+                                <button class="dropdown-item" onclick="exportToExcel()">
+                                    <i class="fas fa-table"></i> Export to CSV
+                                </button>
+                                <button class="dropdown-item" onclick="exportAsJSON()">
+                                    <i class="fas fa-file-code"></i> Backup (JSON)
+                                </button>
+                            </div>
+                            <div class="dropdown-divider"></div>
+                            <div class="dropdown-group">
+                                <button class="dropdown-item" onclick="importJSON()">
+                                    <i class="fas fa-upload"></i> Restore from Backup
+                                </button>
+                                <input type="file" id="jsonImportInput" accept=".json" style="display: none;" onchange="handleJSONImport(event)">
+                            </div>
+                        </div>
+                    </div>
+
+                    <button class="btn-action" onclick="loadSampleData()" title="Load Labassa sample assessment">
+                        <i class="fas fa-database"></i> Load Sample
+                    </button>
+                    <button class="btn-action" onclick="clearFormData()" title="Clear all form data and start over" style="margin-left: auto;">
+                        <i class="fas fa-trash"></i> Clear
+                    </button>
+                    <div class="save-indicator" id="saveIndicator">
+                        <i class="fas fa-check"></i>
+                        <span>Saved</span>
+                    </div>
+                </div>
+                <div class="progress-bar-container">
+                    <div class="progress-bar">
+                        <div class="progress-fill" id="progressFill"></div>
+                    </div>
+                    <span class="progress-text">Complete</span>
+                </div>
+            </div>
+
+            <div class="form-content" id="formContent"></div>
+            <!-- v1.1: Bottom section navigation -->
+            <div class="form-nav-footer" id="navFooter"></div>
+        </div>
+    </div>
+
+    <div class="copy-feedback" id="copyFeedback">
+        <i class="fas fa-check-circle"></i>
+        <span>Copied to clipboard!</span>
+    </div>
+
+    <div id="copyModal" class="modal-overlay">
+        <div class="modal-content">
+            <div class="modal-header">
+                <i class="fas fa-copy" style="color: var(--primary); font-size: 24px;"></i>
+                <h3>Ready to Copy</h3>
+            </div>
+            <div class="modal-body" id="modalBody"></div>
+            <div class="modal-actions">
+                <button class="btn-copy" onclick="copyModalData()">
+                    <i class="fas fa-copy"></i> Copy to Clipboard
+                </button>
+                <button class="btn-close" onclick="closeCopyModal()">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- v1.1: Session Management Modal -->
+    <div id="sessionModal" class="modal-overlay">
+        <div class="session-modal-content">
+            <div class="session-modal-header">
+                <h3><i class="fas fa-folder-open" style="color:var(--good);margin-right:10px;"></i>Saved Assessments</h3>
+                <button class="btn-close" onclick="closeSessionModal()" style="border:none;padding:8px 14px;">✕ Close</button>
+            </div>
+            <div class="session-modal-body">
+                <div id="sessionList"><p style="color:var(--text-muted);text-align:center;padding:20px 0;font-size:13px;">No saved assessments yet.</p></div>
+            </div>
+            <div class="session-modal-footer">
+                <button class="btn-add" onclick="newSession()" style="margin-top:0;flex:1;justify-content:center;">
+                    <i class="fas fa-plus"></i> New Assessment
+                </button>
+                <button class="btn-action primary" onclick="saveSessionAs()" style="flex:1;justify-content:center;">
+                    <i class="fas fa-save"></i> Save Current As…
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- v1.1: Custom Confirm Modal (replaces native confirm()) -->
+    <div id="confirmModal" class="modal-overlay">
+        <div class="confirm-modal-content">
+            <p class="confirm-modal-title"><i class="fas fa-question-circle" style="color:var(--good);margin-right:8px;"></i>Confirm</p>
+            <p class="confirm-modal-message" id="confirmMessage">Are you sure?</p>
+            <div class="confirm-modal-actions">
+                <button class="btn-close" onclick="resolveConfirm(false)" style="padding:10px 20px;">Cancel</button>
+                <button class="btn-copy" onclick="resolveConfirm(true)">Confirm</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const sections = [
+            { id: 1, name: 'Property Information', icon: 'fas fa-home' },
+            { id: 2, name: 'Electrical Systems', icon: 'fas fa-bolt', hasPhotos: true },
+            { id: 3, name: 'Plumbing Systems', icon: 'fas fa-faucet', hasPhotos: true },
+            { id: 4, name: 'Environmental Conditions', icon: 'fas fa-leaf', hasPhotos: true },
+            { id: 5, name: 'Hazardous Materials', icon: 'fas fa-exclamation', hasPhotos: true },
+            { id: 6, name: 'Structural Assessment', icon: 'fas fa-cubes', hasPhotos: true },
+            { id: 7, name: 'Exterior Elements', icon: 'fas fa-building', isComplex: true },
+            { id: 8, name: 'Interior Spaces', icon: 'fas fa-door-open', isComplex: true },
+            { id: 9, name: 'Identified Defects', icon: 'fas fa-exclamation-triangle', isComplex: true },
+            { id: 10, name: 'Cost Summary', icon: 'fas fa-calculator', isComplex: true }
+        ];
+
+        // v1.1: Session state
+        let sessions = {};
+        let currentSessionName = 'Untitled Assessment';
+        let autoSaveTimer = null;
+        let pendingConfirmCallback = null;
+        let lastSavedTime = null;
+
+        let formData = {};
+        let photoData = {};
+        let complexData = {
+            7: [
+                { part: 'R-01', room: 'Roof', notes: 'Good condition, minor moss growth', photos: [] },
+                { part: 'EE-01', room: 'East Elevation', notes: 'Rendered brick, some cracks visible', photos: [] }
+            ],
+            8: [
+                { part: 'RM-01', room: 'Kitchen', notes: 'Good condition, well maintained', photos: [] },
+                { part: 'RM-02', room: 'Living Room', notes: 'Original floorboards, some wear', photos: [] }
+            ],
+            9: [
+                { part: 'D-01', room: 'Roof', notes: 'Missing roof tiles on east side', priority: 'Urgent', suggestedWork: 'Replace tiles', photos: [] },
+                { part: 'D-02', room: 'Roof', notes: 'Flashing needs repair', priority: 'Important', suggestedWork: 'Repair/replace flashing', photos: [] },
+                { part: 'D-03', room: 'Window', notes: 'Frame decay on north-facing bedroom windows', priority: 'Important', suggestedWork: 'Replace frames', photos: [] }
+            ]
+        };
+        let currentSection = 1;
+        let editingIndex = null;
+
+        window.addEventListener('DOMContentLoaded', () => {
+            loadFormData();
+            loadSessions(); // v1.1
+            renderSidebar();
+            showSection(1);
+            setTimeout(updateProgress, 500);
+            setupMobileMenu();
+        });
+
+        function setupMobileMenu() {
+            const sidebar = document.getElementById('sidebar');
+            const toggle = document.getElementById('mobileMenuToggle');
+            const appContainer = document.querySelector('.app-container');
+
+            // Close sidebar when clicking on a section (mobile only)
+            document.querySelectorAll('.section-item').forEach(item => {
+                item.addEventListener('click', () => {
+                    if (window.innerWidth <= 768) {
+                        sidebar.classList.remove('open');
+                        appContainer.classList.remove('sidebar-open');
+                    }
+                });
+            });
+
+            // Close sidebar when clicking outside (mobile only)
+            document.addEventListener('click', (e) => {
+                if (window.innerWidth <= 768 && sidebar.classList.contains('open')) {
+                    if (!sidebar.contains(e.target) && !toggle.contains(e.target)) {
+                        sidebar.classList.remove('open');
+                        appContainer.classList.remove('sidebar-open');
+                    }
+                }
+            });
+        }
+
+        function toggleMobileMenu() {
+            const sidebar = document.getElementById('sidebar');
+            const appContainer = document.querySelector('.app-container');
+            sidebar.classList.toggle('open');
+            appContainer.classList.toggle('sidebar-open');
+        }
+
+        function renderSidebar() {
+            const sidebar = document.getElementById('sidebarSections');
+            sidebar.innerHTML = sections.map(section => `
+                <div class="section-item" onclick="showSection(${section.id})" data-section="${section.id}" tabindex="0">
+                    <i class="${section.icon}"></i>
+                    <span>${section.name}</span>
+                    <div class="section-completion-dot" id="completion-${section.id}" title="Section has data"></div>
+                    <span class="section-badge" id="badge-${section.id}">—</span>
+                </div>
+            `).join('');
+        }
+
+        // v1.1: Update completion dots for sidebar sections
+        function updateCompletionDots() {
+            sections.forEach(section => {
+                const dot = document.getElementById(`completion-${section.id}`);
+                if (!dot) return;
+                let hasData = false;
+                if (section.isComplex) {
+                    hasData = (complexData[section.id] || []).length > 0;
+                } else {
+                    const data = formData[section.id] || {};
+                    hasData = Object.values(data).some(v => v && String(v).trim());
+                    if (!hasData && photoData[section.id]) hasData = photoData[section.id].length > 0;
+                }
+                dot.classList.toggle('complete', hasData);
+            });
+        }
+
+        function showSection(sectionId) {
+            currentSection = sectionId;
+            document.querySelectorAll('.section-item').forEach(item => item.classList.remove('active'));
+            document.querySelector(`[data-section="${sectionId}"]`).classList.add('active');
+
+            const section = sections.find(s => s.id === sectionId);
+            document.getElementById('currentSectionTitle').textContent = section.name;
+            renderFormContent(sectionId);
+            renderNavFooter(); // v1.1
+        }
+
+        // v1.1: Render bottom prev/next navigation
+        function renderNavFooter() {
+            const container = document.getElementById('navFooter');
+            if (!container) return;
+            const currentIdx = sections.findIndex(s => s.id === currentSection);
+            const prev = sections[currentIdx - 1];
+            const next = sections[currentIdx + 1];
+            container.innerHTML = `
+                <button class="btn-nav" onclick="navigateSection(-1)" ${!prev ? 'disabled' : ''} title="${prev ? prev.name : ''}">
+                    <i class="fas fa-chevron-left"></i><span>${prev ? prev.name : '—'}</span>
+                </button>
+                <span class="nav-section-label">${currentIdx + 1} / ${sections.length}</span>
+                <button class="btn-nav" onclick="navigateSection(1)" ${!next ? 'disabled' : ''} title="${next ? next.name : ''}">
+                    <span>${next ? next.name : '—'}</span><i class="fas fa-chevron-right"></i>
+                </button>`;
+        }
+
+        // v1.1: Navigate prev/next section
+        function navigateSection(direction) {
+            const currentIdx = sections.findIndex(s => s.id === currentSection);
+            const newIdx = currentIdx + direction;
+            if (newIdx >= 0 && newIdx < sections.length) {
+                showSection(sections[newIdx].id);
+                document.getElementById('formContent').scrollTop = 0;
+            }
+        }
+
+        function renderFormContent(sectionId) {
+            const content = document.getElementById('formContent');
+            const section = sections.find(s => s.id === sectionId);
+
+            if (section.isComplex) {
+                content.innerHTML = renderComplexSection(sectionId);
+            } else {
+                content.innerHTML = renderSimpleSection(sectionId);
+            }
+
+            attachEventListeners(sectionId);
+            restoreYesNoSelections(sectionId);
+            setTimeout(() => {
+                updatePreview(sectionId);
+                updateEnteredEntries(sectionId);
+                updateProgress();
+            }, 100);
+        }
+
+        function renderSimpleSection(sectionId) {
+            const section = sections.find(s => s.id === sectionId);
+            let html = `<div class="form-section active"><h2>${section.name}</h2>`;
+
+            html += `<div class="section-layout">
+                <div>
+                    <div class="section-part-title"><i class="fas fa-pencil"></i> Entry</div>
+                    <div id="entryForm-${sectionId}" style="background: white; border: 1px solid var(--border); border-radius: 8px; padding: 16px;">`;
+
+            // Add form fields based on section
+            if (sectionId === 1) {
+                html += `
+                    <div class="form-group">
+                        <label>Property Address<span class="required-indicator">*</span></label>
+                        <input type="text" name="address" placeholder="e.g., 123 Heritage Lane, Sample Town" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Inspection Date<span class="required-indicator">*</span></label>
+                        <input type="date" name="date" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Inspector Name</label>
+                        <input type="text" name="inspector" placeholder="e.g., Jane Smith">
+                    </div>
+                `;
+            } else if (sectionId === 2) {
+                html += `
+                    <div class="form-group">
+                        <h3>Safety Switch (RCD) Present?</h3>
+                        <div class="yes-no-buttons">
+                            <button type="button" class="yes-no-btn" onclick="selectYesNo(event, 'rcdPresent', 'Yes')">Yes</button>
+                            <button type="button" class="yes-no-btn" onclick="selectYesNo(event, 'rcdPresent', 'No')">No</button>
+                            <button type="button" class="yes-no-btn" onclick="selectYesNo(event, 'rcdPresent', 'Unknown')">Unknown</button>
+                        </div>
+                        <input type="hidden" name="rcdPresent">
+                    </div>
+                    <div class="form-group">
+                        <label>Condition Assessment</label>
+                        <textarea name="condition" placeholder="Describe electrical system condition, safety concerns..."></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label>Photos - Evidence</label>
+                        <div class="photo-upload-btn" onclick="document.getElementById('file-${sectionId}').click()">
+                            <i class="fas fa-camera" style="font-size: 24px;"></i>
+                            <p style="margin: 8px 0 0 0;">Click to add photos</p>
+                        </div>
+                        <input type="file" id="file-${sectionId}" multiple accept="image/*" style="display:none;" onchange="handlePhotoUpload(event, ${sectionId})">
+                        <div class="photo-gallery" id="gallery-${sectionId}"></div>
+                    </div>
+                `;
+            } else if (sectionId === 3) {
+                html += `
+                    <div class="form-group">
+                        <label>Condition Assessment</label>
+                        <textarea name="condition" placeholder="Describe plumbing system condition, leaks, issues..."></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label>Photos - Evidence</label>
+                        <div class="photo-upload-btn" onclick="document.getElementById('file-${sectionId}').click()">
+                            <i class="fas fa-camera" style="font-size: 24px;"></i>
+                            <p style="margin: 8px 0 0 0;">Click to add photos</p>
+                        </div>
+                        <input type="file" id="file-${sectionId}" multiple accept="image/*" style="display:none;" onchange="handlePhotoUpload(event, ${sectionId})">
+                        <div class="photo-gallery" id="gallery-${sectionId}"></div>
+                    </div>
+                `;
+            } else if (sectionId === 4) {
+                html += `
+                    <div class="form-group">
+                        <h3>Water Ingress Present?</h3>
+                        <div class="yes-no-buttons">
+                            <button type="button" class="yes-no-btn" onclick="selectYesNo(event, 'waterIngress', 'Yes')">Yes</button>
+                            <button type="button" class="yes-no-btn" onclick="selectYesNo(event, 'waterIngress', 'No')">No</button>
+                        </div>
+                        <input type="hidden" name="waterIngress">
+                    </div>
+                    <div class="form-group">
+                        <label>Environmental Conditions</label>
+                        <textarea name="condition" placeholder="Describe moisture, dampness, ventilation, environmental hazards..."></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label>Photos - Evidence</label>
+                        <div class="photo-upload-btn" onclick="document.getElementById('file-${sectionId}').click()">
+                            <i class="fas fa-camera" style="font-size: 24px;"></i>
+                            <p style="margin: 8px 0 0 0;">Click to add photos</p>
+                        </div>
+                        <input type="file" id="file-${sectionId}" multiple accept="image/*" style="display:none;" onchange="handlePhotoUpload(event, ${sectionId})">
+                        <div class="photo-gallery" id="gallery-${sectionId}"></div>
+                    </div>
+                `;
+            } else if (sectionId === 5) {
+                html += `
+                    <div class="form-group">
+                        <h3>Asbestos Present?</h3>
+                        <div class="yes-no-buttons">
+                            <button type="button" class="yes-no-btn" onclick="selectYesNo(event, 'asbestos', 'Yes')">Yes</button>
+                            <button type="button" class="yes-no-btn" onclick="selectYesNo(event, 'asbestos', 'No')">No</button>
+                            <button type="button" class="yes-no-btn" onclick="selectYesNo(event, 'asbestos', 'Unknown')">Unknown</button>
+                        </div>
+                        <input type="hidden" name="asbestos">
+                    </div>
+                    <div class="form-group">
+                        <label>Hazardous Materials</label>
+                        <textarea name="condition" placeholder="Asbestos, lead paint, other hazardous materials identified..."></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label>Photos - Evidence</label>
+                        <div class="photo-upload-btn" onclick="document.getElementById('file-${sectionId}').click()">
+                            <i class="fas fa-camera" style="font-size: 24px;"></i>
+                            <p style="margin: 8px 0 0 0;">Click to add photos</p>
+                        </div>
+                        <input type="file" id="file-${sectionId}" multiple accept="image/*" style="display:none;" onchange="handlePhotoUpload(event, ${sectionId})">
+                        <div class="photo-gallery" id="gallery-${sectionId}"></div>
+                    </div>
+                `;
+            } else if (sectionId === 6) {
+                html += `
+                    <div class="form-group">
+                        <label>Structural Assessment</label>
+                        <textarea name="condition" placeholder="Foundation, walls, load bearing, cracks, movement..."></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label>Photos - Evidence</label>
+                        <div class="photo-upload-btn" onclick="document.getElementById('file-${sectionId}').click()">
+                            <i class="fas fa-camera" style="font-size: 24px;"></i>
+                            <p style="margin: 8px 0 0 0;">Click to add photos</p>
+                        </div>
+                        <input type="file" id="file-${sectionId}" multiple accept="image/*" style="display:none;" onchange="handlePhotoUpload(event, ${sectionId})">
+                        <div class="photo-gallery" id="gallery-${sectionId}"></div>
+                    </div>
+                `;
+            } else if (sectionId === 10) {
+                html += `
+                    <div class="form-group">
+                        <label>Item Description</label>
+                        <input type="text" name="itemName" placeholder="e.g., Roof Replacement">
+                    </div>
+                    <div class="form-group">
+                        <label>Estimated Cost</label>
+                        <input type="text" name="costEstimate" placeholder="$">
+                    </div>
+                `;
+            }
+
+            html += `</div>
+
+                    <div>
+                        <div class="section-part-title"><i class="fas fa-eye"></i> Preview (Copy Ready)</div>
+                        <div id="preview-${sectionId}" style="background: white; border: 1px solid var(--border); border-radius: 8px; padding: 16px; min-height: 120px;"></div>
+                    </div>
+                </div>
+            </div></div>`;
+
+            return html;
+        }
+
+        function renderComplexSection(sectionId) {
+            const section = sections.find(s => s.id === sectionId);
+            const isDefects = sectionId === 9;
+            const isExterior = sectionId === 7;
+            const isCosts = sectionId === 10;
+
+            let partLabel, partPlaceholder;
+            if (isDefects) {
+                partLabel = 'Ref Number';
+                partPlaceholder = 'e.g., D-01, Roof-A, Window-1';
+            } else if (isCosts) {
+                partLabel = 'Item Description';
+                partPlaceholder = 'e.g., Roof Replacement, Window Repairs';
+            } else {
+                partLabel = 'Ref Number';
+                partPlaceholder = isExterior ? 'e.g., R-01, EE-01, Garage-A' : 'e.g., RM-01, Kitchen, Bedroom-A';
+            }
+
+            let html = `<div class="form-section active"><h2>${section.name}</h2>`;
+
+            if (isCosts) {
+                // Cost summary doesn't have Add Entry form - costs are entered in the preview
+                html += `<div class="section-layout">
+                    <div style="flex: 1;">
+                        <div class="section-part-title"><i class="fas fa-eye"></i> Cost Estimates by Element</div>
+                        <div id="preview-${sectionId}" style="background: white; border: 1px solid var(--border); border-radius: 8px; padding: 16px; min-height: 200px; overflow-x: auto;"></div>
+                    </div>
+                    <div>
+                        <div class="section-part-title"><i class="fas fa-check"></i> Summary</div>
+                        <div id="entered-${sectionId}" style="background: var(--light-bg); border: 1px solid var(--border); border-radius: 8px; padding: 12px; font-size: 13px; min-height: 100px; max-height: 300px; overflow-y: auto;">
+                            <p style="color: var(--text);">—</p>
+                        </div>
+                    </div>
+                </div>
+            </div></div>`;
+            } else {
+                html += `<div class="section-layout">
+                    <div>
+                        <div class="section-part-title"><i class="fas fa-eye"></i> Preview (Copy Ready)</div>
+                        <div id="preview-${sectionId}" style="background: white; border: 1px solid var(--border); border-radius: 8px; padding: 16px; min-height: 120px; overflow-x: auto;"></div>
+                    </div>
+
+                    <div>
+                        <div class="section-part-title"><i class="fas fa-pencil"></i> Add Entry</div>
+                        <div id="entryForm-${sectionId}">
+                        <div class="form-group">
+                            <label>${partLabel}</label>
+                            <input type="text" id="part-${sectionId}" placeholder="${partPlaceholder}">
+                        </div>`;
+
+                // For interior/exterior/defects sections, add room/element field
+                if (!isCosts) {
+                    const roomLabel = isDefects ? 'Element/Building Part' : (isExterior ? 'Location/Area' : 'Room/Space');
+                    const roomPlaceholder = isDefects ? 'e.g., Roof, Window, Door, Foundation' : (isExterior ? 'e.g., Kitchen, Living Room, East wing' : 'e.g., Kitchen, Bedroom, Living Room');
+                    html += `<div class="form-group">
+                                <label>${roomLabel}</label>
+                                <input type="text" id="room-${sectionId}" placeholder="${roomPlaceholder}">
+                            </div>`;
+                }
+
+                if (isDefects) {
+                    html += `<div class="form-group">
+                                <label>Priority</label>
+                                <select id="priority-${sectionId}">
+                                    <option value="">Select...</option>
+                                    <option value="Urgent">Urgent</option>
+                                    <option value="Important">Important</option>
+                                    <option value="Routine">Routine</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label>Description</label>
+                                <textarea id="notes-${sectionId}" placeholder="Detailed description of the defect..."></textarea>
+                            </div>
+                            <div class="form-group">
+                                <label>Recommended Works</label>
+                                <input type="text" id="suggestedWork-${sectionId}" placeholder="e.g., Repair, Replace, Monitor">
+                            </div>
+                            <div class="form-group">
+                                <label>Photos - Evidence</label>
+                                <div class="photo-upload-btn" onclick="document.getElementById('file-${sectionId}').click()">
+                                    <i class="fas fa-camera" style="font-size: 24px;"></i>
+                                    <p style="margin: 8px 0 0 0;">Click to add photos</p>
+                                </div>
+                                <input type="file" id="file-${sectionId}" multiple accept="image/*" style="display:none;" onchange="handleComplexPhotoUpload(event, ${sectionId})">
+                                <div class="photo-gallery" id="gallery-${sectionId}"></div>
+                            </div>`;
+                } else {
+                    html += `<div class="form-group">
+                                <label>Description</label>
+                                <textarea id="notes-${sectionId}" placeholder="Describe condition, observations..."></textarea>
+                            </div>
+                            <div class="form-group">
+                                <label>Photos</label>
+                                <div class="photo-upload-btn" onclick="document.getElementById('file-${sectionId}').click()">
+                                    <i class="fas fa-camera" style="font-size: 24px;"></i>
+                                    <p style="margin: 8px 0 0 0;">Click to add photos</p>
+                                </div>
+                                <input type="file" id="file-${sectionId}" multiple accept="image/*" style="display:none;" onchange="handleComplexPhotoUpload(event, ${sectionId})">
+                                <div class="photo-gallery" id="gallery-${sectionId}"></div>
+                            </div>`;
+                }
+
+                html += `<button class="btn-add" onclick="addComplexEntry(${sectionId})">
+                                <i class="fas fa-plus"></i> Add Entry
+                            </button>
+                            <button class="btn-cancel-edit" id="cancel-edit-${sectionId}" onclick="cancelEdit(${sectionId})" style="display:none;">
+                                <i class="fas fa-times"></i> Cancel Edit
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div></div>`;
+            }
+
+            return html;
+        }
+
+        function updatePreview(sectionId) {
+            const preview = document.getElementById(`preview-${sectionId}`);
+            const section = sections.find(s => s.id === sectionId);
+
+            let html = '';
+
+            if (section.isComplex) {
+                // Table format for complex sections
+                if (sectionId === 9) {
+                    // Defects table with grouping by Element/Building Part
+                    if (complexData[sectionId] && complexData[sectionId].length > 0) {
+                        // Group by element/building part (room field)
+                        const grouped = {};
+                        complexData[sectionId].forEach((entry) => {
+                            const element = entry.room || 'Ungrouped';
+                            if (!grouped[element]) {
+                                grouped[element] = [];
+                            }
+                            grouped[element].push(entry);
+                        });
+
+                        html = '<div style="font-size: 12px;">';
+
+                        Object.keys(grouped).sort().forEach((elementName) => {
+                            const entries = grouped[elementName];
+                            // Sort entries within group by priority
+                            const priorityOrder = { 'Urgent': 0, 'Important': 1, 'Routine': 2 };
+                            entries.sort((a, b) => (priorityOrder[a.priority] || 3) - (priorityOrder[b.priority] || 3));
+
+                            html += '<div style="margin-bottom: 20px;"><div style="background: var(--primary); color: white; padding: 12px 14px; border-radius: 6px 6px 0 0; font-weight: 600; font-size: 13px;">' + elementName + '</div><table style="width: 100%; border-collapse: collapse; font-size: 12px; background: white;"><tr style="background: #fafafa; border-bottom: 1px solid var(--border);"><th style="padding: 10px 12px; text-align: left; border-right: 1px solid var(--border); width: 60px; font-weight: 600; color: var(--text);">Ref #</th><th style="padding: 10px 12px; text-align: left; border-right: 1px solid var(--border); width: 30%; font-weight: 600; color: var(--text);">Description</th><th style="padding: 10px 12px; text-align: left; border-right: 1px solid var(--border); width: 22%; font-weight: 600; color: var(--text);">Works</th><th style="padding: 10px 12px; text-align: center; border-right: 1px solid var(--border); width: 70px; font-weight: 600; color: var(--text);">Priority</th><th style="padding: 10px 12px; text-align: center; border-right: 1px solid var(--border); width: 50px; font-weight: 600; color: var(--text);">Photos</th><th style="padding: 10px 12px; text-align: center; width: 60px; font-weight: 600; color: var(--text);">Actions</th></tr>';
+
+                            entries.forEach((entry) => {
+                                const globalIdx = complexData[9].indexOf(entry);
+                                const priorityColor = entry.priority === 'Urgent' ? '#9B5B5B' : entry.priority === 'Important' ? '#C4A56B' : '#A8C9C3';
+                                html += '<tr style="border-bottom: 1px solid var(--border);"><td style="padding: 12px; border-right: 1px solid var(--border); background: var(--light-bg); font-weight: 600; color: var(--primary);">' + entry.part + '</td><td style="padding: 12px; border-right: 1px solid var(--border);">' + entry.notes + '</td><td style="padding: 12px; border-right: 1px solid var(--border); font-size: 11px; color: #666;">' + (entry.suggestedWork || '—') + '</td><td style="padding: 12px; border-right: 1px solid var(--border); text-align: center; background: ' + priorityColor + '; color: white; font-weight: 600; font-size: 11px;">' + (entry.priority || '—') + '</td><td style="padding: 12px; border-right: 1px solid var(--border); text-align: center; color: #666;">' + (entry.photos && entry.photos.length > 0 ? '📸 ' + entry.photos.length : '—') + '</td><td style="padding: 12px; text-align: center; white-space: nowrap;"><button onclick="editComplexEntry(9, ' + globalIdx + ')" style="background: none; border: none; cursor: pointer; color: #3D5C45; font-size: 14px; padding: 4px 6px; margin-right: 4px;" title="Edit">✎</button><button onclick="removeComplexEntry(9, ' + globalIdx + ')" style="background: none; border: none; cursor: pointer; color: #9B5B5B; font-size: 16px; padding: 4px 6px;" title="Delete">✕</button></td></tr>';
+                            });
+                            html += '</table></div>';
+                        });
+                        html += '</div>';
+                    } else {
+                        html = '<p style="color: var(--text); font-size: 13px; margin: 0;">—</p>';
+                    }
+                } else if (sectionId === 10) {
+                    // Cost Summary based on defects groups
+                    const defects = complexData[9] || [];
+                    if (defects && defects.length > 0) {
+                        // Group defects by element/building part (room field)
+                        const grouped = {};
+                        defects.forEach((entry) => {
+                            const element = entry.room || 'Ungrouped';
+                            if (!grouped[element]) {
+                                grouped[element] = [];
+                            }
+                            grouped[element].push(entry);
+                        });
+
+                        // Get saved costs from formData
+                        const costs = formData[10] || {};
+
+                        html = `<div style="font-size: 13px;">`;
+                        let grandTotal = 0;
+
+                        Object.keys(grouped).sort().forEach((elementName) => {
+                            const defectList = grouped[elementName];
+                            const defectCount = defectList.length;
+                            const urgentCount = defectList.filter(d => d.priority === 'Urgent').length;
+                            const cost = parseFloat(costs[elementName]) || 0;
+                            grandTotal += cost;
+
+                            html += `<div style="margin-bottom: 20px;">
+                                <div style="background: var(--primary); color: white; padding: 12px 14px; border-radius: 6px 6px 0 0; font-weight: 600; font-size: 13px; display: flex; justify-content: space-between; align-items: center;">
+                                    <div>
+                                        <div>${elementName}</div>
+                                        <div style="font-size: 11px; font-weight: 400; margin-top: 4px; opacity: 0.9;">${defectCount} ${defectCount === 1 ? 'defect' : 'defects'}${urgentCount > 0 ? ` • ${urgentCount} urgent` : ''}</div>
+                                    </div>
+                                </div>
+                                <table style="width: 100%; border-collapse: collapse; background: white;">
+                                    <tr style="background: #fafafa; border-bottom: 1px solid var(--border);">
+                                        <th style="padding: 10px 12px; text-align: left; border-right: 1px solid var(--border); font-weight: 600; color: var(--text);">Issues</th>
+                                        <th style="padding: 10px 12px; text-align: right; width: 140px; font-weight: 600; color: var(--text);">Priority</th>
+                                    </tr>`;
+
+                            defectList.forEach((defect, idx) => {
+                                const priorityColor = defect.priority === 'Urgent' ? '#9B5B5B' :
+                                                     defect.priority === 'Important' ? '#C4A56B' : '#A8C9C3';
+                                html += `<tr style="border-bottom: 1px solid var(--border);">
+                                    <td style="padding: 10px 12px; border-right: 1px solid var(--border); font-size: 12px;">${defect.notes.substring(0, 55)}${defect.notes.length > 55 ? '...' : ''}</td>
+                                    <td style="padding: 10px 12px; text-align: center; background: ${priorityColor}; color: white; font-weight: 600; font-size: 11px;">${defect.priority}</td>
+                                </tr>`;
+                            });
+
+                            html += `<tr style="background: #fafafa; border-bottom: 2px solid var(--border);">
+                                <td style="padding: 12px; border-right: 1px solid var(--border); font-weight: 600; color: var(--text);">Cost for ${elementName}</td>
+                                <td style="padding: 12px; text-align: right;">
+                                    <input type="number" class="cost-input-${sectionId}" data-element="${elementName}" value="${cost}" placeholder="0.00" step="0.01" min="0"
+                                        style="width: 120px; padding: 8px; border: 1px solid var(--border); border-radius: 4px; text-align: right; font-weight: 600; font-size: 12px;"
+                                        onchange="updateCostSummary(10)">
+                                </td>
+                            </tr></table></div>`;
+                        });
+
+                        html += `<div style="background: var(--primary); color: white; padding: 16px 14px; border-radius: 6px; font-size: 14px; font-weight: 700; display: flex; justify-content: space-between; align-items: center; margin-top: 4px;">
+                            <span>TOTAL ESTIMATED COST</span>
+                            <span id="grand-total-${sectionId}" style="font-size: 16px;">$0.00</span>
+                        </div></div>`;
+                    } else {
+                        html = '<p style="color: var(--text); font-size: 13px; margin: 0; padding: 16px;">Add defects first to create cost estimates by element</p>';
+                    }
+                } else {
+                    // Standard table for Exterior/Interior sections with grouping
+                    if (complexData[sectionId] && complexData[sectionId].length > 0) {
+                        // Group entries by room/location
+                        const grouped = {};
+                        complexData[sectionId].forEach((entry) => {
+                            const room = entry.room || 'Ungrouped';
+                            if (!grouped[room]) {
+                                grouped[room] = [];
+                            }
+                            grouped[room].push(entry);
+                        });
+
+                        html = '<div style="font-size: 13px;">';
+                        Object.keys(grouped).sort().forEach((roomName) => {
+                            const entries = grouped[roomName];
+                            html += '<div style="margin-bottom: 16px;"><div style="background: var(--primary); color: white; padding: 10px 12px; border-radius: 6px 6px 0 0; font-weight: 600; display: flex; justify-content: space-between; align-items: center;"><span><strong>' + roomName + '</strong></span><span style="font-size: 12px; background: rgba(255,255,255,0.3); padding: 2px 8px; border-radius: 12px;">' + entries.length + ' ' + (entries.length === 1 ? 'item' : 'items') + '</span></div><table style="width: 100%; border-collapse: collapse; font-size: 13px;"><tr style="background: #f9f9f9; border-bottom: 2px solid var(--border);"><th style="padding: 8px 10px; text-align: left; border: 1px solid #ddd; width: 15%;">Ref #</th><th style="padding: 8px 10px; text-align: left; border: 1px solid #ddd; width: 45%;">Description</th><th style="padding: 8px 10px; text-align: left; border: 1px solid #ddd; width: 25%;">Photos</th><th style="padding: 8px 10px; text-align: center; border: 1px solid #ddd; width: 15%; min-width: 80px;">Actions</th></tr>';
+                            entries.forEach((entry) => {
+                                const globalIdx = complexData[sectionId].indexOf(entry);
+                                let photoHtml = '—';
+                                if (entry.photos && entry.photos.length > 0) {
+                                    photoHtml = '<div style="display: flex; gap: 4px; flex-wrap: wrap;">';
+                                    entry.photos.slice(0, 3).forEach((photo) => {
+                                        const photoSrc = photo.base64 || photo.data || '';
+                                        photoHtml += '<img src="' + photoSrc + '" style="width: 40px; height: 40px; object-fit: cover; border-radius: 4px; border: 1px solid #ddd;" title="' + photo.name + '">';
+                                    });
+                                    if (entry.photos.length > 3) {
+                                        photoHtml += '<div style="width: 40px; height: 40px; background: var(--border); border-radius: 4px; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 600; color: var(--primary);">+' + (entry.photos.length - 3) + '</div>';
+                                    }
+                                    photoHtml += '</div>';
+                                }
+                                html += '<tr style="background: var(--light-bg); border-bottom: 1px solid #ddd;"><td style="padding: 10px; border: 1px solid #ddd; font-weight: 600; color: var(--primary);">' + entry.part + '</td><td style="padding: 10px; border: 1px solid #ddd;">' + entry.notes + '</td><td style="padding: 10px; border: 1px solid #ddd;">' + photoHtml + '</td><td style="padding: 10px; border: 1px solid #ddd; text-align: center; white-space: nowrap;"><button onclick="editComplexEntry(' + sectionId + ', ' + globalIdx + ')" style="background: none; border: none; cursor: pointer; color: #3D5C45; font-size: 14px; padding: 4px 6px; margin-right: 4px;" title="Edit">✎</button><button onclick="removeComplexEntry(' + sectionId + ', ' + globalIdx + ')" style="background: none; border: none; cursor: pointer; color: #9B5B5B; font-size: 16px; padding: 4px 6px;" title="Delete">✕</button></td></tr>';
+                            });
+                            html += '</table></div>';
+                        });
+                        html += '</div>';
+                    } else {
+                        html = '<p style="color: var(--text); font-size: 13px; margin: 0;">—</p>';
+                    }
+                }
+            } else {
+                // Simple format for regular sections
+                const data = formData[sectionId] || {};
+                const photos = photoData[sectionId] || [];
+
+                // Define labels for yes/no fields
+                const yesNoLabels = {
+                    rcdPresent: 'Safety Switch (RCD) Present?',
+                    waterIngress: 'Water Ingress Present?',
+                    asbestos: 'Asbestos Present?'
+                };
+
+                if (Object.keys(data).length > 0 || photos.length > 0) {
+                    html = '<div style="font-size: 13px; line-height: 1.6;">';
+                    Object.entries(data).forEach(([key, value]) => {
+                        if (value) {
+                            const label = yesNoLabels[key] || key;
+                            html += `<div style="margin-bottom: 8px;"><strong>${label}:</strong> ${value}</div>`;
+                        }
+                    });
+                    if (photos.length > 0) {
+                        html += `<div style="margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--border);">
+                            <div style="margin-bottom: 8px;"><strong>📸 Photos (${photos.length}):</strong></div>
+                            <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px;">`;
+                        photos.forEach(photo => {
+                            html += `<img src="${photo.base64}" style="width: 80px; height: 80px; object-fit: cover; border: 1px solid var(--border); border-radius: 4px;">`;
+                        });
+                        html += '</div></div>';
+                    }
+                    html += '</div>';
+                } else {
+                    html = '<p style="color: var(--text); font-size: 13px; margin: 0;">—</p>';
+                }
+            }
+
+            if (preview) {
+                preview.innerHTML = html;
+                // Initialize cost summary calculations after rendering
+                if (sectionId === 10) {
+                    setTimeout(() => updateCostSummary(10), 100);
+                }
+            }
+        }
+
+        function editComplexEntry(sectionId, idx) {
+            const entry = complexData[sectionId][idx];
+            // Populate form fields
+            document.getElementById(`part-${sectionId}`).value = entry.part;
+            document.getElementById(`notes-${sectionId}`).value = entry.notes;
+            const roomField = document.getElementById(`room-${sectionId}`);
+            if (roomField) {
+                roomField.value = entry.room || '';
+            }
+            if (sectionId === 9) {
+                document.getElementById(`priority-${sectionId}`).value = entry.priority;
+                document.getElementById(`suggestedWork-${sectionId}`).value = entry.suggestedWork || '';
+            }
+            // Set editing state
+            editingIndex = idx;
+            // Change button label
+            const btn = document.querySelector(`#entryForm-${sectionId} .btn-add`);
+            if (btn) {
+                btn.innerHTML = '<i class="fas fa-save"></i> Update Entry';
+                btn.style.background = '#C4A56B';
+            }
+            // v1.1: Show cancel button
+            const cancelBtn = document.getElementById(`cancel-edit-${sectionId}`);
+            if (cancelBtn) cancelBtn.style.display = 'flex';
+            // Scroll to form
+            document.getElementById(`entryForm-${sectionId}`).scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+
+        function addComplexEntry(sectionId) {
+            const part = document.getElementById(`part-${sectionId}`).value;
+            const notes = document.getElementById(`notes-${sectionId}`).value;
+            const roomField = document.getElementById(`room-${sectionId}`);
+            const room = roomField ? roomField.value : '';
+
+            const isCosts = sectionId === 10;
+            const isDefects = sectionId === 9;
+            const isInteriorExterior = sectionId === 7 || sectionId === 8;
+            let missingField = '';
+
+            if (!part) {
+                missingField = isCosts ? 'item description' : 'ref number';
+            } else if (!notes) {
+                missingField = isCosts ? 'estimated cost' : 'description';
+            } else if ((isInteriorExterior || isDefects) && !room) {
+                if (isDefects) missingField = 'element/building part';
+                else missingField = sectionId === 7 ? 'location/area' : 'room/space';
+            }
+
+            if (missingField) {
+                alert(`Please enter the ${missingField}`);
+                return;
+            }
+
+            // For cost section, validate that cost is a valid number
+            if (isCosts && isNaN(parseFloat(notes))) {
+                alert('Please enter a valid cost amount (numbers only)');
+                return;
+            }
+
+            if (!complexData[sectionId]) {
+                complexData[sectionId] = [];
+            }
+
+            const entry = {
+                part,
+                notes,
+                photos: tempComplexPhotos[sectionId] || []
+            };
+
+            // Add room/element field for interior/exterior/defects
+            if (isInteriorExterior || isDefects) {
+                entry.room = room;
+            }
+
+            // Add defect-specific fields
+            if (isDefects) {
+                const priority = document.getElementById(`priority-${sectionId}`).value;
+                const suggestedWork = document.getElementById(`suggestedWork-${sectionId}`).value;
+
+                if (!priority) {
+                    alert('Please select a priority level');
+                    return;
+                }
+
+                entry.priority = priority;
+                entry.suggestedWork = suggestedWork;
+            }
+
+            // Handle edit mode vs add mode
+            if (editingIndex !== null) {
+                complexData[sectionId].splice(editingIndex, 1, entry);
+                editingIndex = null;
+                // Reset button
+                const btn = document.querySelector(`#entryForm-${sectionId} .btn-add`);
+                if (btn) {
+                    btn.innerHTML = '<i class="fas fa-plus"></i> Add Entry';
+                    btn.style.background = '';
+                }
+                // v1.1: hide cancel button
+                const cancelBtn = document.getElementById(`cancel-edit-${sectionId}`);
+                if (cancelBtn) cancelBtn.style.display = 'none';
+            } else {
+                complexData[sectionId].push(entry);
+            }
+
+            document.getElementById(`part-${sectionId}`).value = '';
+            document.getElementById(`notes-${sectionId}`).value = '';
+            const roomFieldClear = document.getElementById(`room-${sectionId}`);
+            if (roomFieldClear) {
+                roomFieldClear.value = '';
+            }
+
+            if (sectionId === 9) {
+                document.getElementById(`priority-${sectionId}`).value = '';
+                document.getElementById(`suggestedWork-${sectionId}`).value = '';
+                // Also update cost summary when defects change
+                updatePreview(10);
+                updateEnteredEntries(10);
+            } else {
+                document.getElementById(`gallery-${sectionId}`).innerHTML = '';
+                tempComplexPhotos[sectionId] = [];
+            }
+
+            saveFormData();
+            updatePreview(sectionId);
+            updateProgress();
+            updateSectionBadges();
+        }
+
+        function updateSectionBadges() {
+            sections.forEach(section => {
+                const badge = document.getElementById(`badge-${section.id}`);
+                if (!badge) return;
+
+                let count = 0;
+
+                if (section.isComplex) {
+                    // Count complex entries
+                    if (complexData[section.id] && complexData[section.id].length > 0) {
+                        count = complexData[section.id].length;
+                    }
+                } else {
+                    // Count filled form fields
+                    const data = formData[section.id] || {};
+                    Object.values(data).forEach(value => {
+                        if (value && String(value).trim()) count++;
+                    });
+                    // Add photo count
+                    if (photoData[section.id]) {
+                        count += photoData[section.id].length;
+                    }
+                }
+
+                badge.textContent = count > 0 ? count : '—';
+                badge.style.opacity = count > 0 ? '1' : '0.5';
+            });
+            updateCompletionDots(); // v1.1
+        }
+
+        function updateCostSummary(sectionId) {
+            // Collect all cost inputs
+            if (!formData[sectionId]) {
+                formData[sectionId] = {};
+            }
+
+            const inputs = document.querySelectorAll(`.cost-input-${sectionId}`);
+            let grandTotal = 0;
+
+            inputs.forEach(input => {
+                const element = input.getAttribute('data-element');
+                const cost = parseFloat(input.value) || 0;
+                formData[sectionId][element] = cost;
+                grandTotal += cost;
+            });
+
+            // Update grand total display
+            const totalDisplay = document.getElementById(`grand-total-${sectionId}`);
+            if (totalDisplay) {
+                totalDisplay.textContent = `$${grandTotal.toFixed(2)}`;
+            }
+
+            // Save to localStorage
+            saveFormData();
+            updateProgress();
+            updateSectionBadges();
+            updateEnteredEntries(sectionId);
+        }
+
+        function updateEnteredEntries(sectionId) {
+            const entered = document.getElementById(`entered-${sectionId}`);
+            const section = sections.find(s => s.id === sectionId);
+
+            let html = '';
+
+            if (section.isComplex) {
+                // Special case: Cost Summary (section 10) stores costs in formData[10], not complexData[10]
+                if (sectionId === 10) {
+                    const costs = formData[10] || {};
+                    const costEntries = Object.entries(costs).filter(([k, v]) => parseFloat(v) > 0);
+                    if (costEntries.length > 0) {
+                        let total = 0;
+                        html = '<div style="font-size: 12px;">';
+                        costEntries.forEach(([element, cost]) => {
+                            const c = parseFloat(cost);
+                            total += c;
+                            html += `<div style="margin-bottom: 8px; display: flex; justify-content: space-between;"><strong>${element}:</strong> <span style="color: var(--primary); font-weight: 600;">$${c.toFixed(2)}</span></div>`;
+                        });
+                        html += `<div style="margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--border); display: flex; justify-content: space-between; font-weight: 700; color: var(--primary);"><strong>Total:</strong> <span>$${total.toFixed(2)}</span></div>`;
+                        html += '</div>';
+                    } else {
+                        html = '<p style="color: var(--text); margin: 0;">Enter costs in the table on the left</p>';
+                    }
+                } else if (complexData[sectionId] && complexData[sectionId].length > 0) {
+                    html = '<ul style="margin: 0; padding-left: 20px; list-style: disc;">';
+                    complexData[sectionId].forEach((entry, idx) => {
+                        html += `<li style="margin-bottom: 6px;"><strong>${entry.part}</strong> • ${entry.notes.substring(0, 40)}${entry.notes.length > 40 ? '...' : ''} ${entry.photos && entry.photos.length > 0 ? `[${entry.photos.length} 📸]` : ''} <button class="btn-remove" onclick="removeComplexEntry(${sectionId}, ${idx})" style="margin-left: 8px;">✕</button></li>`;
+                    });
+                    html += '</ul>';
+                } else {
+                    html = '<p style="color: var(--text); margin: 0;">—</p>';
+                }
+            } else {
+                const data = formData[sectionId] || {};
+                const photos = photoData[sectionId] || [];
+
+                // Special handling for cost summary section
+                if (sectionId === 10) {
+                    if (Object.keys(data).length > 0) {
+                        html = '<div style="font-size: 12px;">';
+                        let total = 0;
+                        Object.entries(data).forEach(([key, value]) => {
+                            const cost = parseFloat(value) || 0;
+                            total += cost;
+                            if (cost > 0) {
+                                html += `<div style="margin-bottom: 8px; display: flex; justify-content: space-between;"><strong>${key}:</strong> <span style="color: var(--primary); font-weight: 600;">$${cost.toFixed(2)}</span></div>`;
+                            }
+                        });
+                        if (total > 0) {
+                            html += `<div style="margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--border); display: flex; justify-content: space-between; font-weight: 700; color: var(--primary);"><strong>Total:</strong> <span>$${total.toFixed(2)}</span></div>`;
+                        }
+                        html += '</div>';
+                    } else {
+                        html = '<p style="color: var(--text); margin: 0;">—</p>';
+                    }
+                } else {
+                    if (Object.keys(data).length > 0 || photos.length > 0) {
+                        html = '<ul style="margin: 0; padding-left: 20px; list-style: disc;">';
+                        Object.entries(data).forEach(([key, value]) => {
+                            if (value) {
+                                html += `<li style="margin-bottom: 6px;"><strong>${key}:</strong> ${value.substring(0, 50)}${value.length > 50 ? '...' : ''}</li>`;
+                            }
+                        });
+                        if (photos.length > 0) {
+                            html += `<li style="margin-bottom: 6px;"><strong>Photos:</strong> ${photos.length} item(s)</li>`;
+                        }
+                        html += '</ul>';
+                    } else {
+                        html = '<p style="color: var(--text); margin: 0;">—</p>';
+                    }
+                }
+            }
+
+            if (entered) {
+                entered.innerHTML = html;
+            }
+        }
+
+        function removeComplexEntry(sectionId, idx) {
+            // v1.1: use custom confirm modal instead of native confirm()
+            showConfirm('Remove this entry?', () => {
+                complexData[sectionId].splice(idx, 1);
+                saveFormData();
+                updateEnteredEntries(sectionId);
+                updateSectionBadges();
+                updateProgress();
+                updatePreview(sectionId);
+                if (sectionId === 9) {
+                    updatePreview(10);
+                    updateEnteredEntries(10);
+                }
+            });
+        }
+
+        function attachEventListeners(sectionId) {
+            const form = document.getElementById(`entryForm-${sectionId}`);
+            if (!form) return;
+
+            const inputs = form.querySelectorAll('input[type="text"], input[type="date"], textarea, select');
+            inputs.forEach(input => {
+                input.addEventListener('change', () => {
+                    saveSimpleEntry(sectionId);
+                    updateProgress();
+                });
+                input.addEventListener('input', () => {
+                    saveSimpleEntry(sectionId);
+                    updateProgress();
+                });
+            });
+        }
+
+        function saveSimpleEntry(sectionId) {
+            const form = document.getElementById(`entryForm-${sectionId}`);
+            if (!form) return;
+
+            formData[sectionId] = {};
+            form.querySelectorAll('input[type="text"], input[type="date"], textarea, select').forEach(input => {
+                if (input.name) {
+                    formData[sectionId][input.name] = input.value;
+                }
+            });
+
+            saveFormData();
+            updateEnteredEntries(sectionId);
+            updateSectionBadges();
+            setTimeout(() => updatePreview(sectionId), 100);
+        }
+
+        let tempComplexPhotos = {};
+
+        function handleComplexPhotoUpload(event, sectionId) {
+            const files = event.target.files;
+            if (!tempComplexPhotos[sectionId]) {
+                tempComplexPhotos[sectionId] = [];
+            }
+
+            Array.from(files).forEach(file => {
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    tempComplexPhotos[sectionId].push({ base64: e.target.result, name: file.name });
+                    renderTempPhotoGallery(sectionId);
+                };
+                reader.readAsDataURL(file);
+            });
+        }
+
+        function renderTempPhotoGallery(sectionId) {
+            const gallery = document.getElementById(`gallery-${sectionId}`);
+            if (!gallery) return;
+
+            gallery.innerHTML = (tempComplexPhotos[sectionId] || []).map((photo, idx) => `
+                <div class="photo-item">
+                    <img src="${photo.base64 || photo}" alt="photo">
+                    <button class="photo-remove" onclick="removeTempPhoto(${sectionId}, ${idx})">✕</button>
+                </div>
+            `).join('');
+        }
+
+        function removeTempPhoto(sectionId, idx) {
+            tempComplexPhotos[sectionId].splice(idx, 1);
+            renderTempPhotoGallery(sectionId);
+        }
+
+        function handlePhotoUpload(event, sectionId) {
+            const files = event.target.files;
+            if (!photoData[sectionId]) {
+                photoData[sectionId] = [];
+            }
+
+            Array.from(files).forEach(file => {
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    photoData[sectionId].push({
+                        base64: e.target.result,
+                        name: file.name
+                    });
+                    renderPhotoGallery(sectionId);
+                    saveFormData();
+                    updateEnteredEntries(sectionId);
+                    updateSectionBadges();
+                };
+                reader.readAsDataURL(file);
+            });
+        }
+
+        function renderPhotoGallery(sectionId) {
+            const gallery = document.getElementById(`gallery-${sectionId}`);
+            if (!gallery || !photoData[sectionId]) return;
+
+            gallery.innerHTML = photoData[sectionId].map((photo, idx) => {
+                const photoSrc = photo.base64 || photo.data || '';
+                return `
+                <div class="photo-item">
+                    <img src="${photoSrc}" alt="photo">
+                    <button class="photo-remove" onclick="removePhoto(${sectionId}, ${idx})">✕</button>
+                </div>`;
+            }).join('');
+        }
+
+        function removePhoto(sectionId, idx) {
+            photoData[sectionId].splice(idx, 1);
+            renderPhotoGallery(sectionId);
+            saveFormData();
+            updateEnteredEntries(sectionId);
+            updateSectionBadges();
+            updateProgress();
+        }
+
+        function saveFormData() {
+            try {
+                localStorage.setItem('assessmentForm', JSON.stringify(formData));
+                localStorage.setItem('assessmentPhotos', JSON.stringify(photoData));
+                localStorage.setItem('complexData', JSON.stringify(complexData));
+                lastSavedTime = new Date(); // v1.1
+                showSaveIndicator();
+                // v1.1: auto-persist to named session if one is active
+                if (currentSessionName !== 'Untitled Assessment' || Object.keys(formData).length > 0) {
+                    debouncedSessionSave();
+                }
+            } catch (e) {
+                console.error('Failed to save form data:', e);
+                alert('Warning: Could not save data. Storage may be full or quota exceeded.');
+            }
+        }
+
+        // v1.1: Debounced session save (avoid thrashing localStorage)
+        function debouncedSessionSave() {
+            clearTimeout(autoSaveTimer);
+            autoSaveTimer = setTimeout(() => {
+                persistCurrentSession();
+            }, 1200);
+        }
+
+        function showSaveIndicator() {
+            const indicator = document.getElementById('saveIndicator');
+            if (!indicator) return;
+            indicator.classList.remove('saving');
+            indicator.classList.add('saved');
+            // v1.1: show timestamp
+            const timeStr = lastSavedTime ? lastSavedTime.toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'}) : '';
+            indicator.innerHTML = `<i class="fas fa-check"></i><span>Saved ${timeStr}</span>`;
+            clearTimeout(window.saveIndicatorTimeout);
+            window.saveIndicatorTimeout = setTimeout(() => {
+                indicator.classList.remove('saved');
+            }, 3000);
+        }
+
+        function loadFormData() {
+            try {
+                const saved = localStorage.getItem('assessmentForm');
+                const savedPhotos = localStorage.getItem('assessmentPhotos');
+                const savedComplex = localStorage.getItem('complexData');
+
+                if (saved) formData = JSON.parse(saved);
+                if (savedPhotos) photoData = JSON.parse(savedPhotos);
+                if (savedComplex) complexData = JSON.parse(savedComplex);
+            } catch (e) {
+                console.warn('Could not load saved data from storage:', e);
+                // Continue with empty data - user can still use the form
+            }
+        }
+
+        function copyTableToWord() {
+            let html = '<style>.table-style { width: 100%; border-collapse: collapse; margin: 20px 0; } .table-style th { background: #3D5C45; color: #F5F1E8; padding: 12px; border: 1px solid #ddd; text-align: left; font-weight: 600; } .table-style td { padding: 12px; border: 1px solid #ddd; } .table-style tr:nth-child(even) { background: #FAF9F6; }</style>';
+
+            // Only copy table for current section
+            if (currentSection === 7) {
+                // Exterior
+                if (complexData[7] && complexData[7].length > 0) {
+                    html += '<h3 style="color: #3D5C45; margin: 24px 0 12px 0;">EXTERIOR ELEMENTS</h3>';
+                    html += '<table class="table-style"><tr><th>Location/Area</th><th>Ref Number</th><th>Description</th></tr>';
+                    complexData[7].forEach(entry => {
+                        html += `<tr><td>${entry.room || '—'}</td><td><strong>${entry.part}</strong></td><td>${entry.notes}</td></tr>`;
+                    });
+                    html += '</table>';
+                } else {
+                    html += '<p style="color: #3D5C45;">No exterior data entered for this section.</p>';
+                }
+            } else if (currentSection === 8) {
+                // Interior
+                if (complexData[8] && complexData[8].length > 0) {
+                    html += '<h3 style="color: #3D5C45; margin: 24px 0 12px 0;">INTERIOR SPACES</h3>';
+                    html += '<table class="table-style"><tr><th>Room/Space</th><th>Ref Number</th><th>Description</th></tr>';
+                    complexData[8].forEach(entry => {
+                        html += `<tr><td>${entry.room || '—'}</td><td><strong>${entry.part}</strong></td><td>${entry.notes}</td></tr>`;
+                    });
+                    html += '</table>';
+                } else {
+                    html += '<p style="color: #3D5C45;">No interior data entered for this section.</p>';
+                }
+            } else if (currentSection === 9) {
+                // Defects
+                if (complexData[9] && complexData[9].length > 0) {
+                    html += '<h3 style="color: #3D5C45; margin: 24px 0 12px 0;">IDENTIFIED DEFECTS & RECOMMENDATIONS</h3>';
+                    html += '<table class="table-style"><tr><th>Element</th><th>Ref #</th><th>Description</th><th>Recommended Works</th><th>Priority</th></tr>';
+                    complexData[9].forEach((entry, idx) => {
+                        const priorityColor = entry.priority === 'Urgent' ? '#9B5B5B' :
+                                             entry.priority === 'Important' ? '#C4A56B' : '#A8C9C3';
+                        html += '<tr><td>' + (entry.room || '—') + '</td><td><strong>' + entry.part + '</strong></td><td>' + entry.notes + '</td><td>' + (entry.suggestedWork || '—') + '</td><td style="background-color: ' + priorityColor + '; color: white; font-weight: bold; text-align: center;">' + (entry.priority || '—') + '</td></tr>';
+                    });
+                    html += '</table>';
+                } else {
+                    html += '<p style="color: #3D5C45;">No defect data entered for this section.</p>';
+                }
+            } else {
+                html += `<p style="color: #3D5C45;">No table data available for ${sectionTitles[currentSection]}.</p>`;
+            }
+
+            const blob = new Blob([html], { type: 'text/html' });
+            const data = [new ClipboardItem({ 'text/html': blob })];
+
+            navigator.clipboard.write(data).then(() => {
+                const feedback = document.getElementById('copyFeedback');
+                feedback.classList.add('show');
+                setTimeout(() => feedback.classList.remove('show'), 3000);
+            });
+        }
+
+        const sectionTitles = {
+            1: 'Property Information',
+            2: 'Electrical Systems',
+            3: 'Plumbing Systems',
+            4: 'Environmental Conditions',
+            5: 'Hazardous Materials',
+            6: 'Structural Assessment',
+            7: 'Exterior Elements',
+            8: 'Interior Spaces',
+            9: 'Defects & Recommendations',
+            10: 'Assessment Summary'
+        };
+
+        function selectYesNo(event, fieldName, value) {
+            event.preventDefault();
+            const buttons = event.target.parentElement.querySelectorAll('.yes-no-btn');
+            buttons.forEach(btn => btn.classList.remove('selected'));
+            event.target.classList.add('selected');
+
+            // Store in formData
+            formData[currentSection] = formData[currentSection] || {};
+            formData[currentSection][fieldName] = value;
+            saveFormData();
+            updatePreview(currentSection);
+        }
+
+        function restoreYesNoSelections(sectionId) {
+            if (!formData[sectionId]) return;
+
+            const form = document.getElementById(`entryForm-${sectionId}`);
+            if (!form) return;
+
+            // Restore RCD Present
+            if (formData[sectionId].rcdPresent) {
+                const buttons = form.querySelectorAll('[onclick*="rcdPresent"]');
+                buttons.forEach(btn => {
+                    if (btn.textContent.trim() === formData[sectionId].rcdPresent) {
+                        btn.classList.add('selected');
+                    } else {
+                        btn.classList.remove('selected');
+                    }
+                });
+            }
+
+            // Restore Water Ingress
+            if (formData[sectionId].waterIngress) {
+                const buttons = form.querySelectorAll('[onclick*="waterIngress"]');
+                buttons.forEach(btn => {
+                    if (btn.textContent.trim() === formData[sectionId].waterIngress) {
+                        btn.classList.add('selected');
+                    } else {
+                        btn.classList.remove('selected');
+                    }
+                });
+            }
+
+            // Restore Asbestos
+            if (formData[sectionId].asbestos) {
+                const buttons = form.querySelectorAll('[onclick*="asbestos"]');
+                buttons.forEach(btn => {
+                    if (btn.textContent.trim() === formData[sectionId].asbestos) {
+                        btn.classList.add('selected');
+                    } else {
+                        btn.classList.remove('selected');
+                    }
+                });
+            }
+        }
+
+        function copySectionData() {
+            let text = `${sectionTitles[currentSection]}\n${'═'.repeat(60)}\n\n`;
+
+            // Handle complex sections (7, 8, 9, 10) that use table data
+            if (currentSection >= 7 && currentSection <= 10) {
+                if (!complexData[currentSection] || complexData[currentSection].length === 0) {
+                    alert('No data to copy for this section');
+                    return;
+                }
+
+                if (currentSection === 9) {
+                    // Defects section with priority
+                    text += 'IDENTIFIED DEFECTS & RECOMMENDATIONS\n';
+                    complexData[currentSection].forEach((entry, idx) => {
+                        text += `\n${idx + 1}. ${entry.part}\n`;
+                        text += `   Description: ${entry.notes}\n`;
+                        text += `   Recommended Work: ${entry.suggestedWork || '—'}\n`;
+                        text += `   Priority: ${entry.priority || '—'}\n`;
+                    });
+                } else if (currentSection === 10) {
+                    // Cost estimate section — stored in formData[10] keyed by element name
+                    text += 'COST ESTIMATES\n';
+                    const costs10 = formData[10] || {};
+                    const costList = Object.entries(costs10).filter(([k, v]) => parseFloat(v) > 0);
+                    if (costList.length === 0) { alert('No cost data to copy for this section'); return; }
+                    let costTotal = 0;
+                    costList.forEach(([element, cost]) => {
+                        const c = parseFloat(cost);
+                        costTotal += c;
+                        text += `${element}: $${c.toFixed(2)}\n`;
+                    });
+                    text += `\nTOTAL ESTIMATED COST: $${costTotal.toFixed(2)}\n`;
+                } else {
+                    // Exterior (7) and Interior (8) sections
+                    const sectionLabel = currentSection === 7 ? 'EXTERIOR ELEMENTS' : 'INTERIOR SPACES';
+                    text += `${sectionLabel}\n`;
+                    complexData[currentSection].forEach((entry, idx) => {
+                        text += `${idx + 1}. ${entry.part}: ${entry.notes}\n`;
+                    });
+                }
+            } else {
+                // Handle regular sections (1-6) with form inputs
+                const section = document.getElementById(`entryForm-${currentSection}`);
+                if (!section) {
+                    alert('No data to copy for this section');
+                    return;
+                }
+
+                const inputs = section.querySelectorAll('input:not([type="hidden"]):not([type="button"]):not([type="date"]), textarea');
+                inputs.forEach(input => {
+                    if (input.value) {
+                        const label = input.parentElement?.querySelector('label')?.textContent || '';
+                        if (label) text += `${label}: ${input.value}\n`;
+                    }
+                });
+
+                // Add date fields separately
+                const dateInputs = section.querySelectorAll('input[type="date"]');
+                dateInputs.forEach(input => {
+                    if (input.value) {
+                        const label = input.parentElement?.querySelector('label')?.textContent || '';
+                        if (label) text += `${label}: ${input.value}\n`;
+                    }
+                });
+
+                // Add yes/no button values
+                const yesNoBtns = section.querySelectorAll('.yes-no-btn.selected');
+                yesNoBtns.forEach(btn => {
+                    const label = btn.closest('.form-group')?.querySelector('h3')?.textContent ||
+                                 btn.closest('.form-group')?.querySelector('label')?.textContent || '';
+                    if (label) text += `${label}: ${btn.textContent}\n`;
+                });
+            }
+
+            // Add photos
+            if (photoData[currentSection] && photoData[currentSection].length > 0) {
+                text += `\n📸 PHOTOS (${photoData[currentSection].length}):\n`;
+                photoData[currentSection].forEach((photo, idx) => {
+                    text += `[PHOTO ${idx + 1}: ${photo.name}]\n`;
+                });
+            }
+
+            showCopyModal(text, `${sectionTitles[currentSection]} - Ready to Copy`);
+        }
+
+        function updateProgress() {
+            let filledSections = 0;
+            let totalSections = 10;
+
+            // Check each section's data in formData and complexData, not DOM
+            for (let i = 1; i <= totalSections; i++) {
+                let hasFilled = false;
+
+                // Check formData for this section
+                if (formData[i] && Object.keys(formData[i]).length > 0) {
+                    for (let key in formData[i]) {
+                        if (formData[i][key] && String(formData[i][key]).trim()) {
+                            hasFilled = true;
+                            break;
+                        }
+                    }
+                }
+
+                // Check complexData for this section
+                if (!hasFilled && complexData[i] && complexData[i].length > 0) {
+                    hasFilled = true;
+                }
+
+                // Check photoData for this section
+                if (!hasFilled && photoData[i] && photoData[i].length > 0) {
+                    hasFilled = true;
+                }
+
+                if (hasFilled) filledSections++;
+            }
+
+            const percentage = Math.round((filledSections / totalSections) * 100);
+            const progressFill = document.getElementById('progressFill');
+            const progressText = document.getElementById('progressText');
+
+            if (progressFill) {
+                progressFill.style.width = percentage + '%';
+            }
+            if (progressText) {
+                progressText.textContent = percentage + '% Complete';
+            }
+        }
+
+        function validateRequiredFields() {
+            const address = document.querySelector('input[name="address"]')?.value?.trim() || '';
+            const date = document.querySelector('input[name="date"]')?.value || '';
+
+            const missing = [];
+            if (!address) missing.push('Property Address');
+            if (!date) missing.push('Inspection Date');
+
+            return { isValid: missing.length === 0, missing };
+        }
+
+        function clearFormData() {
+            // v1.1: use custom confirm modal
+            showConfirm('Clear all form data? This cannot be undone.', () => {
+                localStorage.removeItem('assessmentForm');
+                localStorage.removeItem('assessmentPhotos');
+                localStorage.removeItem('complexData');
+
+                formData = {};
+                photoData = {};
+                complexData = { 7: [], 8: [], 9: [] };
+
+                showSection(1);
+                updateProgress();
+                updateSectionBadges();
+
+                const feedback = document.getElementById('copyFeedback');
+                if (feedback) {
+                    feedback.textContent = '✓ Form cleared - ready for new assessment';
+                    feedback.classList.add('show');
+                    setTimeout(() => feedback.classList.remove('show'), 3000);
+                }
+                currentSessionName = 'Untitled Assessment'; // v1.1
+                updateSessionBar(); // v1.1
+            }); // v1.1: end showConfirm callback
+        }
+
+        function loadSampleData() {
+            const sampleData = {
+                1: {
+                    address: '123 Heritage Lane, Melbourne VIC 3000',
+                    date: '2024-04-10',
+                    inspector: 'Sample Inspector',
+                    rcdPresent: 'Yes'
+                },
+                2: {
+                    rcdPresent: 'Yes',
+                    condition: 'Electrical system appears to be in good condition. Safety switch (RCD) is present and functional. Recent inspection shows no safety concerns.'
+                },
+                3: {
+                    condition: 'Plumbing system is functional. No visible leaks detected. Water pressure is adequate throughout the property.'
+                },
+                4: {
+                    waterIngress: 'No',
+                    condition: 'Good ventilation throughout. No signs of moisture or dampness observed. Environmental conditions are stable.'
+                },
+                5: {
+                    condition: 'No hazardous materials detected during assessment. Building appears safe for occupancy.'
+                },
+                6: {
+                    condition: 'Structural integrity is good. Foundation appears sound. No major cracks or settlement observed.'
+                },
+                7: {
+                    condition: 'Exterior elements in good condition. Roof is secure. Paint and finishes are well-maintained.'
+                },
+                8: {
+                    condition: 'Interior spaces are in good condition. Ceilings, walls, and floors are in good repair.'
+                },
+                9: {
+                    condition: 'Assessment complete. Overall condition is good with no major defects identified.'
+                },
+                10: {
+                    condition: 'This heritage building is in good condition overall. Regular maintenance recommended. No urgent repairs required.'
+                }
+            };
+
+            formData = sampleData;
+            complexData = {
+                7: [
+                    {part: 'R-01', room: 'Roof', notes: 'Good condition, recently maintained. Minor moss growth on north-facing pitch.', photos: []},
+                    {part: 'EE-01', room: 'East Elevation', notes: 'Rendered brick facade. Some hairline cracks at window surrounds.', photos: []},
+                    {part: 'EE-02', room: 'West Elevation', notes: 'Painted timber weatherboards. Paint peeling in upper sections.', photos: []}
+                ],
+                8: [
+                    {part: 'RM-01', room: 'Living Room', notes: 'Good condition. Original cornices intact. Minor scuff marks on skirting boards.', photos: []},
+                    {part: 'RM-02', room: 'Kitchen', notes: 'Functional condition. Tiles cracked near sink area. Ventilation adequate.', photos: []},
+                    {part: 'RM-03', room: 'Main Bedroom', notes: 'Good condition. Original floorboards with some wear near doorway.', photos: []}
+                ],
+                9: [
+                    {part: 'D-01', room: 'Roof', notes: 'Tiles loose in northeast corner following storm damage', priority: 'Urgent', suggestedWork: 'Replace tiles and seal', photos: []},
+                    {part: 'D-02', room: 'Windows', notes: 'Original timber frames have deteriorated seals and minor rot on south-facing side', priority: 'Important', suggestedWork: 'Reputty and seal', photos: []},
+                    {part: 'D-03', room: 'Plaster', notes: 'Significant peeling and dampness in corners of bedroom and hallway', priority: 'Important', suggestedWork: 'Investigate moisture source and repair', photos: []},
+                    {part: 'D-04', room: 'Foundation', notes: 'Minor settlement cracks visible in basement, stable for 20+ years', priority: 'Routine', suggestedWork: 'Monitor annually', photos: []}
+                ]
+            };
+            // Pre-populate cost estimates in formData[10] keyed by element name
+            formData[10] = { 'Roof': 15000, 'Windows': 8500, 'Plaster': 12000, 'Foundation': 5000 };
+
+            saveFormData();
+            updateSectionBadges();
+            showSection(1);
+
+            // Restore form with sample data
+            setTimeout(() => {
+                const inputs = document.querySelectorAll('input, textarea, select');
+                inputs.forEach(input => {
+                    if (input.name && sampleData[currentSection] && sampleData[currentSection][input.name]) {
+                        input.value = sampleData[currentSection][input.name];
+                    }
+                });
+                updateProgress();
+                updatePreview(1);
+                updateEnteredEntries(1);
+                updateSectionBadges();
+            }, 100);
+        }
+
+        function copyAllData() {
+            const validation = validateRequiredFields();
+
+            if (!validation.isValid) {
+                // Highlight empty required fields
+                const addressInput = document.querySelector('input[name="address"]');
+                const dateInput = document.querySelector('input[name="date"]');
+
+                if (!validation.missing.includes('Property Address') === false && addressInput) {
+                    addressInput.classList.add('input-error');
+                }
+                if (!validation.missing.includes('Inspection Date') === false && dateInput) {
+                    dateInput.classList.add('input-error');
+                }
+
+                const warning = document.createElement('div');
+                warning.className = 'validation-warning';
+                warning.innerHTML = `<strong>⚠️ Cannot export - Required fields missing</strong><br/>
+                    Complete these to export:<ul>${validation.missing.map(f => `<li>📝 ${f}</li>`).join('')}</ul>`;
+
+                const formContent = document.getElementById('formContent');
+                formContent.insertBefore(warning, formContent.firstChild);
+
+                setTimeout(() => {
+                    warning.remove();
+                    addressInput?.classList.remove('input-error');
+                    dateInput?.classList.remove('input-error');
+                }, 6000);
+                return;
+            }
+
+            let text = `HERITAGE BUILDING CONDITION ASSESSMENT REPORT\n${'═'.repeat(60)}\n\n`;
+
+            for (let i = 1; i <= 10; i++) {
+                const section = document.getElementById(`entryForm-${i}`);
+                if (!section) continue;
+
+                text += `\n${sectionTitles[i]}\n${'-'.repeat(60)}\n`;
+
+                const inputs = section.querySelectorAll('.form-input:not([type="hidden"]), textarea');
+                inputs.forEach(input => {
+                    if (input.value) {
+                        const label = input.parentElement?.querySelector('label')?.textContent || '';
+                        if (label) text += `${label}: ${input.value}\n`;
+                    }
+                });
+
+                // Add yes/no values
+                if (formData[i]) {
+                    if (formData[i].rcdPresent) text += `Safety Switch (RCD) Present?: ${formData[i].rcdPresent}\n`;
+                    if (formData[i].waterIngress) text += `Water Ingress Present?: ${formData[i].waterIngress}\n`;
+                    if (formData[i].asbestos) text += `Asbestos Present?: ${formData[i].asbestos}\n`;
+                }
+
+                // Complex data (Exterior Elements, Interior Spaces, Defects)
+                if (complexData[i] && complexData[i].length > 0) {
+                    if (i === 9) {
+                        // Defects table format
+                        text += '\nRef | Element | Description | Recommended Works | Priority\n';
+                        text += '─'.repeat(100) + '\n';
+                        complexData[i].forEach((entry, idx) => {
+                            const ref = `D-${String(idx + 1).padStart(2, '0')}`;
+                            text += `${ref} | ${entry.part} | ${entry.notes} | ${entry.suggestedWork || '—'} | ${entry.priority || '—'}\n`;
+                        });
+                    } else {
+                        // Room/Property Part format
+                        const label = i === 7 ? 'Property Part' : 'Room';
+                        complexData[i].forEach(entry => {
+                            text += `\n${label}: ${entry.part}\n`;
+                            text += `Condition: ${entry.notes}\n`;
+                            if (entry.photos && entry.photos.length > 0) {
+                                text += `Photos: ${entry.photos.length}\n`;
+                            }
+                        });
+                    }
+                }
+
+                // Photos
+                if (photoData[i] && photoData[i].length > 0) {
+                    text += `\n📸 Photos (${photoData[i].length}):\n`;
+                    photoData[i].forEach((photo, idx) => {
+                        text += `[PHOTO ${idx + 1}: ${photo.name}]\n`;
+                    });
+                }
+            }
+
+            showCopyModal(text, 'Complete Assessment Report - Ready to Copy');
+        }
+
+        function showCopyModal(text, title) {
+            document.getElementById('modalBody').textContent = text;
+            document.querySelector('.modal-header h3').textContent = title;
+            document.getElementById('copyModal').classList.add('active');
+        }
+
+        function closeCopyModal() {
+            document.getElementById('copyModal').classList.remove('active');
+        }
+
+        function copyModalData() {
+            const text = document.getElementById('modalBody').textContent;
+            navigator.clipboard.writeText(text).then(() => {
+                const feedback = document.createElement('div');
+                feedback.className = 'copy-feedback';
+                feedback.style.position = 'fixed';
+                feedback.style.bottom = '24px';
+                feedback.style.right = '24px';
+                feedback.style.zIndex = '1002';
+                feedback.textContent = '✓ Copied to clipboard!';
+                document.body.appendChild(feedback);
+                setTimeout(() => feedback.remove(), 2000);
+                closeCopyModal();
+            });
+        }
+
+        // ===== EXPORT/IMPORT FUNCTIONALITY =====
+
+        function toggleExportMenu() {
+            const menu = document.getElementById('exportMenu');
+            menu.classList.toggle('active');
+            document.addEventListener('click', closeExportMenuOnClick, { once: true });
+        }
+
+        function closeExportMenuOnClick(e) {
+            const menu = document.getElementById('exportMenu');
+            const toggle = document.querySelector('.dropdown-toggle');
+            if (!menu.contains(e.target) && !toggle.contains(e.target)) {
+                menu.classList.remove('active');
+            } else {
+                document.addEventListener('click', closeExportMenuOnClick, { once: true });
+            }
+        }
+
+        function exportToWord() {
+            const validation = validateRequiredFields();
+            if (!validation.isValid) {
+                alert(`Cannot export - Missing required fields:\n${validation.missing.join('\n')}`);
+                return;
+            }
+
+            let html = `
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Condition Report - STEWRD Assessment</title>
+    <style>
+        body { font-family: Calibri, Arial, sans-serif; line-height: 1.5; color: #333; }
+        h1 { color: #3D5C45; font-size: 24pt; margin-bottom: 10pt; border-bottom: 2pt solid #3D5C45; padding-bottom: 10pt; }
+        h2 { color: #3D5C45; font-size: 16pt; margin-top: 20pt; margin-bottom: 10pt; }
+        h3 { color: #5A7A63; font-size: 13pt; margin-top: 12pt; margin-bottom: 8pt; }
+        table { width: 100%; border-collapse: collapse; margin: 15pt 0; }
+        th { background: #3D5C45; color: white; padding: 8pt; text-align: left; border: 1pt solid #ccc; font-weight: bold; }
+        td { padding: 8pt; border: 1pt solid #ddd; }
+        tr:nth-child(even) { background: #f9f9f9; }
+        .section { margin: 20pt 0; }
+        .field { margin: 8pt 0; }
+        .field-label { font-weight: bold; color: #3D5C45; }
+        .page-break { page-break-after: always; }
+    </style>
+</head>
+<body>
+    <h1>Condition Report - STEWRD Agent 2</h1>
+`;
+
+            // Property Information
+            html += '<div class="section"><h2>Property Information</h2>';
+            html += `<div class="field"><span class="field-label">Address:</span> ${formData[1]?.address || '—'}</div>`;
+            html += `<div class="field"><span class="field-label">Inspection Date:</span> ${formData[1]?.date || '—'}</div>`;
+            html += `<div class="field"><span class="field-label">Inspector:</span> ${formData[1]?.inspector || '—'}</div>`;
+            html += '</div>';
+
+            // Sections with form data (2-6)
+            const sectionContent = [
+                { id: 2, title: 'Electrical Systems', label: 'RCD Present' },
+                { id: 3, title: 'Plumbing Systems', label: 'System Condition' },
+                { id: 4, title: 'Environmental Conditions', label: 'Water Ingress' },
+                { id: 5, title: 'Hazardous Materials', label: 'Materials Found' },
+                { id: 6, title: 'Structural Elements', label: 'Structural Notes' }
+            ];
+
+            sectionContent.forEach(section => {
+                if (formData[section.id] && Object.keys(formData[section.id]).length > 0) {
+                    html += `<div class="section"><h2>${section.title}</h2>`;
+                    for (let key in formData[section.id]) {
+                        const value = formData[section.id][key];
+                        if (value) {
+                            const label = key.charAt(0).toUpperCase() + key.slice(1).replace(/([A-Z])/g, ' $1');
+                            html += `<div class="field"><span class="field-label">${label}:</span> ${value}</div>`;
+                        }
+                    }
+                    html += '</div>';
+                }
+            });
+
+            // Exterior Elements (Section 7)
+            if (complexData[7] && complexData[7].length > 0) {
+                html += '<div class="section"><h2>Exterior Elements</h2><table><tr><th>Property Part</th><th>Condition</th><th>Photos</th></tr>';
+                complexData[7].forEach(entry => {
+                    let photosCell = '—';
+                    if (entry.photos && entry.photos.length > 0) {
+                        photosCell = `${entry.photos.length} photo${entry.photos.length > 1 ? 's' : ''}`;
+                    }
+                    html += `<tr><td>${entry.part}</td><td>${entry.notes}</td><td>${photosCell}</td></tr>`;
+                });
+                html += '</table>';
+                // Add photos below table
+                complexData[7].forEach(entry => {
+                    if (entry.photos && entry.photos.length > 0) {
+                        html += `<h3 style="margin-top: 15pt;">${entry.part} — Reference Photos</h3>`;
+                        html += '<div style="display: flex; gap: 10pt; flex-wrap: wrap; margin: 10pt 0;">';
+                        entry.photos.forEach(photo => {
+                            const photoSrc = photo.base64 || photo.data || '';
+                            html += `<div style="text-align: center;"><img src="${photoSrc}" style="max-width: 150pt; max-height: 150pt; border: 1pt solid #ccc;" /><p style="font-size: 9pt; margin: 4pt 0 0 0; color: #666;">${photo.name}</p></div>`;
+                        });
+                        html += '</div>';
+                    }
+                });
+                html += '</div>';
+            }
+
+            // Interior Spaces (Section 8)
+            if (complexData[8] && complexData[8].length > 0) {
+                html += '<div class="section"><h2>Interior Spaces</h2><table><tr><th>Room</th><th>Condition</th><th>Photos</th></tr>';
+                complexData[8].forEach(entry => {
+                    let photosCell = '—';
+                    if (entry.photos && entry.photos.length > 0) {
+                        photosCell = `${entry.photos.length} photo${entry.photos.length > 1 ? 's' : ''}`;
+                    }
+                    html += `<tr><td>${entry.part}</td><td>${entry.notes}</td><td>${photosCell}</td></tr>`;
+                });
+                html += '</table>';
+                // Add photos below table
+                complexData[8].forEach(entry => {
+                    if (entry.photos && entry.photos.length > 0) {
+                        html += `<h3 style="margin-top: 15pt;">${entry.part} — Reference Photos</h3>`;
+                        html += '<div style="display: flex; gap: 10pt; flex-wrap: wrap; margin: 10pt 0;">';
+                        entry.photos.forEach(photo => {
+                            const photoSrc = photo.base64 || photo.data || '';
+                            html += `<div style="text-align: center;"><img src="${photoSrc}" style="max-width: 150pt; max-height: 150pt; border: 1pt solid #ccc;" /><p style="font-size: 9pt; margin: 4pt 0 0 0; color: #666;">${photo.name}</p></div>`;
+                        });
+                        html += '</div>';
+                    }
+                });
+                html += '</div>';
+            }
+
+            // Identified Defects (Section 9)
+            if (complexData[9] && complexData[9].length > 0) {
+                html += '<div class="section page-break"><h2>Identified Defects & Recommendations</h2><table><tr><th>Element</th><th>Description</th><th>Recommended Works</th><th>Priority</th><th>Photos</th></tr>';
+                complexData[9].forEach(entry => {
+                    const priorityColor = entry.priority === 'Urgent' ? '#9B5B5B' : entry.priority === 'Important' ? '#C4A56B' : '#A8C9C3';
+                    let photosCell = '—';
+                    if (entry.photos && entry.photos.length > 0) {
+                        photosCell = `${entry.photos.length}`;
+                    }
+                    html += `<tr><td>${entry.part}</td><td>${entry.notes}</td><td>${entry.suggestedWork || '—'}</td><td style="background-color: ${priorityColor}; color: white; font-weight: bold;">${entry.priority || '—'}</td><td>${photosCell}</td></tr>`;
+                });
+                html += '</table>';
+                // Add photos below table
+                complexData[9].forEach(entry => {
+                    if (entry.photos && entry.photos.length > 0) {
+                        html += `<h3 style="margin-top: 15pt;">${entry.part} — Reference Photos</h3>`;
+                        html += '<div style="display: flex; gap: 10pt; flex-wrap: wrap; margin: 10pt 0;">';
+                        entry.photos.forEach(photo => {
+                            const photoSrc = photo.base64 || photo.data || '';
+                            html += `<div style="text-align: center;"><img src="${photoSrc}" style="max-width: 150pt; max-height: 150pt; border: 1pt solid #ccc;" /><p style="font-size: 9pt; margin: 4pt 0 0 0; color: #666;">${photo.name}</p></div>`;
+                        });
+                        html += '</div>';
+                    }
+                });
+                html += '</div>';
+            }
+
+            // Cost Estimates (Section 10) — stored in formData[10] keyed by element name
+            const costData10 = formData[10] || {};
+            const costEntries10 = Object.entries(costData10).filter(([k, v]) => parseFloat(v) > 0);
+            if (costEntries10.length > 0) {
+                html += '<div class="section"><h2>Cost Estimates</h2><table><tr><th>Element / Building Part</th><th>Estimated Cost</th></tr>';
+                let total = 0;
+                costEntries10.forEach(([element, cost]) => {
+                    const c = parseFloat(cost);
+                    total += c;
+                    html += `<tr><td>${element}</td><td>$${c.toFixed(2)}</td></tr>`;
+                });
+                html += `<tr><th>TOTAL</th><th>$${total.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}</th></tr>`;
+                html += '</table></div>';
+            }
+
+            html += `
+    <div class="section" style="margin-top: 40pt; padding-top: 20pt; border-top: 1pt solid #ccc; color: #999; font-size: 10pt;">
+        <p>Report generated: ${new Date().toLocaleString()}</p>
+    </div>
+</body>
+</html>`;
+
+            const filename = `heritage-assessment-${formData[1]?.address?.replace(/\s+/g, '-')}-${new Date().toISOString().split('T')[0]}.doc`;
+            downloadFile(html, filename, 'application/msword');
+            showNotification('✓ Exported to Word');
+        }
+
+        function exportToExcel() {
+            const validation = validateRequiredFields();
+            if (!validation.isValid) {
+                alert(`Cannot export - Missing required fields:\n${validation.missing.join('\n')}`);
+                return;
+            }
+
+            let csv = 'HERITAGE BUILDING ASSESSMENT\n';
+            csv += `Exported: ${new Date().toLocaleString()}\n\n`;
+
+            // Property Information
+            csv += 'PROPERTY INFORMATION\n';
+            csv += 'Address,' + (formData[1]?.address || '') + '\n';
+            csv += 'Inspection Date,' + (formData[1]?.date || '') + '\n';
+            csv += 'Inspector,' + (formData[1]?.inspector || '') + '\n';
+
+            // Assessment Sections
+            csv += '\n\nASSESSMENT SECTIONS\n';
+            [2,3,4,5,6].forEach(id => {
+                if (formData[id] && Object.keys(formData[id]).length > 0) {
+                    csv += '\n' + sectionTitles[id] + '\n';
+                    for (let key in formData[id]) {
+                        if (formData[id][key]) {
+                            csv += key + ',"' + formData[id][key].replace(/"/g, '""') + '"\n';
+                        }
+                    }
+                }
+            });
+
+            // Exterior Elements
+            if (complexData[7] && complexData[7].length > 0) {
+                csv += '\n\nEXTERIOR ELEMENTS\n';
+                csv += 'Property Part,Condition\n';
+                complexData[7].forEach(entry => {
+                    csv += '"' + entry.part.replace(/"/g, '""') + '","' + entry.notes.replace(/"/g, '""') + '"\n';
+                });
+            }
+
+            // Interior Spaces
+            if (complexData[8] && complexData[8].length > 0) {
+                csv += '\n\nINTERIOR SPACES\n';
+                csv += 'Room,Condition\n';
+                complexData[8].forEach(entry => {
+                    csv += '"' + entry.part.replace(/"/g, '""') + '","' + entry.notes.replace(/"/g, '""') + '"\n';
+                });
+            }
+
+            // Identified Defects
+            if (complexData[9] && complexData[9].length > 0) {
+                csv += '\n\nIDENTIFIED DEFECTS & RECOMMENDATIONS\n';
+                csv += 'Element,Description,Recommended Works,Priority\n';
+                complexData[9].forEach(entry => {
+                    csv += '"' + entry.part.replace(/"/g, '""') + '","' + entry.notes.replace(/"/g, '""') + '","' +
+                           (entry.suggestedWork || '').replace(/"/g, '""') + '",' + (entry.priority || 'Routine') + '\n';
+                });
+            }
+
+            // Cost Estimates — stored in formData[10] keyed by element name
+            const csvCostData = formData[10] || {};
+            const csvCostEntries = Object.entries(csvCostData).filter(([k, v]) => parseFloat(v) > 0);
+            if (csvCostEntries.length > 0) {
+                csv += '\n\nCOST ESTIMATES\n';
+                csv += 'Element / Building Part,Cost\n';
+                let total = 0;
+                csvCostEntries.forEach(([element, cost]) => {
+                    const c = parseFloat(cost);
+                    csv += '"' + element.replace(/"/g, '""') + '",' + c.toFixed(2) + '\n';
+                    total += c;
+                });
+                csv += 'TOTAL,' + total.toFixed(2) + '\n';
+            }
+
+            const filename = `heritage-assessment-${formData[1]?.address?.replace(/\s+/g, '-')}-${new Date().toISOString().split('T')[0]}.csv`;
+            downloadFile(csv, filename, 'text/csv;charset=utf-8');
+            showNotification('✓ Exported to Excel');
+        }
+
+        function exportAsJSON() {
+            const validation = validateRequiredFields();
+            if (!validation.isValid) {
+                alert(`Cannot export - Missing required fields:\n${validation.missing.join('\n')}`);
+                return;
+            }
+
+            const exportData = {
+                version: '1.0',
+                exportDate: new Date().toISOString(),
+                formData: formData,
+                complexData: complexData,
+                photoData: photoData
+            };
+
+            const jsonString = JSON.stringify(exportData, null, 2);
+            downloadFile(jsonString, `heritage-assessment-${formData[1]?.address?.replace(/\s+/g, '-')}-${new Date().toISOString().split('T')[0]}.json`, 'application/json');
+            showNotification('✓ Exported as JSON');
+        }
+
+        function exportAsCSV() {
+            const validation = validateRequiredFields();
+            if (!validation.isValid) {
+                alert(`Cannot export - Missing required fields:\n${validation.missing.join('\n')}`);
+                return;
+            }
+
+            let csv = 'HERITAGE BUILDING ASSESSMENT - CSV EXPORT\n';
+            csv += `Exported: ${new Date().toLocaleString()}\n\n`;
+
+            // Property Information
+            csv += '=== PROPERTY INFORMATION ===\n';
+            csv += `Property Address,${formData[1]?.address || ''}\n`;
+            csv += `Inspection Date,${formData[1]?.date || ''}\n`;
+            csv += `Inspector Name,${formData[1]?.inspectorName || ''}\n\n`;
+
+            // Exterior Elements
+            if (complexData[7]?.length > 0) {
+                csv += '=== EXTERIOR ELEMENTS ===\n';
+                csv += 'Property Part,Condition\n';
+                complexData[7].forEach(entry => {
+                    csv += `"${entry.part}","${(entry.notes || '').replace(/"/g, '""')}"\n`;
+                });
+                csv += '\n';
+            }
+
+            // Interior Spaces
+            if (complexData[8]?.length > 0) {
+                csv += '=== INTERIOR SPACES ===\n';
+                csv += 'Room,Condition\n';
+                complexData[8].forEach(entry => {
+                    csv += `"${entry.part}","${(entry.notes || '').replace(/"/g, '""')}"\n`;
+                });
+                csv += '\n';
+            }
+
+            // Defects
+            if (complexData[9]?.length > 0) {
+                csv += '=== DEFECTS / REPAIR ITEMS ===\n';
+                csv += 'Element,Description,Recommended Works,Priority\n';
+                complexData[9].forEach(entry => {
+                    csv += `"${entry.part}","${(entry.notes || '').replace(/"/g, '""')}","${(entry.suggestedWork || '').replace(/"/g, '""')}","${entry.priority || ''}"\n`;
+                });
+                csv += '\n';
+            }
+
+            downloadFile(csv, `heritage-assessment-${formData[1]?.address?.replace(/\s+/g, '-')}-${new Date().toISOString().split('T')[0]}.csv`, 'text/csv');
+            showNotification('✓ Exported as CSV');
+        }
+
+        function exportAsMarkdown() {
+            const validation = validateRequiredFields();
+            if (!validation.isValid) {
+                alert(`Cannot export - Missing required fields:\n${validation.missing.join('\n')}`);
+                return;
+            }
+
+            let md = '# Heritage Building Assessment Report\n\n';
+            md += `**Exported:** ${new Date().toLocaleString()}\n\n`;
+
+            // Property Information
+            md += '## Property Information\n\n';
+            md += `- **Address:** ${formData[1]?.address || '—'}\n`;
+            md += `- **Inspection Date:** ${formData[1]?.date || '—'}\n`;
+            md += `- **Inspector:** ${formData[1]?.inspectorName || '—'}\n\n`;
+
+            // Exterior Elements
+            if (complexData[7]?.length > 0) {
+                md += '## Exterior Elements\n\n';
+                complexData[7].forEach(entry => {
+                    md += `### ${entry.part}\n${entry.notes}\n\n`;
+                });
+            }
+
+            // Interior Spaces
+            if (complexData[8]?.length > 0) {
+                md += '## Interior Spaces\n\n';
+                complexData[8].forEach(entry => {
+                    md += `### ${entry.part}\n${entry.notes}\n\n`;
+                });
+            }
+
+            // Defects
+            if (complexData[9]?.length > 0) {
+                md += '## Defects & Repair Items\n\n';
+                md += '| Element | Description | Works | Priority |\n';
+                md += '|---------|-------------|-------|----------|\n';
+                complexData[9].forEach(entry => {
+                    md += `| ${entry.part} | ${entry.notes} | ${entry.suggestedWork || '—'} | ${entry.priority || '—'} |\n`;
+                });
+                md += '\n';
+            }
+
+            downloadFile(md, `heritage-assessment-${formData[1]?.address?.replace(/\s+/g, '-')}-${new Date().toISOString().split('T')[0]}.md`, 'text/markdown');
+            showNotification('✓ Exported as Markdown');
+        }
+
+        function exportAsPDF() {
+            const validation = validateRequiredFields();
+            if (!validation.isValid) {
+                alert(`Cannot export - Missing required fields:\n${validation.missing.join('\n')}`);
+                return;
+            }
+
+            try {
+                const { jsPDF } = window.jspdf;
+                const doc = new jsPDF();
+                const pageWidth = doc.internal.pageSize.getWidth();
+                const pageHeight = doc.internal.pageSize.getHeight();
+                let yPos = 20;
+
+                // Title
+                doc.setFontSize(18);
+                doc.text('Heritage Building Assessment Report', pageWidth / 2, yPos, { align: 'center' });
+                yPos += 15;
+
+                // Date
+                doc.setFontSize(10);
+                doc.setTextColor(100);
+                doc.text(`Exported: ${new Date().toLocaleString()}`, pageWidth / 2, yPos, { align: 'center' });
+                yPos += 15;
+
+                // Property Information
+                doc.setFontSize(12);
+                doc.setTextColor(0);
+                doc.text('Property Information', 20, yPos);
+                yPos += 8;
+
+                doc.setFontSize(10);
+                doc.text(`Address: ${formData[1]?.address || '—'}`, 20, yPos);
+                yPos += 6;
+                doc.text(`Date: ${formData[1]?.date || '—'}`, 20, yPos);
+                yPos += 6;
+                doc.text(`Inspector: ${formData[1]?.inspectorName || '—'}`, 20, yPos);
+                yPos += 12;
+
+                // Tables for complex data
+                if (complexData[7]?.length > 0) {
+                    doc.text('Exterior Elements', 20, yPos);
+                    yPos += 8;
+                    const exteriorData = complexData[7].map(e => [e.part, e.notes]);
+                    doc.autoTable({
+                        head: [['Element', 'Condition']],
+                        body: exteriorData,
+                        startY: yPos,
+                        margin: 20,
+                        didDrawPage: (data) => {
+                            yPos = data.lastAutoTable.finalY + 10;
+                        }
+                    });
+                }
+
+                if (complexData[9]?.length > 0) {
+                    yPos = doc.lastAutoTable?.finalY ? doc.lastAutoTable.finalY + 10 : yPos;
+                    doc.text('Defects & Repairs', 20, yPos);
+                    yPos += 8;
+                    const defectsData = complexData[9].map(e => [
+                        e.part,
+                        e.notes,
+                        e.suggestedWork || '—',
+                        e.priority || '—'
+                    ]);
+                    doc.autoTable({
+                        head: [['Element', 'Description', 'Works', 'Priority']],
+                        body: defectsData,
+                        startY: yPos,
+                        margin: 20
+                    });
+                }
+
+                const filename = `heritage-assessment-${formData[1]?.address?.replace(/\s+/g, '-')}-${new Date().toISOString().split('T')[0]}.pdf`;
+                doc.save(filename);
+                showNotification('✓ Exported as PDF');
+            } catch (error) {
+                console.error('PDF export error:', error);
+                alert('Error creating PDF. Please try another format.');
+            }
+        }
+
+        function importJSON() {
+            document.getElementById('jsonImportInput').click();
+        }
+
+        function handleJSONImport(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                try {
+                    const fileContent = e.target.result;
+                    console.log('File content length:', fileContent.length);
+                    console.log('First 200 chars:', fileContent.substring(0, 200));
+
+                    const importedData = JSON.parse(fileContent);
+                    console.log('Parsed JSON successfully');
+                    console.log('Has formData:', !!importedData.formData);
+                    console.log('Has complexData:', !!importedData.complexData);
+                    console.log('formData keys:', Object.keys(importedData.formData || {}));
+                    console.log('complexData keys:', Object.keys(importedData.complexData || {}));
+
+                    if (!importedData.formData || !importedData.complexData) {
+                        alert('Invalid file format. Please use a file exported from this tool.\n\nMissing: ' +
+                            (!importedData.formData ? 'formData ' : '') +
+                            (!importedData.complexData ? 'complexData' : ''));
+                        return;
+                    }
+
+                    if (confirm('This will replace all current form data. Continue?')) {
+                        formData = importedData.formData;
+                        complexData = importedData.complexData;
+                        photoData = importedData.photoData || {};
+
+                        console.log('Data assigned successfully');
+                        saveFormData();
+                        updateProgress();
+                        updateSectionBadges();
+
+                        // Update all sections in sidebar
+                        for (let i = 1; i <= 10; i++) {
+                            updateEnteredEntries(i);
+                            updatePreview(i);
+                        }
+
+                        showSection(1);
+
+                        // Refresh the form
+                        setTimeout(() => {
+                            const inputs = document.querySelectorAll('input, textarea, select');
+                            inputs.forEach(input => {
+                                if (input.name && formData[currentSection] && formData[currentSection][input.name]) {
+                                    input.value = formData[currentSection][input.name];
+                                }
+                            });
+                            updateProgress();
+                            updatePreview(currentSection);
+                            showNotification('✓ Data imported successfully');
+                        }, 100);
+                    }
+                } catch (error) {
+                    console.error('Import error details:', error);
+                    console.error('Error stack:', error.stack);
+                    alert('Error: ' + error.message + '\n\nPlease check browser console (F12) for details.');
+                }
+            };
+            reader.onerror = (error) => {
+                console.error('File read error:', error);
+                alert('Could not read file. Please check the file and try again.');
+            };
+            reader.readAsText(file);
+
+            // Reset input so same file can be selected again
+            event.target.value = '';
+        }
+
+        function downloadFile(content, filename, mimeType) {
+            const blob = new Blob([content], { type: mimeType });
+            const url = URL.createObjectURL(blob);
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = filename;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            URL.revokeObjectURL(url);
+        }
+
+        function showNotification(message) {
+            const notification = document.createElement('div');
+            notification.style.cssText = `
+                position: fixed;
+                bottom: 24px;
+                right: 24px;
+                background: var(--primary);
+                color: var(--cream);
+                padding: 12px 20px;
+                border-radius: 8px;
+                font-size: 14px;
+                font-weight: 600;
+                z-index: 1001;
+                animation: slideUp 0.3s ease;
+                box-shadow: 0 4px 12px rgba(61, 92, 69, 0.3);
+            `;
+            notification.textContent = message;
+            document.body.appendChild(notification);
+            setTimeout(() => notification.remove(), 2500);
+        }
+
+        // ═══════════════════════════════════════════════════════════
+        // v1.1 NEW FUNCTIONS
+        // ═══════════════════════════════════════════════════════════
+
+        // ── Cancel Edit ─────────────────────────────────────────────
+        function cancelEdit(sectionId) {
+            editingIndex = null;
+            const partField = document.getElementById(`part-${sectionId}`);
+            const notesField = document.getElementById(`notes-${sectionId}`);
+            const roomField = document.getElementById(`room-${sectionId}`);
+            if (partField) partField.value = '';
+            if (notesField) notesField.value = '';
+            if (roomField) roomField.value = '';
+            if (sectionId === 9) {
+                const pf = document.getElementById(`priority-${sectionId}`);
+                const wf = document.getElementById(`suggestedWork-${sectionId}`);
+                if (pf) pf.value = '';
+                if (wf) wf.value = '';
+            }
+            tempComplexPhotos[sectionId] = [];
+            const gallery = document.getElementById(`gallery-${sectionId}`);
+            if (gallery) gallery.innerHTML = '';
+            const btn = document.querySelector(`#entryForm-${sectionId} .btn-add`);
+            if (btn) { btn.innerHTML = '<i class="fas fa-plus"></i> Add Entry'; btn.style.background = ''; }
+            const cancelBtn = document.getElementById(`cancel-edit-${sectionId}`);
+            if (cancelBtn) cancelBtn.style.display = 'none';
+            showNotification('Edit cancelled');
+        }
+
+        // ── Custom Confirm Modal ────────────────────────────────────
+        function showConfirm(message, onConfirm) {
+            pendingConfirmCallback = onConfirm;
+            document.getElementById('confirmMessage').textContent = message;
+            document.getElementById('confirmModal').classList.add('active');
+        }
+
+        function resolveConfirm(confirmed) {
+            document.getElementById('confirmModal').classList.remove('active');
+            if (confirmed && pendingConfirmCallback) {
+                const cb = pendingConfirmCallback;
+                pendingConfirmCallback = null;
+                cb();
+            } else {
+                pendingConfirmCallback = null;
+            }
+        }
+
+        // ── Session Management ──────────────────────────────────────
+        function loadSessions() {
+            try {
+                sessions = JSON.parse(localStorage.getItem('assessmentSessions') || '{}');
+            } catch(e) { sessions = {}; }
+            // Restore last active session name
+            const lastName = localStorage.getItem('lastSessionName');
+            if (lastName) currentSessionName = lastName;
+            updateSessionBar();
+        }
+
+        function persistCurrentSession() {
+            // Only persist if there's some data to save
+            const hasData = Object.keys(formData).length > 0 ||
+                            (complexData[9] || []).length > 0 ||
+                            (complexData[7] || []).length > 0 ||
+                            (complexData[8] || []).length > 0;
+            if (!hasData) return;
+
+            sessions[currentSessionName] = {
+                name: currentSessionName,
+                savedAt: new Date().toISOString(),
+                formData: JSON.parse(JSON.stringify(formData)),
+                complexData: JSON.parse(JSON.stringify(complexData)),
+                photoData: photoData // photos are large, stored by reference
+            };
+            try {
+                localStorage.setItem('assessmentSessions', JSON.stringify(sessions));
+                localStorage.setItem('lastSessionName', currentSessionName);
+            } catch(e) {
+                console.warn('Could not persist session (storage may be full)');
+            }
+            updateSessionBar();
+        }
+
+        function updateSessionBar() {
+            const nameEl = document.getElementById('currentSessionName');
+            if (nameEl) nameEl.textContent = currentSessionName;
+        }
+
+        function openSessionModal() {
+            renderSessionList();
+            document.getElementById('sessionModal').classList.add('active');
+        }
+
+        function closeSessionModal() {
+            document.getElementById('sessionModal').classList.remove('active');
+        }
+
+        function renderSessionList() {
+            const list = document.getElementById('sessionList');
+            const entries = Object.values(sessions).sort((a,b) => new Date(b.savedAt) - new Date(a.savedAt));
+
+            if (entries.length === 0) {
+                list.innerHTML = '<p style="color:var(--text-muted);text-align:center;padding:24px 0;font-size:13px;"><i class="fas fa-folder-open" style="font-size:24px;display:block;margin-bottom:8px;opacity:0.4;"></i>No saved assessments yet.<br>Use "Save Current As…" to name and save this assessment.</p>';
+                return;
+            }
+
+            list.innerHTML = entries.map(s => {
+                const dateStr = new Date(s.savedAt).toLocaleString([], {dateStyle:'medium', timeStyle:'short'});
+                const address = s.formData?.[1]?.address || 'No address entered';
+                const defects = (s.complexData?.[9] || []).length;
+                const isCurrent = s.name === currentSessionName;
+                return `<div class="session-list-item ${isCurrent ? 'current' : ''}">
+                    <div class="session-item-info">
+                        <div class="session-item-name">${escapeHtml(s.name)}${isCurrent ? '&nbsp;<span style="font-size:10px;background:var(--good);color:white;padding:2px 6px;border-radius:4px;font-weight:600;">Active</span>' : ''}</div>
+                        <div class="session-item-meta">${escapeHtml(address)} · ${defects} defect${defects !== 1 ? 's' : ''} · ${dateStr}</div>
+                    </div>
+                    ${!isCurrent ? `<button onclick="loadSession('${escapeAttr(s.name)}')" class="btn-add" style="margin:0;padding:8px 14px;font-size:12px;white-space:nowrap;flex-shrink:0;">Open</button>` : ''}
+                    <button onclick="deleteSessionConfirm('${escapeAttr(s.name)}')" class="btn-remove" style="margin:0;flex-shrink:0;" title="Delete">✕</button>
+                </div>`;
+            }).join('');
+        }
+
+        function escapeHtml(str) {
+            return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+        }
+
+        function escapeAttr(str) {
+            return String(str).replace(/'/g, "\\'");
+        }
+
+        function newSession() {
+            showConfirm('Start a new blank assessment? Unsaved changes to the current assessment will be lost.', () => {
+                currentSessionName = 'Assessment ' + new Date().toLocaleDateString('en-AU');
+                formData = {};
+                photoData = {};
+                complexData = { 7: [], 8: [], 9: [] };
+                saveFormData();
+                updateSessionBar();
+                updateCompletionDots();
+                showSection(1);
+                updateProgress();
+                updateSectionBadges();
+                closeSessionModal();
+                showNotification('✓ New assessment started');
+            });
+        }
+
+        function saveSessionAs() {
+            const defaultName = formData[1]?.address
+                ? formData[1].address.split(',')[0].trim()
+                : 'Assessment ' + new Date().toLocaleDateString('en-AU');
+            const name = prompt('Save assessment as:', defaultName);
+            if (!name || !name.trim()) return;
+            currentSessionName = name.trim();
+            persistCurrentSession();
+            renderSessionList();
+            showNotification(`✓ Saved as "${currentSessionName}"`);
+        }
+
+        function loadSession(name) {
+            const session = sessions[name];
+            if (!session) { showNotification('Session not found'); return; }
+            showConfirm(`Load "${name}"? Current unsaved changes will be replaced.`, () => {
+                currentSessionName = name;
+                formData = session.formData || {};
+                complexData = session.complexData || { 7: [], 8: [], 9: [] };
+                photoData = session.photoData || {};
+                saveFormData();
+                updateSessionBar();
+                showSection(1);
+                updateProgress();
+                updateSectionBadges();
+                updateCompletionDots();
+                closeSessionModal();
+                showNotification(`✓ Loaded "${name}"`);
+            });
+        }
+
+        function deleteSessionConfirm(name) {
+            showConfirm(`Delete "${name}"? This cannot be undone.`, () => {
+                delete sessions[name];
+                try { localStorage.setItem('assessmentSessions', JSON.stringify(sessions)); } catch(e) {}
+                renderSessionList();
+                updateSessionBar();
+                showNotification(`Deleted "${name}"`);
+            });
+        }
+
+        // ═══════════════════════════════════════════════════════════
+        // END v1.1 NEW FUNCTIONS
+        // ═══════════════════════════════════════════════════════════
+    </script>
+</body>
+</html>

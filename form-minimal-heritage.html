@@ -1,0 +1,1489 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Heritage Building Condition Assessment</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        * { scroll-behavior: smooth; }
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #0f1419 100%);
+            min-height: 100vh;
+        }
+
+        .glass {
+            backdrop-filter: blur(12px);
+            background: rgba(255, 255, 255, 0.95);
+            border: 1px solid rgba(255, 255, 255, 0.6);
+            box-shadow: 0 8px 32px rgba(15, 23, 42, 0.1);
+        }
+
+        .section-card {
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
+        }
+        .section-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 25px 50px rgba(15, 23, 42, 0.15);
+        }
+
+        .icon-box { width: 48px; height: 48px; display: flex; align-items: center; justify-content: center; border-radius: 10px; font-size: 24px; }
+        .progress-ring { transition: stroke-dashoffset 0.5s ease; }
+
+        .form-input {
+            border: 2px solid #e2e8f0;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            border-radius: 10px;
+            background: #f8fafc;
+            font-family: inherit;
+        }
+        .form-input:hover {
+            border-color: #cbd5e1;
+            background: #ffffff;
+        }
+        .form-input:focus {
+            border-color: #6366f1;
+            box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.1);
+            outline: none;
+            background: white;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 4px 15px rgba(99, 102, 241, 0.3);
+        }
+        .btn-primary:hover:not(:disabled) {
+            background: linear-gradient(135deg, #4f46e5 0%, #4338ca 100%);
+            transform: translateY(-2px);
+            box-shadow: 0 12px 25px rgba(99, 102, 241, 0.4);
+        }
+
+        .section-icon {
+            width: 56px;
+            height: 56px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 28px;
+            background: linear-gradient(135deg, #e0e7ff 0%, #f0f4ff 100%);
+            box-shadow: 0 4px 12px rgba(99, 102, 241, 0.15);
+        }
+
+        .yes-no-buttons { display: grid; grid-template-columns: repeat(auto-fit, minmax(100px, 1fr)); gap: 10px; }
+        .yes-no-btn {
+            padding: 10px 16px;
+            border: 2px solid #e2e8f0;
+            border-radius: 10px;
+            background: white;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            font-weight: 500;
+            color: #64748b;
+            font-size: 14px;
+        }
+        .yes-no-btn:hover {
+            border-color: #cbd5e1;
+            background: #f8fafc;
+            box-shadow: 0 2px 8px rgba(15, 23, 42, 0.08);
+        }
+        .yes-no-btn.selected {
+            background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%);
+            color: white;
+            border-color: #4f46e5;
+            box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
+        }
+
+        .step-badge {
+            display: inline-block;
+            padding: 6px 14px;
+            background: linear-gradient(135deg, #e0e7ff 0%, #f0f4ff 100%);
+            color: #4338ca;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+            box-shadow: 0 2px 4px rgba(99, 102, 241, 0.1);
+        }
+
+        /* Enhanced visual refinements */
+        textarea.form-input {
+            resize: vertical;
+            min-height: 80px;
+        }
+
+        select.form-input {
+            appearance: none;
+            background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+            background-repeat: no-repeat;
+            background-position: right 10px center;
+            background-size: 18px;
+            padding-right: 38px;
+        }
+
+        .section-card h2 {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        /* Table enhancements */
+        table thead th {
+            position: relative;
+        }
+
+        table tbody tr:nth-child(even) {
+            background-color: rgba(99, 102, 241, 0.03);
+        }
+
+        table tbody tr:hover {
+            background-color: rgba(99, 102, 241, 0.08) !important;
+        }
+
+        /* Button enhancements */
+        button {
+            position: relative;
+            overflow: hidden;
+        }
+
+        button:active {
+            transform: scale(0.98);
+        }
+
+        /* Input focus enhancements */
+        .form-input:focus-visible {
+            outline: none;
+        }
+
+        /* Page background */
+        .min-h-screen {
+            background: linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #0f1419 100%);
+        }
+
+        /* Modal and preview styles */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.6);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            backdrop-filter: blur(4px);
+        }
+
+        .modal-content {
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 25px 50px rgba(15, 23, 42, 0.25);
+            max-width: 600px;
+            width: 90%;
+            max-height: 80vh;
+            overflow-y: auto;
+            padding: 32px;
+        }
+
+        .modal-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 20px;
+            border-bottom: 2px solid #e2e8f0;
+            padding-bottom: 16px;
+        }
+
+        .modal-header h3 {
+            margin: 0;
+            font-size: 20px;
+            font-weight: 700;
+            color: #0f172a;
+        }
+
+        .modal-body {
+            margin: 20px 0;
+            font-family: 'Monaco', 'Courier New', monospace;
+            font-size: 13px;
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            padding: 16px;
+            overflow-x: auto;
+            line-height: 1.6;
+            color: #334155;
+            white-space: pre-wrap;
+            word-break: break-word;
+        }
+
+        .modal-actions {
+            display: flex;
+            gap: 12px;
+            margin-top: 24px;
+            justify-content: flex-end;
+            flex-wrap: wrap;
+        }
+
+        .export-buttons {
+            display: flex;
+            gap: 12px;
+            margin: 12px 0;
+            flex-wrap: wrap;
+        }
+
+        .btn-export {
+            background: #f8fafc;
+            border: 2px solid #e2e8f0;
+            padding: 8px 16px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s;
+            font-size: 13px;
+            color: #334155;
+        }
+
+        .btn-export.active {
+            background: linear-gradient(135deg, #e0e7ff 0%, #f0f4ff 100%);
+            border-color: #6366f1;
+            color: #4338ca;
+        }
+
+        .btn-export:hover {
+            border-color: #cbd5e1;
+            background: #ffffff;
+        }
+
+        .btn-copy {
+            background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-copy:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 16px rgba(99, 102, 241, 0.3);
+        }
+
+        .btn-close {
+            background: #e2e8f0;
+            color: #334155;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+
+        .btn-close:hover {
+            background: #cbd5e1;
+        }
+    </style>
+</head>
+<body>
+    <div class="min-h-screen py-12 px-4">
+        <div class="max-w-4xl mx-auto">
+
+            <!-- Header -->
+            <div class="text-center mb-12">
+                <div class="mb-8">
+                    <div class="inline-block mb-6 text-6xl drop-shadow-lg">🏛️</div>
+                    <h1 class="text-5xl font-bold bg-gradient-to-r from-slate-50 to-slate-200 bg-clip-text text-transparent mb-3">Heritage Building Assessment</h1>
+                    <p class="text-lg text-slate-300 max-w-2xl mx-auto font-light">Comprehensive condition documentation with structured data capture</p>
+                </div>
+            </div>
+
+            <!-- Progress Section -->
+            <div class="mb-8 glass rounded-2xl p-8 border-t-4 border-indigo-600">
+                <div class="flex items-center justify-between mb-6">
+                    <div>
+                        <h2 class="text-xl font-bold bg-gradient-to-r from-slate-900 to-slate-700 bg-clip-text text-transparent">Assessment Progress</h2>
+                        <p class="text-slate-500 text-sm mt-1 font-medium" id="section-text">Section 1 of 10</p>
+                    </div>
+                    <div class="text-right">
+                        <div class="text-4xl font-bold bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent" id="completion">10%</div>
+                        <p class="text-slate-500 text-sm font-medium">Complete</p>
+                    </div>
+                </div>
+                <div class="w-full bg-slate-200 rounded-full h-3 overflow-hidden">
+                    <div id="progress-fill" class="bg-gradient-to-r from-indigo-600 via-purple-600 to-indigo-600 h-full rounded-full transition-all duration-500 shadow-lg" style="width: 10%"></div>
+                </div>
+            </div>
+
+            <!-- Form Sections -->
+            <form id="assessment-form" class="space-y-6">
+
+                <!-- SECTION 1: PROPERTY INFO -->
+                <div id="section-1" class="section-card glass rounded-2xl shadow-lg p-8 border-t-4 border-indigo-600">
+                    <div class="flex items-start gap-4 mb-6">
+                        <div class="section-icon">🏠</div>
+                        <div>
+                            <span class="step-badge">Step 1</span>
+                            <h2 class="text-2xl font-bold bg-gradient-to-r from-slate-900 to-slate-700 bg-clip-text text-transparent mt-2">Property Information</h2>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+                        <div>
+                            <label class="block text-sm font-bold text-slate-700 mb-2">Property Name</label>
+                            <input type="text" name="propertyName" class="form-input w-full px-4 py-2.5" placeholder="e.g., Labassa Mansion">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-bold text-slate-700 mb-2">Address</label>
+                            <input type="text" name="address" class="form-input w-full px-4 py-2.5" placeholder="Street address">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-bold text-slate-700 mb-2">Year Built</label>
+                            <input type="number" name="yearBuilt" class="form-input w-full px-4 py-2.5" placeholder="1890">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-bold text-slate-700 mb-2">Assessment Date</label>
+                            <input type="date" name="assessmentDate" class="form-input w-full px-4 py-2.5">
+                        </div>
+                    </div>
+
+                    <div class="mt-5 pt-5 border-t border-slate-200">
+                        <label class="block text-sm font-bold text-slate-700 mb-2">Building Overview</label>
+                        <textarea name="overview" class="form-input w-full px-4 py-2.5" rows="3" placeholder="History, construction stages, key features..."></textarea>
+                    </div>
+                </div>
+
+                <!-- SECTION 2: ELECTRICAL -->
+                <div id="section-2" class="section-card glass rounded-2xl shadow-lg p-8 border-t-4 border-indigo-600 hidden">
+                    <div class="flex items-start gap-4 mb-6">
+                        <div class="section-icon">⚡</div>
+                        <div>
+                            <span class="step-badge">Step 2</span>
+                            <h2 class="text-2xl font-bold bg-gradient-to-r from-slate-900 to-slate-700 bg-clip-text text-transparent mt-2">Electrical Systems</h2>
+                        </div>
+                    </div>
+
+                    <div class="space-y-5">
+                        <div class="bg-gradient-to-br from-slate-50 to-slate-100 rounded-lg p-5 border border-slate-200 hover:border-indigo-300 transition-colors">
+                            <h3 class="text-base font-bold text-slate-900 mb-3">Safety Switch (RCD) Present?</h3>
+                            <div class="yes-no-buttons">
+                                <button type="button" class="yes-no-btn" onclick="selectYesNo(this, 'rcdPresent', 'yes')">Yes</button>
+                                <button type="button" class="yes-no-btn" onclick="selectYesNo(this, 'rcdPresent', 'no')">No</button>
+                                <button type="button" class="yes-no-btn" onclick="selectYesNo(this, 'rcdPresent', 'unknown')">Unknown</button>
+                            </div>
+                            <input type="hidden" name="rcdPresent">
+                        </div>
+
+                        <div class="bg-gradient-to-br from-slate-50 to-slate-100 rounded-lg p-5 border border-slate-200 hover:border-indigo-300 transition-colors">
+                            <h3 class="text-base font-bold text-slate-900 mb-3">Electrical Issues Reported?</h3>
+                            <div class="yes-no-buttons">
+                                <button type="button" class="yes-no-btn" onclick="selectYesNo(this, 'electricalIssues', 'yes')">Yes</button>
+                                <button type="button" class="yes-no-btn" onclick="selectYesNo(this, 'electricalIssues', 'no')">No</button>
+                            </div>
+                            <input type="hidden" name="electricalIssues">
+                        </div>
+
+                        <div>
+                            <label class="block text-sm font-bold text-slate-700 mb-2">Electrical Notes</label>
+                            <textarea name="electricalNotes" class="form-input w-full px-4 py-2.5" rows="3" placeholder="Meter, last inspection, safety concerns..."></textarea>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- SECTION 3: PLUMBING -->
+                <div id="section-3" class="section-card glass rounded-2xl shadow-lg p-8 border-t-4 border-indigo-600 hidden">
+                    <div class="flex items-start gap-4 mb-6">
+                        <div class="section-icon">💧</div>
+                        <div>
+                            <span class="step-badge">Step 3</span>
+                            <h2 class="text-2xl font-bold bg-gradient-to-r from-slate-900 to-slate-700 bg-clip-text text-transparent mt-2">Plumbing Systems</h2>
+                        </div>
+                    </div>
+
+                    <div class="space-y-5">
+                        <div class="bg-gradient-to-br from-slate-50 to-slate-100 rounded-lg p-5 border border-slate-200 hover:border-indigo-300 transition-colors">
+                            <h3 class="text-base font-bold text-slate-900 mb-3">System Type</h3>
+                            <select name="plumbingType" class="form-input w-full px-4 py-2.5">
+                                <option value="">Select...</option>
+                                <option value="original">Original</option>
+                                <option value="partial-modern">Partial Modern</option>
+                                <option value="modern">Modern</option>
+                            </select>
+                        </div>
+
+                        <div class="bg-gradient-to-br from-slate-50 to-slate-100 rounded-lg p-5 border border-slate-200 hover:border-indigo-300 transition-colors">
+                            <h3 class="text-base font-bold text-slate-900 mb-3">Known Issues?</h3>
+                            <div class="yes-no-buttons">
+                                <button type="button" class="yes-no-btn" onclick="selectYesNo(this, 'plumbingIssues', 'yes')">Yes</button>
+                                <button type="button" class="yes-no-btn" onclick="selectYesNo(this, 'plumbingIssues', 'no')">No</button>
+                            </div>
+                            <input type="hidden" name="plumbingIssues">
+                        </div>
+
+                        <div>
+                            <label class="block text-sm font-bold text-slate-700 mb-2">Plumbing Notes</label>
+                            <textarea name="plumbingNotes" class="form-input w-full px-4 py-2.5" rows="3" placeholder="System condition, repairs needed..."></textarea>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- SECTION 4: ENVIRONMENTAL -->
+                <div id="section-4" class="section-card glass rounded-2xl shadow-lg p-8 border-t-4 border-indigo-600 hidden">
+                    <div class="flex items-start gap-4 mb-6">
+                        <div class="section-icon">🌱</div>
+                        <div>
+                            <span class="step-badge">Step 4</span>
+                            <h2 class="text-2xl font-bold bg-gradient-to-r from-slate-900 to-slate-700 bg-clip-text text-transparent mt-2">Environmental Conditions</h2>
+                        </div>
+                    </div>
+
+                    <div class="space-y-5">
+                        <div class="bg-gradient-to-br from-slate-50 to-slate-100 rounded-lg p-5 border border-slate-200 hover:border-indigo-300 transition-colors">
+                            <h3 class="text-base font-bold text-slate-900 mb-3">Water Ingress Present?</h3>
+                            <div class="yes-no-buttons">
+                                <button type="button" class="yes-no-btn" onclick="selectYesNo(this, 'waterIngress', 'yes')">Yes</button>
+                                <button type="button" class="yes-no-btn" onclick="selectYesNo(this, 'waterIngress', 'no')">No</button>
+                            </div>
+                            <input type="hidden" name="waterIngress">
+                        </div>
+
+                        <div class="bg-gradient-to-br from-slate-50 to-slate-100 rounded-lg p-5 border border-slate-200 hover:border-indigo-300 transition-colors">
+                            <h3 class="text-base font-bold text-slate-900 mb-3">Damp or Mold Detected?</h3>
+                            <div class="yes-no-buttons">
+                                <button type="button" class="yes-no-btn" onclick="selectYesNo(this, 'dampPresent', 'yes')">Yes</button>
+                                <button type="button" class="yes-no-btn" onclick="selectYesNo(this, 'dampPresent', 'no')">No</button>
+                            </div>
+                            <input type="hidden" name="dampPresent">
+                        </div>
+
+                        <div>
+                            <label class="block text-sm font-bold text-slate-700 mb-2">Environmental Notes</label>
+                            <textarea name="environmentalNotes" class="form-input w-full px-4 py-2.5" rows="3" placeholder="Water locations, damp areas, pest observations..."></textarea>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- SECTION 5: HAZARDOUS MATERIALS -->
+                <div id="section-5" class="section-card glass rounded-2xl shadow-lg p-8 border-t-4 border-indigo-600 hidden">
+                    <div class="flex items-start gap-4 mb-6">
+                        <div class="section-icon">⚠️</div>
+                        <div>
+                            <span class="step-badge">Step 5</span>
+                            <h2 class="text-2xl font-bold bg-gradient-to-r from-slate-900 to-slate-700 bg-clip-text text-transparent mt-2">Hazardous Materials</h2>
+                        </div>
+                    </div>
+
+                    <div class="space-y-5">
+                        <div class="bg-gradient-to-br from-slate-50 to-slate-100 rounded-lg p-5 border border-slate-200 hover:border-indigo-300 transition-colors">
+                            <h3 class="text-base font-bold text-slate-900 mb-3">Asbestos Present?</h3>
+                            <div class="yes-no-buttons">
+                                <button type="button" class="yes-no-btn" onclick="selectYesNo(this, 'asbestosPresent', 'yes')">Yes</button>
+                                <button type="button" class="yes-no-btn" onclick="selectYesNo(this, 'asbestosPresent', 'no')">No</button>
+                                <button type="button" class="yes-no-btn" onclick="selectYesNo(this, 'asbestosPresent', 'unknown')">Unknown</button>
+                            </div>
+                            <input type="hidden" name="asbestosPresent">
+                        </div>
+
+                        <div class="bg-gradient-to-br from-slate-50 to-slate-100 rounded-lg p-5 border border-slate-200 hover:border-indigo-300 transition-colors">
+                            <h3 class="text-base font-bold text-slate-900 mb-3">Lead Paint Assumed?</h3>
+                            <div class="yes-no-buttons">
+                                <button type="button" class="yes-no-btn" onclick="selectYesNo(this, 'leadPaint', 'yes')">Yes</button>
+                                <button type="button" class="yes-no-btn" onclick="selectYesNo(this, 'leadPaint', 'no')">No</button>
+                                <button type="button" class="yes-no-btn" onclick="selectYesNo(this, 'leadPaint', 'unknown')">Unknown</button>
+                            </div>
+                            <input type="hidden" name="leadPaint">
+                        </div>
+
+                        <div>
+                            <label class="block text-sm font-bold text-slate-700 mb-2">Hazard Notes</label>
+                            <textarea name="hazardNotes" class="form-input w-full px-4 py-2.5" rows="3" placeholder="Locations, types, condition, testing done..."></textarea>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- SECTION 6: OTHER SYSTEMS -->
+                <div id="section-6" class="section-card glass rounded-2xl shadow-lg p-8 border-t-4 border-indigo-600 hidden">
+                    <div class="flex items-start gap-4 mb-6">
+                        <div class="section-icon">🔧</div>
+                        <div>
+                            <span class="step-badge">Step 6</span>
+                            <h2 class="text-2xl font-bold bg-gradient-to-r from-slate-900 to-slate-700 bg-clip-text text-transparent mt-2">Building Systems</h2>
+                        </div>
+                    </div>
+
+                    <div class="space-y-5">
+                        <div class="bg-gradient-to-br from-slate-50 to-slate-100 rounded-lg p-5 border border-slate-200 hover:border-indigo-300 transition-colors">
+                            <h3 class="text-base font-bold text-slate-900 mb-3">WiFi Present?</h3>
+                            <div class="yes-no-buttons">
+                                <button type="button" class="yes-no-btn" onclick="selectYesNo(this, 'wifiPresent', 'yes')">Yes</button>
+                                <button type="button" class="yes-no-btn" onclick="selectYesNo(this, 'wifiPresent', 'no')">No</button>
+                            </div>
+                            <input type="hidden" name="wifiPresent">
+                        </div>
+
+                        <div class="bg-gradient-to-br from-slate-50 to-slate-100 rounded-lg p-5 border border-slate-200 hover:border-indigo-300 transition-colors">
+                            <h3 class="text-base font-bold text-slate-900 mb-3">NBN/Broadband Available?</h3>
+                            <div class="yes-no-buttons">
+                                <button type="button" class="yes-no-btn" onclick="selectYesNo(this, 'nbnPresent', 'yes')">Yes</button>
+                                <button type="button" class="yes-no-btn" onclick="selectYesNo(this, 'nbnPresent', 'no')">No</button>
+                            </div>
+                            <input type="hidden" name="nbnPresent">
+                        </div>
+
+                        <div>
+                            <label class="block text-sm font-bold text-slate-700 mb-2">Systems Notes</label>
+                            <textarea name="otherSystems" class="form-input w-full px-4 py-2.5" rows="3" placeholder="Heating, cooling, ventilation, data..."></textarea>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- SECTION 7: STRUCTURAL & FABRIC -->
+                <div id="section-7" class="section-card glass rounded-2xl shadow-lg p-8 border-t-4 border-indigo-600 hidden">
+                    <div class="flex items-start gap-4 mb-6">
+                        <div class="section-icon">🧱</div>
+                        <div>
+                            <span class="step-badge">Step 7</span>
+                            <h2 class="text-2xl font-bold bg-gradient-to-r from-slate-900 to-slate-700 bg-clip-text text-transparent mt-2">Structural & Building Fabric</h2>
+                        </div>
+                    </div>
+
+                    <div class="space-y-5">
+                        <div>
+                            <label class="block text-sm font-bold text-slate-700 mb-2">Roof Condition</label>
+                            <textarea name="roofCondition" class="form-input w-full px-4 py-2.5" rows="2.5" placeholder="Materials, leaks, repairs needed..."></textarea>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-bold text-slate-700 mb-2">External Cladding & Render</label>
+                            <textarea name="cladding" class="form-input w-full px-4 py-2.5" rows="2.5" placeholder="Paint condition, cracks, water damage..."></textarea>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-bold text-slate-700 mb-2">Structural Integrity</label>
+                            <textarea name="structure" class="form-input w-full px-4 py-2.5" rows="2.5" placeholder="Foundation, walls, cracks, movement, settling..."></textarea>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- SECTION 8: BUILDING DETAILS -->
+                <div id="section-8" class="section-card glass rounded-2xl shadow-lg p-8 border-t-4 border-indigo-600 hidden">
+                    <div class="flex items-start gap-4 mb-6">
+                        <div class="section-icon">📐</div>
+                        <div>
+                            <span class="step-badge">Step 8</span>
+                            <h2 class="text-2xl font-bold bg-gradient-to-r from-slate-900 to-slate-700 bg-clip-text text-transparent mt-2">Building Details</h2>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+                        <div>
+                            <label class="block text-sm font-bold text-slate-700 mb-2">Floor Construction</label>
+                            <input type="text" name="floorConstruction" class="form-input w-full px-4 py-2.5" placeholder="e.g., Timber boards on joists">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-bold text-slate-700 mb-2">Wall Construction</label>
+                            <input type="text" name="wallConstruction" class="form-input w-full px-4 py-2.5" placeholder="e.g., Brick with bluestone footings">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-bold text-slate-700 mb-2">Roof Materials</label>
+                            <input type="text" name="roofMaterials" class="form-input w-full px-4 py-2.5" placeholder="e.g., Corrugated steel, slate">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-bold text-slate-700 mb-2">Number of Windows</label>
+                            <input type="number" name="numWindows" class="form-input w-full px-4 py-2.5" placeholder="97">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- SECTION 9: DEFECTS & RECOMMENDATIONS -->
+                <div id="section-9" class="section-card glass rounded-2xl shadow-lg p-8 border-t-4 border-indigo-600 hidden">
+                    <div class="flex items-start gap-4 mb-6">
+                        <div class="section-icon">🔍</div>
+                        <div>
+                            <span class="step-badge">Step 9</span>
+                            <h2 class="text-2xl font-bold bg-gradient-to-r from-slate-900 to-slate-700 bg-clip-text text-transparent mt-2">Defects & Recommendations</h2>
+                            <p class="text-slate-600 text-sm mt-1">Document building issues with location, priority, and photos</p>
+                        </div>
+                    </div>
+
+                    <div class="space-y-6">
+                        <!-- DEFECTS TABLE -->
+                        <div>
+                            <h3 class="text-lg font-semibold text-slate-900 mb-3">Building Defects</h3>
+                            <div class="overflow-x-auto rounded-lg border border-slate-200">
+                                <table class="w-full text-sm border-collapse">
+                                    <thead>
+                                        <tr class="bg-gradient-to-r from-indigo-50 to-purple-50 border-b border-slate-200">
+                                            <th class="text-left px-4 py-3 font-bold text-slate-700 text-xs uppercase tracking-wide">Type</th>
+                                            <th class="text-left px-4 py-3 font-bold text-slate-700 text-xs uppercase tracking-wide">Location</th>
+                                            <th class="text-left px-4 py-3 font-bold text-slate-700 text-xs uppercase tracking-wide">Work Category</th>
+                                            <th class="text-left px-4 py-3 font-bold text-slate-700 text-xs uppercase tracking-wide">Description</th>
+                                            <th class="text-left px-4 py-3 font-bold text-slate-700 text-xs uppercase tracking-wide">Priority</th>
+                                            <th class="text-left px-4 py-3 font-bold text-slate-700 text-xs uppercase tracking-wide">Recommendation</th>
+                                            <th class="text-center px-4 py-3 font-bold text-slate-700 text-xs uppercase tracking-wide">Photos</th>
+                                            <th class="text-center px-4 py-3 font-bold text-slate-700 text-xs uppercase tracking-wide">Remove</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="defects-table-body">
+                                        <!-- Defect rows added here dynamically -->
+                                    </tbody>
+                                </table>
+                            </div>
+
+                            <button type="button" class="mt-4 px-4 py-2 bg-gradient-to-r from-indigo-600 to-purple-600 text-white font-semibold rounded-lg hover:from-indigo-700 hover:to-purple-700 shadow-md hover:shadow-lg transition" onclick="addDefectRow()">
+                                + Add Defect
+                            </button>
+                        </div>
+
+                        <!-- COST SUMMARY TABLE -->
+                        <div class="pt-4 border-t border-gray-300">
+                            <h3 class="text-lg font-semibold text-slate-900 mb-3">Cost Summary by Work Type</h3>
+                            <p class="text-sm text-slate-600 mb-3">Group defects by work type and estimate total cost per category</p>
+                            <div class="overflow-x-auto">
+                                <table class="w-full text-sm border-collapse">
+                                    <thead>
+                                        <tr class="bg-slate-100 border-b-2 border-gray-300">
+                                            <th class="text-left px-3 py-2 font-semibold text-slate-700 text-xs">Work Type</th>
+                                            <th class="text-left px-3 py-2 font-semibold text-slate-700 text-xs">Defects Covered</th>
+                                            <th class="text-left px-3 py-2 font-semibold text-slate-700 text-xs">Estimated Total Cost</th>
+                                            <th class="text-center px-3 py-2 font-semibold text-slate-700 text-xs">Remove</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="cost-summary-body">
+                                        <!-- Cost summary rows added here dynamically -->
+                                    </tbody>
+                                </table>
+                            </div>
+
+                            <button type="button" class="mt-4 px-4 py-2 bg-gradient-to-r from-indigo-600 to-purple-600 text-white font-semibold rounded-lg hover:from-indigo-700 hover:to-purple-700 shadow-md hover:shadow-lg transition" onclick="addCostRow()">
+                                + Add Cost Category
+                            </button>
+                        </div>
+
+                        <!-- DEFECT SUMMARY BY CATEGORY -->
+                        <div class="pt-4 border-t border-gray-300">
+                            <h3 class="text-lg font-semibold text-slate-900 mb-3">Defect Summary by Work Category</h3>
+                            <p class="text-sm text-slate-600 mb-3">Auto-updated as you add defects</p>
+                            <div class="overflow-x-auto">
+                                <table class="w-full text-sm border-collapse">
+                                    <thead>
+                                        <tr class="bg-slate-100 border-b-2 border-gray-300">
+                                            <th class="text-left px-3 py-2 font-semibold text-slate-700 text-xs">Work Category</th>
+                                            <th class="text-left px-3 py-2 font-semibold text-slate-700 text-xs">External Count</th>
+                                            <th class="text-left px-3 py-2 font-semibold text-slate-700 text-xs">Internal Count</th>
+                                            <th class="text-left px-3 py-2 font-semibold text-slate-700 text-xs">Total</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="defect-summary-body">
+                                        <!-- Summary rows auto-generated -->
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mt-6 pt-6 border-t border-slate-200">
+                        <label class="block text-sm font-bold text-slate-700 mb-2">Overall Condition Summary</label>
+                        <textarea name="overallSummary" class="form-input w-full px-4 py-2.5" rows="2.5" placeholder="General condition, main issues, maintenance history..."></textarea>
+                    </div>
+
+                    <div class="mt-4">
+                        <label class="block text-sm font-bold text-slate-700 mb-2">Priority Recommendations</label>
+                        <textarea name="recommendations" class="form-input w-full px-4 py-2.5" rows="2.5" placeholder="Urgent repairs, planned maintenance, budget priorities..."></textarea>
+                    </div>
+                </div>
+
+                <!-- SECTION 10: PHOTOS -->
+                <div id="section-10" class="section-card glass rounded-2xl shadow-lg p-8 border-t-4 border-indigo-600 hidden">
+                    <div class="flex items-start gap-4 mb-6">
+                        <div class="section-icon">📷</div>
+                        <div>
+                            <span class="step-badge">Step 10</span>
+                            <h2 class="text-2xl font-bold bg-gradient-to-r from-slate-900 to-slate-700 bg-clip-text text-transparent mt-2">Photo Documentation</h2>
+                        </div>
+                    </div>
+
+                    <div class="space-y-6">
+                        <!-- EXTERNAL PHOTOS BY ELEVATION -->
+                        <div>
+                            <h3 class="text-lg font-semibold text-slate-900 mb-4">External Photos by Elevation</h3>
+                            <div id="external-elevations-container" class="space-y-4">
+                                <!-- Elevation sections added dynamically -->
+                            </div>
+                            <button type="button" class="mt-4 px-4 py-2 bg-gradient-to-r from-indigo-600 to-purple-600 text-white font-semibold rounded-lg hover:from-indigo-700 hover:to-purple-700 shadow-md hover:shadow-lg transition" onclick="addExternalElevation()">
+                                + Add Elevation
+                            </button>
+                        </div>
+
+                        <!-- INTERNAL PHOTOS BY ROOM -->
+                        <div class="pt-6 border-t border-gray-300">
+                            <h3 class="text-lg font-semibold text-slate-900 mb-4">Internal Photos by Room</h3>
+                            <div id="internal-rooms-container" class="space-y-4">
+                                <!-- Room sections added dynamically -->
+                            </div>
+                            <button type="button" class="mt-4 px-4 py-2 bg-gradient-to-r from-indigo-600 to-purple-600 text-white font-semibold rounded-lg hover:from-indigo-700 hover:to-purple-700 shadow-md hover:shadow-lg transition" onclick="addInternalRoom()">
+                                + Add Room
+                            </button>
+                        </div>
+
+                        <div class="pt-6 border-t border-gray-300">
+                            <label class="block text-sm font-bold text-slate-700 mb-2">Photo Notes</label>
+                            <textarea name="photoNotes" class="form-input w-full px-4 py-2.5" rows="3" placeholder="What was photographed, lighting conditions, angles..."></textarea>
+                        </div>
+                    </div>
+                </div>
+
+            </form>
+
+            <!-- Navigation -->
+            <div class="fixed bottom-0 left-0 right-0 bg-white/95 backdrop-blur-md border-t border-slate-200 shadow-2xl">
+                <div class="max-w-4xl mx-auto px-4 py-4 flex justify-between items-center gap-3">
+                    <button onclick="previousSection()" id="btn-back" class="px-5 py-2.5 text-slate-600 font-semibold hover:bg-slate-100 rounded-lg transition text-sm">
+                        <i class="fas fa-chevron-left mr-2"></i>Back
+                    </button>
+                    <div class="text-center flex-1">
+                        <span id="nav-text" class="text-xs font-bold text-slate-600 uppercase tracking-widest">Section 1 of 10</span>
+                    </div>
+                    <div class="flex gap-2 flex-wrap" id="export-buttons" style="display: none;">
+                        <button type="button" onclick="showCopyPreview()" class="px-4 py-2 bg-indigo-600 text-white font-semibold rounded-lg hover:bg-indigo-700 transition text-xs shadow-md hover:shadow-lg">
+                            <i class="fas fa-copy mr-1"></i>Copy Data
+                        </button>
+                        <button type="button" onclick="copyMarkdownToClipboard()" class="px-4 py-2 bg-purple-600 text-white font-semibold rounded-lg hover:bg-purple-700 transition text-xs shadow-md hover:shadow-lg">
+                            <i class="fas fa-file-export mr-1"></i>Copy Markdown
+                        </button>
+                        <button type="button" onclick="downloadJSON()" class="px-4 py-2 bg-slate-600 text-white font-semibold rounded-lg hover:bg-slate-700 transition text-xs shadow-md hover:shadow-lg">
+                            <i class="fas fa-download mr-1"></i>Export JSON
+                        </button>
+                    </div>
+                    <button onclick="nextSection()" id="btn-next" class="btn-primary px-6 py-2.5 text-white font-semibold rounded-lg transition text-sm">
+                        Next <i class="fas fa-chevron-right ml-2"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Bottom Spacing -->
+            <div class="h-20"></div>
+
+        </div>
+    </div>
+
+    <script>
+        let currentSection = 1;
+        const totalSections = 10;
+        let defectRowCount = 0;
+        let costRowCount = 0;
+        let externalElevationCount = 0;
+        let internalRoomCount = 0;
+
+        const predefinedElevations = ['Front', 'Rear', 'Left Side', 'Right Side', 'Roof'];
+        const predefinedRooms = ['Living Room', 'Kitchen', 'Master Bedroom', 'Bathroom', 'Basement', 'Attic', 'Dining Room', 'Office'];
+
+        function showSection(section) {
+            for (let i = 1; i <= totalSections; i++) {
+                const el = document.getElementById(`section-${i}`);
+                if (el) el.classList.toggle('hidden', i !== section);
+            }
+
+            const progress = (section / totalSections) * 100;
+            document.getElementById('progress-fill').style.width = progress + '%';
+            document.getElementById('completion').textContent = Math.round(progress) + '%';
+            document.getElementById('section-text').textContent = `Section ${section} of ${totalSections}`;
+            document.getElementById('nav-text').textContent = `Section ${section} of ${totalSections}`;
+
+            document.getElementById('btn-back').disabled = section === 1;
+            document.getElementById('btn-next').textContent = section === totalSections ? '✓ Complete' : `Next ${section < totalSections ? '→' : ''}`;
+            document.getElementById('export-buttons').style.display = section === totalSections ? 'flex' : 'none';
+
+            window.scrollTo(0, 0);
+        }
+
+        function addDefectRow() {
+            const tbody = document.getElementById('defects-table-body');
+            const rowId = `defect-${defectRowCount}`;
+            defectRowCount++;
+
+            const row = document.createElement('tr');
+            row.id = rowId;
+            row.className = 'border-b border-slate-200 hover:bg-indigo-50 transition-colors';
+            row.innerHTML = `
+                <td class="px-3 py-3">
+                    <select class="form-input w-full px-2 py-1.5 text-sm" data-defect="type">
+                        <option value="">Select...</option>
+                        <option value="External">External</option>
+                        <option value="Internal">Internal</option>
+                    </select>
+                </td>
+                <td class="px-3 py-3"><input type="text" class="form-input w-full px-2 py-1.5 text-sm" placeholder="e.g., Room 3, W10" data-defect="location"></td>
+                <td class="px-3 py-3">
+                    <select class="form-input w-full px-2 py-1.5 text-sm" data-defect="workCategory">
+                        <option value="">Select...</option>
+                        <option value="Roof Repairs">Roof Repairs</option>
+                        <option value="Window Restoration">Window Restoration</option>
+                        <option value="Plumbing">Plumbing</option>
+                        <option value="Electrical">Electrical</option>
+                        <option value="Structural">Structural</option>
+                        <option value="Exterior Cladding">Exterior Cladding</option>
+                        <option value="Interior Finishes">Interior Finishes</option>
+                        <option value="Other">Other</option>
+                    </select>
+                </td>
+                <td class="px-3 py-3"><textarea class="form-input w-full px-2 py-1.5 text-sm" rows="2" placeholder="Describe the issue..." data-defect="description"></textarea></td>
+                <td class="px-3 py-3">
+                    <select class="form-input w-full px-2 py-1.5 text-sm" data-defect="priority">
+                        <option value="">Select...</option>
+                        <option value="Immediate">Immediate</option>
+                        <option value="High">High</option>
+                        <option value="Medium">Medium</option>
+                        <option value="Low">Low</option>
+                    </select>
+                </td>
+                <td class="px-3 py-3"><textarea class="form-input w-full px-2 py-1.5 text-sm" rows="2" placeholder="Recommended action..." data-defect="recommendation"></textarea></td>
+                <td class="px-3 py-3 text-center">
+                    <button type="button" class="text-sm px-2 py-1 bg-blue-500 text-white rounded hover:bg-blue-600" onclick="document.getElementById('defect-photo-${defectRowCount-1}').click()">📸</button>
+                    <input type="file" id="defect-photo-${defectRowCount-1}" multiple accept="image/*" class="hidden" onchange="previewDefectPhotos(event, '${rowId}')">
+                    <div id="preview-${rowId}" class="text-xs mt-1 text-slate-600">0 photos</div>
+                </td>
+                <td class="px-3 py-3 text-center">
+                    <button type="button" class="text-sm px-3 py-1 bg-red-500 text-white rounded hover:bg-red-600" onclick="removeDefectRow('${rowId}')">✕</button>
+                </td>
+            `;
+            tbody.appendChild(row);
+        }
+
+        function removeDefectRow(rowId) {
+            const row = document.getElementById(rowId);
+            if (row) row.remove();
+            updateDefectSummary();
+        }
+
+        function updateDefectSummary() {
+            const defects = getDefectsData();
+            const summary = {};
+
+            // Group by work category
+            defects.forEach(d => {
+                const cat = d.workCategory || 'Unassigned';
+                if (!summary[cat]) {
+                    summary[cat] = { external: 0, internal: 0 };
+                }
+                if (d.type === 'External') summary[cat].external++;
+                else if (d.type === 'Internal') summary[cat].internal++;
+            });
+
+            // Render summary table
+            const tbody = document.getElementById('defect-summary-body');
+            tbody.innerHTML = '';
+            Object.keys(summary).sort().forEach(cat => {
+                const row = document.createElement('tr');
+                row.className = 'border-b border-slate-200 hover:bg-indigo-50 transition-colors';
+                const total = summary[cat].external + summary[cat].internal;
+                row.innerHTML = `
+                    <td class="px-3 py-2 font-medium text-slate-900">${cat}</td>
+                    <td class="px-3 py-2 text-center text-slate-700">${summary[cat].external}</td>
+                    <td class="px-3 py-2 text-center text-slate-700">${summary[cat].internal}</td>
+                    <td class="px-3 py-2 text-center font-semibold text-amber-900">${total}</td>
+                `;
+                tbody.appendChild(row);
+            });
+        }
+
+        function addCostRow() {
+            const tbody = document.getElementById('cost-summary-body');
+            const rowId = `cost-${costRowCount}`;
+            costRowCount++;
+
+            const row = document.createElement('tr');
+            row.id = rowId;
+            row.className = 'border-b border-slate-200 hover:bg-indigo-50 transition-colors';
+            row.innerHTML = `
+                <td class="px-3 py-3"><input type="text" class="form-input w-full px-2 py-1.5 text-sm" placeholder="e.g., Roof Repairs" data-cost="workType"></td>
+                <td class="px-3 py-3"><textarea class="form-input w-full px-2 py-1.5 text-sm" rows="2" placeholder="Which defects does this cover?" data-cost="description"></textarea></td>
+                <td class="px-3 py-3"><input type="text" class="form-input w-full px-2 py-1.5 text-sm" placeholder="e.g., $5,000" data-cost="estimatedCost"></td>
+                <td class="px-3 py-3 text-center">
+                    <button type="button" class="text-sm px-3 py-1 bg-red-500 text-white rounded hover:bg-red-600" onclick="removeCostRow('${rowId}')">✕</button>
+                </td>
+            `;
+            tbody.appendChild(row);
+            updateDefectSummary();
+        }
+
+        function removeCostRow(rowId) {
+            const row = document.getElementById(rowId);
+            if (row) row.remove();
+        }
+
+        function previewDefectPhotos(event, rowId) {
+            const photoCount = event.target.files.length;
+            const previewEl = document.getElementById(`preview-${rowId}`);
+            if (previewEl) {
+                previewEl.textContent = `${photoCount} photo${photoCount !== 1 ? 's' : ''}`;
+            }
+        }
+
+        function getDefectsData() {
+            const defects = [];
+            const tbody = document.getElementById('defects-table-body');
+            tbody.querySelectorAll('tr').forEach(row => {
+                const defect = {
+                    type: row.querySelector('[data-defect="type"]')?.value || '',
+                    location: row.querySelector('[data-defect="location"]')?.value || '',
+                    workCategory: row.querySelector('[data-defect="workCategory"]')?.value || '',
+                    description: row.querySelector('[data-defect="description"]')?.value || '',
+                    priority: row.querySelector('[data-defect="priority"]')?.value || '',
+                    recommendation: row.querySelector('[data-defect="recommendation"]')?.value || ''
+                };
+                if (defect.location || defect.description) defects.push(defect);
+            });
+            return defects;
+        }
+
+        function getCostSummaryData() {
+            const costs = [];
+            const tbody = document.getElementById('cost-summary-body');
+            if (tbody) {
+                tbody.querySelectorAll('tr').forEach(row => {
+                    const cost = {
+                        workType: row.querySelector('[data-cost="workType"]')?.value || '',
+                        description: row.querySelector('[data-cost="description"]')?.value || '',
+                        estimatedCost: row.querySelector('[data-cost="estimatedCost"]')?.value || ''
+                    };
+                    if (cost.workType || cost.estimatedCost) costs.push(cost);
+                });
+            }
+            return costs;
+        }
+
+        function getExternalElevationPhotos() {
+            const elevations = [];
+            document.querySelectorAll('[id^="elevation-"]').forEach(section => {
+                const nameSelect = section.querySelector('[data-elevation="name"]');
+                const customInput = section.querySelector('[data-elevation="custom"]');
+                const fileInput = section.querySelector('[data-elevation="photos"]');
+
+                const name = nameSelect.value === 'Other' ? customInput.value : nameSelect.value;
+                const photoCount = fileInput.files.length;
+
+                if (name) {
+                    elevations.push({
+                        name: name,
+                        photoCount: photoCount
+                    });
+                }
+            });
+            return elevations;
+        }
+
+        function getInternalRoomPhotos() {
+            const rooms = [];
+            document.querySelectorAll('[id^="room-"]').forEach(section => {
+                const nameSelect = section.querySelector('[data-room="name"]');
+                const customInput = section.querySelector('[data-room="custom"]');
+                const fileInput = section.querySelector('[data-room="photos"]');
+
+                const name = nameSelect.value === 'Other' ? customInput.value : nameSelect.value;
+                const photoCount = fileInput.files.length;
+
+                if (name) {
+                    rooms.push({
+                        name: name,
+                        photoCount: photoCount
+                    });
+                }
+            });
+            return rooms;
+        }
+
+        function generateMarkdownExport() {
+            const formData = new FormData(document.getElementById('assessment-form'));
+            const data = Object.fromEntries(formData);
+            const defects = getDefectsData();
+            const costs = getCostSummaryData();
+            const externalElevations = getExternalElevationPhotos();
+            const internalRooms = getInternalRoomPhotos();
+
+            // Separate external and internal, and group by work category
+            const external = defects.filter(d => d.type === 'External').sort((a, b) => a.location.localeCompare(b.location));
+            const internal = defects.filter(d => d.type === 'Internal').sort((a, b) => a.location.localeCompare(b.location));
+
+            // Build work category summary
+            const categoryCount = {};
+            defects.forEach(d => {
+                const cat = d.workCategory || 'Unassigned';
+                categoryCount[cat] = (categoryCount[cat] || 0) + 1;
+            });
+
+            let markdown = '';
+
+            // SUMMARY PAGE
+            markdown += `# Heritage Building Condition Assessment\n\n`;
+            markdown += `## Summary\n\n`;
+            markdown += `**Property:** ${data.propertyName || 'Unknown'}\n`;
+            markdown += `**Address:** ${data.address || ''}\n`;
+            markdown += `**Assessment Date:** ${data.assessmentDate || ''}\n`;
+            markdown += `**Year Built:** ${data.yearBuilt || ''}\n\n`;
+
+            // Key Metrics
+            markdown += `### Key Metrics\n\n`;
+            markdown += `- **Total Defects:** ${defects.length}\n`;
+            markdown += `- **External Defects:** ${external.length}\n`;
+            markdown += `- **Internal Defects:** ${internal.length}\n`;
+            markdown += `- **Cost Categories:** ${costs.length}\n`;
+            markdown += `- **Total Photo Locations:** ${externalElevations.length} external, ${internalRooms.length} internal\n\n`;
+
+            // Defects by Category
+            if (Object.keys(categoryCount).length > 0) {
+                markdown += `### Defects by Work Category\n\n`;
+                markdown += `| Category | Count |\n`;
+                markdown += `|----------|-------|\n`;
+                Object.keys(categoryCount).sort().forEach(cat => {
+                    markdown += `| ${cat} | ${categoryCount[cat]} |\n`;
+                });
+                markdown += `\n`;
+            }
+
+            markdown += `---\n\n`;
+
+            // Property header
+            markdown += `# ${data.propertyName || 'Property Assessment'}\n\n`;
+            markdown += `**Address:** ${data.address || ''}\n`;
+            markdown += `**Date:** ${data.assessmentDate || ''}\n`;
+            markdown += `**Year Built:** ${data.yearBuilt || ''}\n\n`;
+
+            // Overview summary
+            if (data.overview) {
+                markdown += `## Overview of Place\n\n${data.overview}\n\n`;
+            }
+
+            // Systems summaries
+            if (data.overallSummary) {
+                markdown += `## Overall Condition Summary\n\n${data.overallSummary}\n\n`;
+            }
+
+            // External Defects Table
+            if (external.length > 0) {
+                markdown += `## External Condition Defects\n\n`;
+                markdown += `| Location | Condition | Priority | Work Category | Recommendation |\n`;
+                markdown += `|----------|-----------|----------|---------------|----------------|\n`;
+                external.forEach(d => {
+                    markdown += `| ${d.location} | ${d.description} | ${d.priority} | ${d.workCategory || 'N/A'} | ${d.recommendation} |\n`;
+                });
+                markdown += `\n`;
+            }
+
+            // Internal Defects Table
+            if (internal.length > 0) {
+                markdown += `## Internal Building Condition Defects\n\n`;
+                markdown += `| Location | Condition | Priority | Work Category | Recommendation |\n`;
+                markdown += `|----------|-----------|----------|---------------|----------------|\n`;
+                internal.forEach(d => {
+                    markdown += `| ${d.location} | ${d.description} | ${d.priority} | ${d.workCategory || 'N/A'} | ${d.recommendation} |\n`;
+                });
+                markdown += `\n`;
+            }
+
+            // Cost Summary Table
+            if (costs.length > 0) {
+                markdown += `## Cost Summary by Work Type\n\n`;
+                markdown += `| Work Type | Defects Covered | Estimated Total Cost |\n`;
+                markdown += `|-----------|-----------------|----------------------|\n`;
+                costs.forEach(c => {
+                    markdown += `| ${c.workType} | ${c.description} | ${c.estimatedCost} |\n`;
+                });
+                markdown += `\n`;
+            }
+
+            // External Photos by Elevation
+            if (externalElevations.length > 0) {
+                markdown += `## External Photography\n\n`;
+                externalElevations.forEach(elev => {
+                    markdown += `### ${elev.name} Elevation\n\n`;
+                    markdown += `**Photos Captured:** ${elev.photoCount}\n\n`;
+                });
+            }
+
+            // Internal Photos by Room
+            if (internalRooms.length > 0) {
+                markdown += `## Internal Photography\n\n`;
+                internalRooms.forEach(room => {
+                    markdown += `### ${room.name}\n\n`;
+                    markdown += `**Photos Captured:** ${room.photoCount}\n\n`;
+                });
+            }
+
+            // Recommendations
+            if (data.recommendations) {
+                markdown += `## Priority Recommendations\n\n${data.recommendations}\n\n`;
+            }
+
+            return markdown;
+        }
+
+        function downloadMarkdown() {
+            const markdown = generateMarkdownExport();
+            const blob = new Blob([markdown], { type: 'text/markdown' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `assessment-markdown-${new Date().toISOString().split('T')[0]}.md`;
+            a.click();
+            URL.revokeObjectURL(url);
+        }
+
+        function copyMarkdownToClipboard() {
+            const markdown = generateMarkdownExport();
+            navigator.clipboard.writeText(markdown).then(() => {
+                alert('✅ Markdown copied to clipboard!\n\nPaste it into Word to create your report.');
+            }).catch(() => {
+                alert('Could not copy to clipboard. Download as file instead.');
+                downloadMarkdown();
+            });
+        }
+
+        function nextSection() {
+            if (currentSection < totalSections) {
+                currentSection++;
+                showSection(currentSection);
+            }
+        }
+
+        function previousSection() {
+            if (currentSection > 1) {
+                currentSection--;
+                showSection(currentSection);
+            }
+        }
+
+        function selectYesNo(button, fieldName, value) {
+            const parent = button.parentElement;
+            parent.querySelectorAll('.yes-no-btn').forEach(btn => btn.classList.remove('selected'));
+            button.classList.add('selected');
+            document.querySelector(`input[name="${fieldName}"]`).value = value;
+        }
+
+        function previewPhotos(event, previewId) {
+            const preview = document.getElementById(previewId);
+            preview.innerHTML = '';
+            const files = Array.from(event.target.files);
+
+            files.forEach(file => {
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    const div = document.createElement('div');
+                    const img = document.createElement('img');
+                    img.src = e.target.result;
+                    img.className = 'w-full h-20 object-cover rounded-md shadow-sm hover:shadow-md transition';
+                    div.appendChild(img);
+                    preview.appendChild(div);
+                };
+                reader.readAsDataURL(file);
+            });
+        }
+
+        function addExternalElevation() {
+            const container = document.getElementById('external-elevations-container');
+            const sectionId = `elevation-${externalElevationCount}`;
+            externalElevationCount++;
+
+            const div = document.createElement('div');
+            div.id = sectionId;
+            div.className = 'border-2 border-dashed border-indigo-300 bg-gradient-to-br from-indigo-50 to-purple-50 rounded-lg p-5 space-y-3';
+
+            const elevationOptions = predefinedElevations.map(e => `<option value="${e}">${e}</option>`).join('');
+
+            div.innerHTML = `
+                <div class="flex items-center gap-3 mb-2">
+                    <select class="form-input flex-1 px-3 py-2 text-sm" data-elevation="name" onchange="updateElevationLabel(this)">
+                        <option value="">Select elevation...</option>
+                        ${elevationOptions}
+                        <option value="Other">Other (specify)</option>
+                    </select>
+                    <input type="text" class="form-input flex-1 px-3 py-2 text-sm" data-elevation="custom" placeholder="Custom elevation name" style="display:none;">
+                    <button type="button" class="px-3 py-2 text-sm bg-red-500 text-white rounded hover:bg-red-600" onclick="removeElevation('${sectionId}')">✕</button>
+                </div>
+                <div class="text-center">
+                    <i class="fas fa-images text-2xl text-slate-400 mb-2 block"></i>
+                    <input type="file" class="hidden" accept="image/*" multiple data-elevation="photos" onchange="previewElevationPhotos(event, '${sectionId}')">
+                    <button type="button" class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 text-sm" onclick="document.querySelector('#${sectionId} input[data-elevation=photos]').click()">
+                        📸 Upload Photos
+                    </button>
+                </div>
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-2" data-elevation="preview"></div>
+            `;
+
+            container.appendChild(div);
+        }
+
+        function removeElevation(sectionId) {
+            const el = document.getElementById(sectionId);
+            if (el) el.remove();
+        }
+
+        function updateElevationLabel(select) {
+            const parent = select.closest('[id^="elevation-"]');
+            const customInput = parent.querySelector('[data-elevation="custom"]');
+            if (select.value === 'Other') {
+                customInput.style.display = 'block';
+            } else {
+                customInput.style.display = 'none';
+            }
+        }
+
+        function previewElevationPhotos(event, sectionId) {
+            const preview = document.querySelector(`#${sectionId} [data-elevation="preview"]`);
+            preview.innerHTML = '';
+            const files = Array.from(event.target.files);
+
+            files.forEach(file => {
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    const div = document.createElement('div');
+                    const img = document.createElement('img');
+                    img.src = e.target.result;
+                    img.className = 'w-full h-20 object-cover rounded-md shadow-sm';
+                    div.appendChild(img);
+                    preview.appendChild(div);
+                };
+                reader.readAsDataURL(file);
+            });
+        }
+
+        function addInternalRoom() {
+            const container = document.getElementById('internal-rooms-container');
+            const sectionId = `room-${internalRoomCount}`;
+            internalRoomCount++;
+
+            const div = document.createElement('div');
+            div.id = sectionId;
+            div.className = 'border-2 border-dashed border-indigo-300 bg-gradient-to-br from-indigo-50 to-purple-50 rounded-lg p-5 space-y-3';
+
+            const roomOptions = predefinedRooms.map(r => `<option value="${r}">${r}</option>`).join('');
+
+            div.innerHTML = `
+                <div class="flex items-center gap-3 mb-2">
+                    <select class="form-input flex-1 px-3 py-2 text-sm" data-room="name" onchange="updateRoomLabel(this)">
+                        <option value="">Select room...</option>
+                        ${roomOptions}
+                        <option value="Other">Other (specify)</option>
+                    </select>
+                    <input type="text" class="form-input flex-1 px-3 py-2 text-sm" data-room="custom" placeholder="Custom room name" style="display:none;">
+                    <button type="button" class="px-3 py-2 text-sm bg-red-500 text-white rounded hover:bg-red-600" onclick="removeRoom('${sectionId}')">✕</button>
+                </div>
+                <div class="text-center">
+                    <i class="fas fa-images text-2xl text-slate-400 mb-2 block"></i>
+                    <input type="file" class="hidden" accept="image/*" multiple data-room="photos" onchange="previewRoomPhotos(event, '${sectionId}')">
+                    <button type="button" class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 text-sm" onclick="document.querySelector('#${sectionId} input[data-room=photos]').click()">
+                        📸 Upload Photos
+                    </button>
+                </div>
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-2" data-room="preview"></div>
+            `;
+
+            container.appendChild(div);
+        }
+
+        function removeRoom(sectionId) {
+            const el = document.getElementById(sectionId);
+            if (el) el.remove();
+        }
+
+        function updateRoomLabel(select) {
+            const parent = select.closest('[id^="room-"]');
+            const customInput = parent.querySelector('[data-room="custom"]');
+            if (select.value === 'Other') {
+                customInput.style.display = 'block';
+            } else {
+                customInput.style.display = 'none';
+            }
+        }
+
+        function previewRoomPhotos(event, sectionId) {
+            const preview = document.querySelector(`#${sectionId} [data-room="preview"]`);
+            preview.innerHTML = '';
+            const files = Array.from(event.target.files);
+
+            files.forEach(file => {
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    const div = document.createElement('div');
+                    const img = document.createElement('img');
+                    img.src = e.target.result;
+                    img.className = 'w-full h-20 object-cover rounded-md shadow-sm';
+                    div.appendChild(img);
+                    preview.appendChild(div);
+                };
+                reader.readAsDataURL(file);
+            });
+        }
+
+        function downloadJSON() {
+            const formData = new FormData(document.getElementById('assessment-form'));
+            const data = Object.fromEntries(formData);
+            data.defects = getDefectsData();
+            data.costSummary = getCostSummaryData();
+            data.externalElevations = getExternalElevationPhotos();
+            data.internalRooms = getInternalRoomPhotos();
+
+            const json = JSON.stringify(data, null, 2);
+            const blob = new Blob([json], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `assessment-${new Date().toISOString().split('T')[0]}.json`;
+            a.click();
+            URL.revokeObjectURL(url);
+
+            // Show confirmation with counts
+            const defectCount = getDefectsData().length;
+            const costCount = getCostSummaryData().length;
+            const externalCount = getExternalElevationPhotos().length;
+            const internalCount = getInternalRoomPhotos().length;
+            alert(`✅ Assessment exported!\nDefects: ${defectCount}\nCost Categories: ${costCount}\nExternal Elevations: ${externalCount}\nInternal Rooms: ${internalCount}`);
+        }
+
+        // Copy/Paste Preview Modal Functions
+        function showCopyPreview(format = 'json') {
+            const modal = document.getElementById('copy-modal');
+            const body = document.getElementById('preview-body');
+
+            let content = '';
+            if (format === 'json') {
+                content = generateJSONPreview();
+            } else if (format === 'markdown') {
+                content = generateMarkdownPreview();
+            } else if (format === 'tsv') {
+                content = generateTSVPreview();
+            }
+
+            body.textContent = content;
+
+            // Update active format button
+            document.querySelectorAll('.btn-export').forEach(btn => btn.classList.remove('active'));
+            document.querySelector(`[data-format="${format}"]`).classList.add('active');
+
+            // Update copy button
+            document.getElementById('copy-btn').onclick = () => copyToClipboard(content);
+
+            modal.style.display = 'flex';
+        }
+
+        function closeCopyModal() {
+            document.getElementById('copy-modal').style.display = 'none';
+        }
+
+        function generateJSONPreview() {
+            const formData = new FormData(document.getElementById('assessment-form'));
+            const data = Object.fromEntries(formData);
+            data.defects = getDefectsData();
+            data.exportDate = new Date().toISOString();
+            data.exportFormat = 'Heritage Building Assessment';
+            return JSON.stringify(data, null, 2);
+        }
+
+        function generateMarkdownPreview() {
+            const form = document.getElementById('assessment-form');
+            let md = `# Heritage Building Condition Assessment\n\n`;
+            md += `**Generated:** ${new Date().toLocaleDateString()}\n\n`;
+
+            md += `## Property Information\n`;
+            md += `- **Property Name:** ${form.propertyName?.value || '—'}\n`;
+            md += `- **Address:** ${form.address?.value || '—'}\n`;
+            md += `- **Year Built:** ${form.yearBuilt?.value || '—'}\n`;
+            md += `- **Assessment Date:** ${form.assessmentDate?.value || '—'}\n\n`;
+
+            md += `## Building Overview\n`;
+            md += `${form.overview?.value || 'No overview provided'}\n\n`;
+
+            const defects = getDefectsData();
+            if (defects.length > 0) {
+                md += `## Identified Defects (${defects.length})\n\n`;
+                defects.forEach((d, i) => {
+                    if (d.location || d.description) {
+                        md += `### ${i + 1}. ${d.location || 'Unlabeled'}\n`;
+                        md += `**Description:** ${d.description || '—'}\n`;
+                        if (d.cost) md += `**Cost:** ${d.cost}\n`;
+                        md += `\n`;
+                    }
+                });
+            }
+
+            return md;
+        }
+
+        function generateTSVPreview() {
+            const form = document.getElementById('assessment-form');
+            let tsv = `Property Name\tAddress\tYear Built\tAssessment Date\n`;
+            tsv += `${form.propertyName?.value || '—'}\t${form.address?.value || '—'}\t${form.yearBuilt?.value || '—'}\t${form.assessmentDate?.value || '—'}\n\n`;
+
+            tsv += `Defects:\nLocation\tDescription\tCost\n`;
+            getDefectsData().forEach(d => {
+                tsv += `${d.location || '—'}\t${d.description || '—'}\t${d.cost || '—'}\n`;
+            });
+
+            return tsv;
+        }
+
+        function copyToClipboard(text) {
+            navigator.clipboard.writeText(text).then(() => {
+                const btn = document.getElementById('copy-btn');
+                const originalText = btn.textContent;
+                btn.textContent = '✓ Copied!';
+                btn.style.background = '#059669';
+                setTimeout(() => {
+                    btn.textContent = originalText;
+                    btn.style.background = '';
+                }, 2000);
+            }).catch(() => {
+                alert('Could not copy to clipboard. Try a different export format.');
+            });
+        }
+
+        // Close modal when clicking outside
+        window.onclick = function(event) {
+            const modal = document.getElementById('copy-modal');
+            if (event.target === modal) {
+                modal.style.display = 'none';
+            }
+        };
+
+        document.getElementById('assessment-form').assessmentDate.valueAsDate = new Date();
+        addDefectRow(); // Start with one empty defect row
+        addCostRow(); // Start with one empty cost row
+        addExternalElevation(); // Start with one empty external elevation
+        addInternalRoom(); // Start with one empty internal room
+        showSection(1);
+    </script>
+
+    <!-- Copy Preview Modal -->
+    <div id="copy-modal" class="modal-overlay" style="display: none;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <span style="font-size: 20px;">📋</span>
+                <h3>Copy Assessment Data</h3>
+            </div>
+
+            <div class="export-buttons">
+                <button type="button" class="btn-export active" data-format="json" onclick="showCopyPreview('json')">📄 JSON</button>
+                <button type="button" class="btn-export" data-format="markdown" onclick="showCopyPreview('markdown')">📝 Markdown</button>
+                <button type="button" class="btn-export" data-format="tsv" onclick="showCopyPreview('tsv')">📊 Tab-Separated</button>
+            </div>
+
+            <div class="modal-body" id="preview-body"></div>
+
+            <div class="modal-actions">
+                <button type="button" class="btn-copy" id="copy-btn">
+                    <span>📋</span> Copy to Clipboard
+                </button>
+                <button type="button" class="btn-close" onclick="closeCopyModal()">Close</button>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
