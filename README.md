@@ -1,191 +1,103 @@
-# STEWRD Heritage CareLog
+<div align="center">
 
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
-[![Version](https://img.shields.io/badge/version-2.0--agent2--demo-brightgreen.svg)](https://github.com/mightytonylun/stewrd-heritage-carelog/releases)
-[![Browser Support](https://img.shields.io/badge/browser-all%20modern-blue.svg)](#browser-support)
+<br/>
 
-**Agent 2: Condition Report Digitizer** · Part of the STEWRD Heritage Management Copilot
+# STEWRD Heritage Copilot
 
-> A free, open-source management copilot for non-professional heritage custodians. Turns a paper-based property walk-around into structured digital data — no specialist knowledge required.
+### A management copilot for non-professional heritage custodians
 
----
+[![GitHub Pages](https://img.shields.io/badge/Try%20it-GitHub%20Pages-3a6b4a?style=flat-square)](https://mightytonylun.github.io/stewrd-heritage-copilot/)&nbsp;
+[![Release](https://img.shields.io/github/v/release/mightytonylun/stewrd-heritage-copilot?style=flat-square&color=8b3a2f&label=Release)](https://github.com/mightytonylun/stewrd-heritage-copilot/releases)&nbsp;
+![Status](https://img.shields.io/badge/Status-Early%20access-c0a882?style=flat-square)
 
-## Quick Start
+**[mightytonylun.github.io/stewrd-heritage-copilot →](https://mightytonylun.github.io/stewrd-heritage-copilot/)**
 
-**No installation. No server. No build step.**
+<br/>
 
-1. [Download `heritage-copilot-v2.html`](https://github.com/mightytonylun/stewrd-heritage-carelog/releases/tag/v2.0-agent2-demo) from the latest release
-2. Open in any modern browser
-3. Click **▶ Load Demo Assessment** to explore a pre-populated example
-
-**iPad / iPhone / Android:** Open in **Chrome or Edge** — Safari on iOS does not support opening local HTML files easily. Download the file from the release page and it opens directly in Chrome or Edge, ready to use.
+</div>
 
 ---
 
-## What Is STEWRD
-
-The heritage conservation sector has a long-tail problem. Well-resourced institutions — national museums, major landmarks, large conservation trusts — are well served. The majority are not:
-
-- Community-managed historic houses run by volunteers
-- Small religious buildings maintained by congregations with no conservation budget
-- Owner-custodians of heritage-listed homes who inherited both the building and the obligation
-- Local government assets managed by generalists with no heritage training
-
-> *"These custodians know their buildings matter. They just don't know what to do next — and every tool built for the sector assumes knowledge and resources they don't have."*
-
-STEWRD is a suite of five modular, free, open-source tools that together give a non-professional custodian the capability to document condition, identify urgency, and generate reports useful to funding bodies and tradespeople.
+> *"My research is grounded in conservation practice: it addresses a problem I encounter directly in fieldwork — the gap between the knowledge produced by professional conservation and the people who actually look after heritage places day to day."*
 
 ---
 
-## The Five Agents
+## The problem
 
-```
-Agent 2 → Condition Digitizer     ✅ Demo live (this repo)
-Agent 1 → AI Photo Assessor       🏗 Next
-Agent 3 → Urgency Ranker          📋 Planned
-Agent 4 → Archive Organiser       📋 Planned
-Agent 5 → Narrative Generator     📋 Planned
-```
+Most small heritage sites have almost nothing to show people. No condition history that reads as a story, no professionally produced archive, no material that makes the place legible to someone who did not already care about it.
 
-**Research question for Agent 2:** What is the minimal digital structure for heritage property assessments that a non-expert can reliably complete?
+The people looking after these places — volunteers running a heritage house a couple of days a week, owner-custodians who inherited a listed property, community groups maintaining a local landmark — know their buildings matter. They just don't know what to do next.
+
+Conservation knowledge stays with professionals. Conservation Management Plans sit in filing cabinets. Every volunteer who takes over starts from scratch. The tools built for the sector assume training, resources, and institutional continuity that most custodians simply don't have.
+
+**STEWRD is a set of tools that bridges that gap.** Not by replacing professionals — but by making expert knowledge persistent and accessible without requiring expertise to receive it.
 
 ---
 
-## Features
+## The framework — NRRT
 
-### Assessment Structure
+STEWRD operationalises **NRRT** (Notice, Record, Read, Tend), an everyday care cycle designed for non-specialist custodians:
 
-10 guided sections covering a complete property condition survey:
+| Step | What it means |
+|------|--------------|
+| **Notice** | Routine, attentive observation during regular visits — looking for change, not damage |
+| **Record** | Lightweight capture: dated photos and a short plain-English note |
+| **Read** | Comparing records across time to detect patterns — where is the place stable, where is it drifting? |
+| **Tend** | Small, incremental responses to what the reading reveals — or deliberate, documented non-action |
 
-| # | Section | Type |
-|---|---------|------|
-| 1 | Property Details | Form |
-| 2 | Electrical | Form + Condition Rating |
-| 3 | Plumbing | Form + Condition Rating |
-| 4 | Moisture & Ventilation | Form + Condition Rating |
-| 5 | Hazardous Materials | Form + Risk Level |
-| 6 | Structural | Form + Condition Rating |
-| 7 | Exterior Elements | Grouped entries |
-| 8 | Interior Spaces | Grouped entries |
-| 9 | Defects & Repairs | Defect register with priorities + costs |
-| 10 | Overall Summary | Auto-stats + final notes |
+> *"The most consequential heritage decisions are not the dramatic interventions but the small, repeated acts of attention that either happen or fail to happen between them."*
 
-### Condition Rating
-
-Every section has a **Good / Fair / Poor / Critical / N/A** rating as the primary input — the core structured data unit that feeds into downstream STEWRD agents.
-
-### Grouped Entry System
-
-Sections 7, 8, and 9 use a slide-up drawer for structured entries:
-- Auto-assigned reference numbers (EE-01, RM-01, D-01…)
-- Location / room / element
-- Condition rating + notes
-- Photo capture (direct camera on tablet, gallery on desktop)
-- Priority + estimated cost (defects only)
-
-### Export
-
-| Format | Use |
-|--------|-----|
-| JSON | Full data backup / pipeline handoff to other STEWRD agents |
-| CSV | Entries spreadsheet for cost planning |
-| Word / HTML | Copy formatted tables into a condition report document |
-| Print / PDF | Browser print dialog |
-
-### Session Management
-
-Save and reload named assessments. Auto-saves every 1.2 seconds. All data stored in `localStorage` — nothing sent anywhere.
+STEWRD's agents map directly onto this cycle. Each tool handles one part of it.
 
 ---
 
-## Demo Assessment
+## Agents
 
-Click **▶ Load Demo Assessment** in the sidebar to load a pre-populated example:
+| | Agent | What it does | |
+|--|-------|-------------|--|
+| **A1** | **Condition Assessor** | Photograph a building element → AI rates it Good / Fair / Poor / Critical → plain-English next step. Works on phone, 5 AI providers, API key remembered. | [Open →](https://mightytonylun.github.io/stewrd-heritage-copilot/agent-1/) |
+| **A2** | **Condition Report Digitizer** | Guided 10-section on-site form for structured condition recording. Session save/restore, offline-capable, exports to text. | [Open →](https://mightytonylun.github.io/stewrd-heritage-copilot/agent-2/) |
+| **A3** | **Urgency Ranker** | Prioritises repair schedule from A1 and A2 output — ranked by urgency, cost tier, and consequence of inaction. | Planned |
+| **A4** | **Archive Organiser** | Structures accumulated assessment data into a discoverable, publishable archive. | Planned |
+| **A5** | **Narrative Generator** | Transforms pipeline output into accessible narratives — one-page place story, condition summary for grant applications. | Planned |
 
-> **Thornton Cottage** — heritage-listed Victorian worker's cottage, Ballarat VIC 3350  
-> Heritage Overlay HO47 · Double brick, bluestone foundations · Terracotta tile roof  
-> Assessed by: Sarah Chen, Ballarat Community Heritage Trust
-
-The demo covers all 10 sections including 6 exterior entries, 6 interior rooms, and 8 defects ranging from urgent safety items (electrical rewire, chimney collapse risk) to routine maintenance (repointing, sub-floor vents). Estimated repair cost: ~$21,200.
-
----
-
-## Architecture
-
-Single `.html` file — no build tools, no dependencies, no server required.
-
-- **CSS:** Custom properties design system, responsive at 900px breakpoint
-- **JS:** Vanilla ES6+, no frameworks
-- **Storage:** `localStorage` only — all data stays on device
-- **PWA:** Manifest + service worker injected as Blob URLs at runtime
-- **Camera:** `getUserMedia` with `facingMode: environment` (rear camera on tablets)
-- **Export:** Client-side Blob download for JSON/CSV/HTML; browser print for PDF
+*Agent 0 (Heritage Document Analyser) is a professional setup layer — ingests existing CMPs, condition reports, and significance statements to create a Property Intelligence Profile that pre-loads all other agents.*
 
 ---
 
-## Browser Support
+## Condition levels (Agent 1)
 
-| Browser | Support |
-|---------|---------|
-| Chrome | Full |
-| Firefox | Full |
-| Safari | Full (iOS PWA via Add to Home Screen only) |
-| Edge | Full |
+Built from ICOMOS condition state definitions and Heritage Victoria guidelines:
 
-Requirements: ES6+, localStorage enabled, camera permissions for photo capture.
-
----
-
-## Version History
-
-### v2.0 — Agent 2 Demo (April 2026)
-- Tablet-first layout with pill-strip navigation
-- PWA — Add to Home Screen on iPad
-- `getUserMedia` direct camera capture (no file picker on tablet)
-- Condition rating (Good / Fair / Poor / Critical / N/A) on every section
-- Unified slide-up drawer for grouped entries
-- Realistic full demo assessment (Thornton Cottage, Ballarat)
-- STEWRD pipeline panel and agent identity
-- Deep green `#1B5E38` palette, 7px border radius
-
-### v1.1 (April 2026, archived)
-- Desktop sidebar layout
-- Gallery photo picker
-- Basic export (Word HTML, JSON)
-
-### v1.0 (Initial)
-- Desktop copilot for structured documentation alongside Word
+| | Level | Headline | Who acts |
+|--|-------|----------|---------|
+| 🟢 | **Good** | Stable — revisit at your next annual check | No action needed |
+| 🟡 | **Fair** | Routine upkeep — repaint, clean or seal as needed | Owner or standard tradesperson |
+| 🟠 | **Poor** | Consult a heritage professional | Heritage tradesperson within 3–6 months |
+| 🔴 | **Critical** | Seek urgent specialist heritage advice | Urgent — do not DIY |
 
 ---
 
-## Roadmap
+## Who this is for
 
-### Agent 2 (this tool)
-- [ ] Field-tested with real heritage custodians
-- [ ] Schema validation and error states
-- [ ] Offline sync between devices
-
-### Agent 1 — AI Photo Assessor (next)
-- AI-assisted condition classification (Good / Fair / Poor / Critical) from smartphone photos
-- Research question: Can automated image analysis of uncontrolled field photos provide condition classifications useful to non-professional custodians?
-
-### Agent 3 — Urgency Ranker (planned)
-- Prioritised repair schedule from Agent 2 + Agent 1 output
-- Ranking by urgency, cost tier, and consequence of inaction
+- Volunteer custodians managing heritage houses with no conservation background
+- Owner-custodians of heritage-listed properties who need to know what to do next
+- Small trusts and committees responsible for community heritage buildings
+- Local government officers managing heritage asset portfolios
+- Heritage professionals looking for a lightweight tool to leave with non-specialist clients
 
 ---
 
-## Citation
+## No installation
 
-```
-STEWRD Heritage CareLog — Condition Report Digitizer v2
-https://github.com/mightytonylun/stewrd-heritage-carelog
-```
+Every agent is a single HTML file. Open in any modern browser — no account, no build step, no server.
 
-## License
-
-MIT License — see [LICENSE](LICENSE) for details.
+**On iPhone / Android:** Agent 1 has a "Take photo" button that opens the rear camera directly. Agent 2 is tablet-optimised.
 
 ---
 
-*STEWRD Heritage CareLog · Draft April 2026 · Agent 2 of 5*
+## Early access
+
+We're sharing these tools as they're built and want feedback from real custodians. Try them on your property — [open an issue](https://github.com/mightytonylun/stewrd-heritage-copilot/issues) with what you find.
+
+---

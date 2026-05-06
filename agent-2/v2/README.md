@@ -169,7 +169,7 @@ STEWRD Heritage CareLog — Condition Report Digitizer v2
 https://github.com/mightytonylun/stewrd-heritage-carelog
 ```
 
-MIT License — see [LICENSE](../LICENSE)
+Part of the STEWRD Heritage Copilot suite — currently in development.
 
 ---
 
