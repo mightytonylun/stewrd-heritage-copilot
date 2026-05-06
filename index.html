@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title>STEWRD — Heritage Copilot</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;1,9..144,500&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+  <style>
+    :root {
+      --font-serif: "Fraunces","Source Serif 4",ui-serif,Georgia,serif;
+      --font-sans:  "Inter","Inter Variable",ui-sans-serif,-apple-system,system-ui,sans-serif;
+      --bg:#f4efe6; --surface:#fbf8f2;
+      --ink:#1a1f2e; --ink-2:#3b3f4a; --ink-3:#6b6f78;
+      --accent:#8b3a2f; --accent-hi:#a24937;
+      --line:rgba(26,31,46,0.10); --line-strong:rgba(26,31,46,0.16);
+      --moss:#6b705c;
+      --shadow-md:0 4px 14px rgba(40,28,20,0.08),0 1px 2px rgba(40,28,20,0.04);
+    }
+    *,*::before,*::after { box-sizing:border-box; margin:0; padding:0; }
+    body {
+      font-family: var(--font-sans);
+      background: var(--bg);
+      color: var(--ink);
+      min-height: 100dvh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* ── Topbar ── */
+    .topbar {
+      display: flex; align-items: center; gap: 12px;
+      padding: 16px 24px;
+      border-bottom: 1px solid var(--line);
+      background: var(--surface);
+    }
+    .topbar svg { flex-shrink:0; }
+    .topbar-name {
+      font-family: var(--font-sans); font-weight: 600; font-size: 14px;
+      letter-spacing: 0.01em; color: var(--ink);
+      line-height: 1.2;
+    }
+    .topbar-name span {
+      display: block; font-weight: 400; font-size: 11px;
+      letter-spacing: 0.12em; text-transform: uppercase; color: var(--ink-3);
+    }
+
+    /* ── Hero ── */
+    .hero {
+      max-width: 560px; margin: 0 auto;
+      padding: 64px 24px 48px;
+      text-align: center;
+    }
+    .hero-eyebrow {
+      font-size: 11px; font-weight: 600; letter-spacing: 0.12em;
+      text-transform: uppercase; color: var(--accent);
+      margin-bottom: 16px;
+    }
+    .hero-heading {
+      font-family: var(--font-serif); font-size: clamp(32px,6vw,48px);
+      font-weight: 500; line-height: 1.1; letter-spacing: -0.02em;
+      color: var(--ink); margin-bottom: 18px;
+    }
+    .hero-sub {
+      font-size: 16px; line-height: 1.65; color: var(--ink-3);
+      max-width: 440px; margin: 0 auto;
+    }
+
+    /* ── Agent cards ── */
+    .agents {
+      max-width: 560px; margin: 0 auto;
+      padding: 0 24px 80px;
+      display: flex; flex-direction: column; gap: 16px;
+    }
+    .agent-card {
+      background: var(--surface);
+      border: 1px solid var(--line-strong);
+      border-radius: 12px;
+      padding: 24px;
+      text-decoration: none; color: inherit;
+      display: flex; align-items: flex-start; gap: 18px;
+      box-shadow: var(--shadow-md);
+      transition: box-shadow 150ms, transform 150ms;
+    }
+    .agent-card:hover {
+      box-shadow: 0 8px 24px rgba(40,28,20,0.12),0 1px 2px rgba(40,28,20,0.05);
+      transform: translateY(-1px);
+    }
+    .agent-card:active { transform: translateY(0); }
+    .agent-badge {
+      flex-shrink: 0;
+      width: 40px; height: 40px;
+      border-radius: 8px;
+      background: var(--accent);
+      color: #fbf8f2;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 11px; font-weight: 700; letter-spacing: 0.04em;
+    }
+    .agent-info { flex: 1; min-width: 0; }
+    .agent-label {
+      font-size: 11px; font-weight: 600; letter-spacing: 0.10em;
+      text-transform: uppercase; color: var(--moss);
+      margin-bottom: 4px;
+    }
+    .agent-name {
+      font-family: var(--font-serif); font-size: 20px; font-weight: 500;
+      color: var(--ink); margin-bottom: 6px; line-height: 1.2;
+    }
+    .agent-desc {
+      font-size: 14px; line-height: 1.6; color: var(--ink-3);
+    }
+    .agent-arrow {
+      flex-shrink: 0; color: var(--ink-3); margin-top: 2px;
+      transition: transform 150ms;
+    }
+    .agent-card:hover .agent-arrow { transform: translateX(3px); }
+
+    /* coming soon */
+    .agent-card.soon { opacity: 0.55; pointer-events: none; }
+    .agent-card.soon .agent-badge { background: var(--moss); }
+    .soon-tag {
+      display: inline-block; margin-top: 8px;
+      font-size: 11px; font-weight: 600; letter-spacing: 0.08em;
+      text-transform: uppercase; color: var(--moss);
+      background: rgba(107,112,92,0.12); border-radius: 4px;
+      padding: 2px 7px;
+    }
+
+    /* ── Footer ── */
+    footer {
+      margin-top: auto;
+      padding: 24px;
+      text-align: center;
+      font-size: 12px; color: var(--ink-3);
+      border-top: 1px solid var(--line);
+    }
+    footer a { color: var(--ink-3); text-decoration: none; }
+    footer a:hover { color: var(--accent); }
+  </style>
+</head>
+<body>
+
+  <div class="topbar">
+    <svg width="28" height="28" viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <rect x="1" y="14" width="26" height="13" rx="2" stroke="var(--ink)" stroke-width="1.5"/>
+      <path d="M7 14 V8 Q7 2 14 2 Q21 2 21 8 V14" stroke="var(--ink)" stroke-width="1.5" stroke-linecap="round"/>
+      <path d="M1 24 L27 24" stroke="var(--ink)" stroke-width="1.5" stroke-linecap="round"/>
+      <path d="M11 24 L11 17 Q11 14 14 14 Q17 14 17 17 L17 24" stroke="var(--ink)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+    </svg>
+    <div class="topbar-name">
+      STEWRD
+      <span>Heritage Copilot</span>
+    </div>
+  </div>
+
+  <div class="hero">
+    <div class="hero-eyebrow">Open-source · Free to use</div>
+    <h1 class="hero-heading">AI tools for heritage property custodians</h1>
+    <p class="hero-sub">No conservation training required. Photograph, assess, and document your heritage property in minutes.</p>
+  </div>
+
+  <div class="agents">
+
+    <a class="agent-card" href="agent-1/">
+      <div class="agent-badge">A1</div>
+      <div class="agent-info">
+        <div class="agent-label">Agent 1</div>
+        <div class="agent-name">Condition Assessor</div>
+        <div class="agent-desc">Upload a photo. The AI classifies the condition of the building element — Good, Fair, Poor, or Critical — and tells you what to do next.</div>
+      </div>
+      <svg class="agent-arrow" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M5 12h14M13 6l6 6-6 6"/>
+      </svg>
+    </a>
+
+    <a class="agent-card" href="agent-2/v2/heritage-copilot-v2.html">
+      <div class="agent-badge">A2</div>
+      <div class="agent-info">
+        <div class="agent-label">Agent 2</div>
+        <div class="agent-name">Condition Report Digitizer</div>
+        <div class="agent-desc">Turn a paper condition report into a structured digital record. Fill in the form on-site or from your notes.</div>
+      </div>
+      <svg class="agent-arrow" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M5 12h14M13 6l6 6-6 6"/>
+      </svg>
+    </a>
+
+    <div class="agent-card soon">
+      <div class="agent-badge">A3</div>
+      <div class="agent-info">
+        <div class="agent-label">Agent 3</div>
+        <div class="agent-name">Maintenance Planner</div>
+        <div class="agent-desc">Generate a prioritised maintenance schedule from your assessment records.</div>
+        <span class="soon-tag">Coming soon</span>
+      </div>
+    </div>
+
+  </div>
+
+  <footer>
+    <a href="https://github.com/mightytonylun/stewrd-heritage-copilot" target="_blank">GitHub</a>
+    &nbsp;·&nbsp;
+    STEWRD Heritage Copilot &mdash; open-source tools for heritage custodians
+  </footer>
+
+</body>
+</html>

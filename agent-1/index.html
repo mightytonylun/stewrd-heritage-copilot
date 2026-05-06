@@ -1,0 +1,1158 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title>STEWRD — Condition Assessor</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;1,9..144,500&family=Inter:wght@300;400;500;510;590;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+  <style>
+/* ── Design tokens ─────────────────────────────────────────────────── */
+:root {
+  --font-serif: "Fraunces","Source Serif 4",ui-serif,Georgia,serif;
+  --font-sans:  "Inter Variable","Inter",ui-sans-serif,-apple-system,system-ui,sans-serif;
+  --font-mono:  "JetBrains Mono","Berkeley Mono",ui-monospace,"SF Mono",Menlo,monospace;
+
+  --s-1:4px;  --s-2:8px;  --s-3:12px; --s-4:16px; --s-5:20px;
+  --s-6:24px; --s-7:32px; --s-8:40px; --s-9:56px; --s-10:72px;
+
+  --r-xs:2px; --r-sm:4px; --r-md:6px; --r-lg:10px;
+  --r-xl:16px; --r-2xl:22px; --r-full:9999px;
+
+  --cond-good-ink:#3a6b4a; --cond-good-fill:#d9e5d4;
+  --cond-fair-ink:#8a6a2c; --cond-fair-fill:#efe4cc;
+  --cond-poor-ink:#a05321; --cond-poor-fill:#efd9c6;
+  --cond-crit-ink:#8c2e22; --cond-crit-fill:#ecd0c9;
+}
+
+.theme-custodian {
+  --bg:#f4efe6; --bg-sunk:#ebe4d6;
+  --surface:#fbf8f2; --surface-2:#f8f3e8; --surface-3:#ffffff;
+  --ink:#1a1f2e; --ink-2:#3b3f4a; --ink-3:#6b6f78; --ink-4:#9a9992;
+  --accent:#8b3a2f; --accent-hi:#a24937; --accent-lo:#6e2b22;
+  --accent-wash:rgba(139,58,47,0.08);
+  --moss:#6b705c; --moss-wash:rgba(107,112,92,0.10);
+  --line:rgba(26,31,46,0.10);
+  --line-strong:rgba(26,31,46,0.18);
+  --line-soft:rgba(26,31,46,0.05);
+  --shadow-sm:0 1px 2px rgba(40,28,20,0.05);
+  --shadow-md:0 4px 14px rgba(40,28,20,0.08),0 1px 2px rgba(40,28,20,0.04);
+  --focus-ring:0 0 0 3px rgba(139,58,47,0.18);
+  --cond-good-bg:var(--cond-good-fill); --cond-good-fg:var(--cond-good-ink);
+  --cond-fair-bg:var(--cond-fair-fill); --cond-fair-fg:var(--cond-fair-ink);
+  --cond-poor-bg:var(--cond-poor-fill); --cond-poor-fg:var(--cond-poor-ink);
+  --cond-crit-bg:var(--cond-crit-fill); --cond-crit-fg:var(--cond-crit-ink);
+}
+
+/* ── Reset ─────────────────────────────────────────────────────────── */
+*,*::before,*::after { box-sizing:border-box; margin:0; padding:0; }
+html { font-optical-sizing:auto; }
+html,body {
+  font-family:var(--font-sans);
+  font-feature-settings:"cv01","ss03","ss01";
+  -webkit-font-smoothing:antialiased;
+  -moz-osx-font-smoothing:grayscale;
+  background:var(--bg);
+  color:var(--ink);
+  line-height:1.5;
+}
+button,input,textarea,select { font-family:inherit; }
+::selection { background:var(--accent-wash); color:var(--ink); }
+
+/* ── Page shell ────────────────────────────────────────────────────── */
+.page {
+  min-height:100vh;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  padding:var(--s-8) var(--s-4) var(--s-10);
+}
+
+/* ── Top bar ───────────────────────────────────────────────────────── */
+.topbar {
+  width:100%;
+  max-width:480px;
+  display:flex;
+  align-items:center;
+  gap:var(--s-3);
+  margin-bottom:var(--s-8);
+}
+.topbar-mark {
+  width:28px; height:28px; flex-shrink:0;
+}
+.topbar-name {
+  font-family:var(--font-serif);
+  font-weight:500;
+  font-size:17px;
+  letter-spacing:-0.01em;
+  color:var(--ink);
+  line-height:1;
+}
+.topbar-name span {
+  display:block;
+  font-family:var(--font-sans);
+  font-size:10px;
+  font-weight:600;
+  letter-spacing:0.10em;
+  text-transform:uppercase;
+  color:var(--ink-3);
+  margin-top:2px;
+}
+.topbar-badge {
+  margin-left:auto;
+  font-family:var(--font-mono);
+  font-size:10px;
+  letter-spacing:0.06em;
+  color:var(--ink-3);
+  background:var(--surface);
+  border:1px solid var(--line-strong);
+  border-radius:var(--r-full);
+  padding:3px 9px;
+}
+
+/* ── Content column ────────────────────────────────────────────────── */
+.col { width:100%; max-width:480px; }
+
+/* ── Eyebrow ───────────────────────────────────────────────────────── */
+.eyebrow {
+  font-family:var(--font-mono);
+  font-size:10px;
+  font-weight:600;
+  letter-spacing:0.12em;
+  text-transform:uppercase;
+  color:var(--accent);
+  margin-bottom:var(--s-2);
+}
+
+/* ── Panel ─────────────────────────────────────────────────────────── */
+.panel {
+  background:var(--surface);
+  border:1px solid var(--line);
+  border-radius:var(--r-xl);
+  padding:var(--s-6);
+  box-shadow:var(--shadow-sm);
+  margin-bottom:var(--s-4);
+}
+.panel-sunk {
+  background:var(--bg-sunk);
+  border:1px solid var(--line);
+  border-radius:var(--r-lg);
+  padding:var(--s-4) var(--s-5);
+}
+
+/* ── Field ─────────────────────────────────────────────────────────── */
+.field-label {
+  display:block;
+  font-size:12px;
+  font-weight:510;
+  color:var(--ink-2);
+  letter-spacing:0.01em;
+  margin-bottom:var(--s-1);
+}
+.field-hint {
+  font-weight:400;
+  color:var(--ink-4);
+}
+.field-input {
+  display:block;
+  width:100%;
+  padding:9px var(--s-3);
+  border:1px solid var(--line-strong);
+  border-radius:var(--r-md);
+  background:var(--surface-3);
+  color:var(--ink);
+  font-size:15px;
+  transition:border-color 120ms,box-shadow 120ms;
+  margin-bottom:var(--s-4);
+}
+.field-input:focus {
+  outline:none;
+  border-color:var(--accent);
+  box-shadow:var(--focus-ring);
+}
+.field-select { appearance:none; background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%236b6f78' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E"); background-repeat:no-repeat; background-position:right 12px center; padding-right:32px; }
+.field-row { display:grid; grid-template-columns:1fr 1fr; gap:var(--s-3); }
+@media (max-width:420px) { .field-row { grid-template-columns:1fr; } }
+.field-hint-line {
+  font-size:12px;
+  color:var(--ink-3);
+  margin-top:-12px;
+  margin-bottom:var(--s-4);
+}
+.field-hint-line a { color:var(--accent); text-decoration:none; }
+.field-hint-line a:hover { text-decoration:underline; }
+
+/* ── API key chip ──────────────────────────────────────────────── */
+.key-chip {
+  display:flex;
+  align-items:center;
+  gap:var(--s-2);
+  padding:7px var(--s-3);
+  background:var(--cond-good-fill);
+  color:var(--cond-good-ink);
+  border-radius:var(--r-md);
+  font-size:13px;
+  font-weight:510;
+  margin-bottom:var(--s-4);
+  border:1px solid rgba(58,107,74,0.20);
+}
+.key-chip-change {
+  margin-left:auto;
+  background:none;
+  border:none;
+  color:var(--cond-good-ink);
+  font-size:12px;
+  cursor:pointer;
+  padding:0;
+  font-family:var(--font-sans);
+  text-decoration:underline;
+  text-underline-offset:2px;
+  opacity:0.75;
+}
+.key-chip-change:hover { opacity:1; }
+
+/* ── Report textarea ───────────────────────────────────────────── */
+.report-textarea {
+  width:100%;
+  min-height:150px;
+  padding:var(--s-3) var(--s-4);
+  border:1px solid var(--line-strong);
+  border-radius:var(--r-md);
+  background:var(--bg-sunk);
+  color:var(--ink-2);
+  font-family:var(--font-mono);
+  font-size:11.5px;
+  line-height:1.65;
+  resize:vertical;
+  cursor:text;
+  margin-bottom:0;
+}
+
+/* ── Photo zone ────────────────────────────────────────────────────── */
+.coaching-card {
+  background:var(--surface-2);
+  border-left:3px solid var(--moss);
+  border-radius:var(--r-lg) var(--r-lg) 0 0;
+  border-bottom:1px solid var(--line);
+  padding:var(--s-3) var(--s-4);
+  display:flex;
+  align-items:center;
+  gap:var(--s-3);
+}
+.coaching-card-icon {
+  flex-shrink:0;
+  display:flex;
+  align-items:center;
+}
+.coaching-card-text {
+  font-size:13px;
+  line-height:1.45;
+  color:var(--ink-3);
+}
+.coaching-card-text strong {
+  color:var(--ink-2);
+  font-weight:590;
+  display:block;
+  margin-bottom:1px;
+}
+
+.drop-zone {
+  position:relative;
+  border:1.5px dashed var(--line-strong);
+  border-top:0;
+  border-radius:0 0 var(--r-lg) var(--r-lg);
+  background:var(--bg-sunk);
+  padding:var(--s-8) var(--s-6);
+  text-align:center;
+  cursor:pointer;
+  transition:border-color 150ms,background 150ms;
+  margin-bottom:var(--s-4);
+}
+.drop-zone:hover,.drop-zone.over {
+  border-color:var(--accent);
+  background:var(--surface-2);
+}
+.drop-overlay {
+  position:absolute; inset:0; opacity:0; cursor:pointer; width:100%; height:100%;
+}
+.drop-icon { display:flex; justify-content:center; margin-bottom:var(--s-2); }
+.drop-label { font-size:14px; color:var(--ink-3); line-height:1.6; }
+.drop-label strong { color:var(--accent); }
+
+/* ── Mobile capture buttons ────────────────────────────────────────── */
+.drop-mobile-btns { display:none; }
+
+@media (pointer: coarse) {
+  .drop-overlay        { display:none; }
+  .drop-desktop-label  { display:none; }
+  .drop-icon           { display:none; }
+  .drop-zone           { padding:var(--s-4); border-style:solid; }
+  .drop-mobile-btns    { display:flex; flex-direction:column; gap:var(--s-3); width:100%; }
+}
+
+.drop-mobile-btn {
+  display:flex; align-items:center; justify-content:center; gap:var(--s-2);
+  width:100%; height:54px;
+  border-radius:var(--r-md);
+  font-size:15px; font-weight:590;
+  cursor:pointer; user-select:none;
+  transition:background 120ms, box-shadow 120ms;
+}
+.drop-mobile-btn input[type=file] { display:none; }
+.drop-mobile-btn-camera {
+  background:var(--accent); color:#fbf8f2;
+  box-shadow:var(--shadow-sm);
+}
+.drop-mobile-btn-camera:active { background:var(--accent-hi); }
+.drop-mobile-btn-gallery {
+  background:var(--surface-3); color:var(--ink-2);
+  border:1.5px solid var(--line-strong);
+}
+.drop-mobile-btn-gallery:active { background:var(--bg-sunk); }
+
+.preview-wrap {
+  display:none;
+  border-radius:var(--r-lg);
+  overflow:hidden;
+  border:1px solid var(--line);
+  margin-bottom:var(--s-4);
+  position:relative;
+  box-shadow:var(--shadow-sm);
+}
+.preview-wrap img { width:100%; max-height:320px; object-fit:cover; display:block; }
+.preview-clear {
+  position:absolute; top:var(--s-2); right:var(--s-2);
+  background:rgba(26,31,46,0.65);
+  color:#fbf8f2;
+  border:none;
+  border-radius:var(--r-full);
+  width:30px; height:30px;
+  font-size:14px;
+  cursor:pointer;
+  display:flex; align-items:center; justify-content:center;
+  backdrop-filter:blur(4px);
+}
+
+/* ── Buttons ───────────────────────────────────────────────────────── */
+.btn {
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  gap:var(--s-2);
+  height:46px;
+  padding:0 var(--s-6);
+  border-radius:var(--r-md);
+  font-size:15px;
+  font-weight:590;
+  cursor:pointer;
+  border:none;
+  transition:background 120ms,box-shadow 120ms,color 120ms;
+  letter-spacing:-0.01em;
+}
+.btn:focus-visible { outline:none; box-shadow:var(--focus-ring); }
+.btn-primary {
+  background:var(--accent);
+  color:#fbf8f2;
+  width:100%;
+}
+.btn-primary:hover:not(:disabled) { background:var(--accent-hi); }
+.btn-primary:active:not(:disabled) { background:var(--accent-lo); }
+.btn-primary:disabled { opacity:0.38; cursor:not-allowed; }
+.btn-ghost {
+  background:transparent;
+  border:1px solid var(--line-strong);
+  color:var(--ink-2);
+  flex:1;
+}
+.btn-ghost:hover:not(:disabled) { background:var(--surface-2); color:var(--ink); }
+.btn-row { display:flex; gap:var(--s-3); }
+
+/* ── Spinner ───────────────────────────────────────────────────────── */
+.spinner-wrap {
+  display:none;
+  text-align:center;
+  padding:var(--s-8) 0;
+  color:var(--ink-3);
+  font-size:14px;
+}
+.spinner {
+  width:28px; height:28px;
+  border:2px solid var(--line-strong);
+  border-top-color:var(--accent);
+  border-radius:var(--r-full);
+  animation:spin 0.75s linear infinite;
+  margin:0 auto var(--s-3);
+}
+@keyframes spin { to { transform:rotate(360deg); } }
+
+/* ── Error ─────────────────────────────────────────────────────────── */
+.error-box {
+  display:none;
+  border-radius:var(--r-lg);
+  padding:var(--s-4) var(--s-5);
+  background:var(--cond-crit-bg);
+  color:var(--cond-crit-fg);
+  font-size:14px;
+  line-height:1.5;
+  margin-bottom:var(--s-4);
+}
+
+/* ── Result ────────────────────────────────────────────────────────── */
+#result { display:none; }
+
+/* Condition pill */
+.cond-pill {
+  display:inline-flex;
+  align-items:center;
+  gap:6px;
+  padding:4px 10px 4px 7px;
+  border-radius:var(--r-full);
+  font-size:12px;
+  font-weight:590;
+  letter-spacing:0.02em;
+}
+.cond-pill-dot {
+  width:6px; height:6px;
+  border-radius:var(--r-full);
+  background:currentColor;
+  flex-shrink:0;
+}
+.cond-good { background:var(--cond-good-bg); color:var(--cond-good-fg); }
+.cond-fair { background:var(--cond-fair-bg); color:var(--cond-fair-fg); }
+.cond-poor { background:var(--cond-poor-bg); color:var(--cond-poor-fg); }
+.cond-crit { background:var(--cond-crit-bg); color:var(--cond-crit-fg); }
+
+/* Confidence ticks (pattern 6.6) */
+.confidence {
+  display:flex;
+  align-items:center;
+  gap:var(--s-2);
+  margin-left:auto;
+}
+.conf-ticks {
+  display:flex;
+  gap:3px;
+  align-items:center;
+}
+.conf-tick {
+  width:18px; height:5px;
+  border-radius:var(--r-xs);
+  background:var(--line-strong);
+}
+.conf-tick.filled { background:var(--accent); }
+.conf-label {
+  font-family:var(--font-mono);
+  font-size:10px;
+  font-weight:500;
+  letter-spacing:0.08em;
+  text-transform:uppercase;
+  color:var(--ink-3);
+}
+
+.result-pill-row {
+  display:flex;
+  align-items:center;
+  gap:var(--s-3);
+  margin-bottom:var(--s-4);
+  flex-wrap:wrap;
+}
+
+/* Diagnosis — Fraunces display */
+.diagnosis {
+  font-family:var(--font-serif);
+  font-weight:500;
+  font-size:22px;
+  line-height:1.30;
+  letter-spacing:-0.015em;
+  color:var(--ink);
+  margin-bottom:var(--s-4);
+}
+
+/* Sunk box */
+.sunk-box {
+  background:var(--bg-sunk);
+  border:1px solid var(--line);
+  border-radius:var(--r-lg);
+  overflow:hidden;
+  margin-bottom:var(--s-4);
+}
+.sunk-section {
+  padding:var(--s-4) var(--s-5);
+}
+.sunk-section + .sunk-section {
+  border-top:1px solid var(--line);
+}
+.sunk-label {
+  font-family:var(--font-mono);
+  font-size:10px;
+  font-weight:600;
+  letter-spacing:0.12em;
+  text-transform:uppercase;
+  color:var(--accent);
+  margin-bottom:var(--s-3);
+}
+
+/* Issue pills */
+.issue-pills {
+  display:flex;
+  flex-wrap:wrap;
+  gap:var(--s-2);
+}
+.pill {
+  display:inline-flex;
+  align-items:center;
+  padding:3px 10px;
+  border-radius:var(--r-full);
+  font-size:12px;
+  font-weight:510;
+  color:var(--ink-2);
+  border:1px solid var(--line-strong);
+  background:transparent;
+  letter-spacing:0.01em;
+}
+
+/* Action sentence */
+.action-text {
+  font-size:15px;
+  line-height:1.60;
+  color:var(--ink-2);
+}
+
+/* Reasoning + meta */
+.reasoning-text {
+  font-size:14px;
+  line-height:1.55;
+  color:var(--ink-3);
+  margin-bottom:var(--s-4);
+}
+
+.meta-row {
+  display:flex;
+  align-items:center;
+  gap:var(--s-4);
+  flex-wrap:wrap;
+  padding-top:var(--s-4);
+  border-top:1px solid var(--line);
+  margin-bottom:var(--s-5);
+}
+.meta-item {
+  font-family:var(--font-mono);
+  font-size:11px;
+  color:var(--ink-4);
+  letter-spacing:0.02em;
+}
+.meta-item strong {
+  font-weight:500;
+  color:var(--ink-3);
+}
+
+/* ── Footer ────────────────────────────────────────────────────────── */
+footer {
+  margin-top:var(--s-10);
+  text-align:center;
+  font-size:12px;
+  color:var(--ink-4);
+  line-height:1.8;
+}
+footer a { color:var(--ink-3); text-decoration:none; }
+footer a:hover { color:var(--accent); }
+</style>
+</head>
+
+<body class="theme-custodian">
+<div class="page">
+
+  <!-- Top bar -->
+  <div class="topbar">
+    <!-- Keystone arch mark (SVG, stroke-only per spec) -->
+    <svg class="topbar-mark" viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path d="M4 24 L4 14 Q4 6 14 6 Q24 6 24 14 L24 24" stroke="var(--ink)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+      <path d="M1 24 L27 24" stroke="var(--ink)" stroke-width="1.5" stroke-linecap="round"/>
+      <path d="M11 24 L11 17 Q11 14 14 14 Q17 14 17 17 L17 24" stroke="var(--ink)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+    </svg>
+    <div class="topbar-name">
+      STEWRD
+      <span>Heritage Copilot</span>
+    </div>
+    <div class="topbar-badge">Agent 1</div>
+  </div>
+
+  <div class="col">
+
+    <!-- Page heading -->
+    <div class="eyebrow">Condition Assessor</div>
+    <p style="font-family:var(--font-serif);font-weight:500;font-size:28px;line-height:1.15;letter-spacing:-0.02em;color:var(--ink);margin-bottom:var(--s-2);">What condition is this part of the building in?</p>
+    <p style="font-size:15px;color:var(--ink-3);line-height:1.60;margin-bottom:var(--s-7);">Upload a photo. The AI will classify its condition and tell you what to do next. No conservation training required.</p>
+
+    <!-- Model settings -->
+    <div class="panel">
+      <div class="eyebrow">Model settings</div>
+      <div class="field-row">
+        <div>
+          <label class="field-label" for="provider">AI Provider</label>
+          <select class="field-input field-select" id="provider" onchange="onProviderChange()">
+            <option value="anthropic">Anthropic Claude</option>
+            <option value="openai">OpenAI GPT-4o</option>
+            <option value="google">Google Gemini</option>
+            <option value="grok">xAI Grok</option>
+            <option value="mistral">Mistral Pixtral</option>
+          </select>
+        </div>
+        <div>
+          <label class="field-label" for="apiKey">API Key <span class="field-hint" id="keyHint">(saved in browser)</span></label>
+          <input type="password" class="field-input" id="apiKey" placeholder="Paste your key…" autocomplete="off" oninput="onKeyInput()"/>
+          <div id="keyChip" class="key-chip" style="display:none;">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>
+            Key added
+            <button class="key-chip-change" onclick="changeKey()">Change</button>
+          </div>
+        </div>
+      </div>
+      <p class="field-hint-line" id="modelHint">
+        Using <span style="font-family:var(--font-mono);font-size:11px;">claude-opus-4-6</span> &nbsp;·&nbsp;
+        <a href="https://console.anthropic.com/" target="_blank">Get a key →</a>
+      </p>
+    </div>
+
+    <!-- Photo -->
+    <div class="panel" style="padding:0;overflow:hidden;">
+      <!-- Coaching card (pattern 6.1) -->
+      <div class="coaching-card">
+        <div class="coaching-card-icon">
+          <!-- eye icon — 24px, 1.5px stroke, round -->
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--moss)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M2 12s4-7 10-7 10 7 10 7-4 7-10 7S2 12 2 12z"/>
+            <circle cx="12" cy="12" r="3"/>
+          </svg>
+        </div>
+        <div class="coaching-card-text">
+          <strong>Frame the whole element.</strong>
+          Step back enough to include a hand-width of context on each side of the defect.
+        </div>
+      </div>
+
+      <!-- Drop zone / preview -->
+      <div style="padding:var(--s-4);">
+        <div class="drop-zone" id="dropZone">
+          <!-- Desktop: full-area overlay input + drag & drop -->
+          <input type="file" id="fileInput" class="drop-overlay" accept="image/jpeg,image/png,image/webp,image/gif" onchange="handleFile(this.files[0])"/>
+          <div class="drop-icon">
+            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="var(--ink-3)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/>
+              <circle cx="12" cy="13" r="4"/>
+            </svg>
+          </div>
+          <div class="drop-label drop-desktop-label"><strong>Click to upload a photo</strong><br/>or drag and drop · JPG, PNG, WEBP</div>
+
+          <!-- Mobile: camera + gallery buttons -->
+          <div class="drop-mobile-btns">
+            <label class="drop-mobile-btn drop-mobile-btn-camera">
+              <input type="file" accept="image/*" capture="environment" onchange="handleFile(this.files[0])"/>
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/>
+                <circle cx="12" cy="13" r="4"/>
+              </svg>
+              Take photo
+            </label>
+            <label class="drop-mobile-btn drop-mobile-btn-gallery">
+              <input type="file" accept="image/jpeg,image/png,image/webp,image/gif" onchange="handleFile(this.files[0])"/>
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <rect x="3" y="3" width="18" height="18" rx="2"/>
+                <circle cx="8.5" cy="8.5" r="1.5"/>
+                <polyline points="21 15 16 10 5 21"/>
+              </svg>
+              Choose from library
+            </label>
+          </div>
+        </div>
+
+        <div class="preview-wrap" id="previewWrap">
+          <img id="previewImg" src="" alt="Selected photo"/>
+          <button class="preview-clear" onclick="clearPhoto()">✕</button>
+        </div>
+
+        <label class="field-label" for="context" style="margin-bottom:var(--s-1);">Context <span class="field-hint">— helps the AI</span></label>
+        <textarea class="field-input" id="context" rows="2" placeholder="e.g. First floor ceiling, plaster, past water ingress from roof now repaired" style="resize:vertical;"></textarea>
+      </div>
+    </div>
+
+    <!-- CTA -->
+    <button class="btn btn-primary" id="analyseBtn" onclick="runAnalysis()" disabled>
+      Assess condition
+    </button>
+
+    <!-- Spinner -->
+    <div class="spinner-wrap" id="spinner">
+      <div class="spinner"></div>
+      Analysing photo…
+    </div>
+
+    <!-- Error -->
+    <div class="error-box" id="errorBox"></div>
+
+    <!-- Result — pattern 6.2 ─────────────────────────────────────── -->
+    <div id="result">
+      <div class="panel" style="margin-top:var(--s-5);">
+
+        <!-- 1. Condition pill + confidence -->
+        <div class="result-pill-row">
+          <div class="cond-pill" id="condPill">
+            <div class="cond-pill-dot"></div>
+            <span id="condLabel"></span>
+          </div>
+          <div class="confidence" id="confWidget">
+            <div class="conf-ticks" id="confTicks">
+              <div class="conf-tick" id="t1"></div>
+              <div class="conf-tick" id="t2"></div>
+              <div class="conf-tick" id="t3"></div>
+            </div>
+            <span class="conf-label" id="confLabel"></span>
+          </div>
+        </div>
+
+        <!-- 2. Plain-English diagnosis (Fraunces) -->
+        <div class="diagnosis" id="diagnosis"></div>
+
+        <!-- 3. Sunk box — what we saw + suggested next step -->
+        <div class="sunk-box" id="sunkBox">
+          <div class="sunk-section" id="issuesSection">
+            <div class="sunk-label">What we saw</div>
+            <div class="issue-pills" id="issuesPills"></div>
+          </div>
+          <div class="sunk-section">
+            <div class="sunk-label">Suggested next step</div>
+            <p class="action-text" id="actionText"></p>
+          </div>
+        </div>
+
+        <!-- Reasoning -->
+        <p class="reasoning-text" id="reasoningText"></p>
+
+        <!-- Meta -->
+        <div class="meta-row" id="metaRow"></div>
+
+        <!-- 4. Actions — formatted report text for copy-paste -->
+        <div class="sunk-label" style="margin-bottom:var(--s-2);">Copy to your notes or email</div>
+        <textarea class="report-textarea" id="reportTextarea" readonly spellcheck="false"></textarea>
+        <div class="btn-row" style="margin-top:var(--s-3);">
+          <button class="btn btn-primary" onclick="copyReport()" id="copyBtn" style="flex:2;">Copy text</button>
+          <button class="btn btn-ghost" onclick="saveJSON()">Save JSON</button>
+          <button class="btn btn-ghost" onclick="resetForm()">Retake</button>
+        </div>
+
+      </div>
+    </div>
+
+  </div><!-- /col -->
+
+  <footer>
+    <a href="https://github.com/stewrd-heritage" target="_blank">STEWRD Heritage Copilot</a> · Agent 1 · Condition Assessor<br/>
+    For volunteers, owner-custodians and small trusts · Draft 2026
+  </footer>
+
+</div><!-- /page -->
+
+<script>
+/* ── State ─────────────────────────────────────────────────────── */
+let currentFile = null;
+let lastResult  = null;
+
+/* ── MIME normaliser ───────────────────────────────────────────── */
+// Anthropic only accepts: image/jpeg, image/png, image/gif, image/webp
+// Browsers sometimes return 'image/jpg' (no 'e') or an empty string.
+function normalizeMime(file) {
+  const VALID = ['image/jpeg','image/png','image/gif','image/webp'];
+  const raw   = (file.type || '').toLowerCase();
+  if (raw === 'image/jpg') return 'image/jpeg';
+  if (VALID.includes(raw))  return raw;
+  // Fall back to extension
+  const ext = (file.name || '').split('.').pop().toLowerCase();
+  const map  = { jpg:'image/jpeg', jpeg:'image/jpeg', png:'image/png', gif:'image/gif', webp:'image/webp' };
+  return map[ext] || 'image/jpeg';
+}
+
+/* ── Drop zone ─────────────────────────────────────────────────── */
+const dz = document.getElementById('dropZone');
+dz.addEventListener('dragover', e => { e.preventDefault(); dz.classList.add('over'); });
+dz.addEventListener('dragleave', () => dz.classList.remove('over'));
+dz.addEventListener('drop', e => {
+  e.preventDefault(); dz.classList.remove('over');
+  const f = e.dataTransfer.files[0]; if (f) handleFile(f);
+});
+
+function handleFile(file) {
+  if (!file) return;
+  currentFile = file;
+  const rd = new FileReader();
+  rd.onload = e => {
+    document.getElementById('previewImg').src = e.target.result;
+    document.getElementById('previewWrap').style.display = 'block';
+    document.getElementById('dropZone').style.display    = 'none';
+  };
+  rd.readAsDataURL(file);
+  updateBtn();
+}
+
+function clearPhoto() {
+  currentFile = null;
+  document.getElementById('fileInput').value = '';
+  document.getElementById('previewWrap').style.display = 'none';
+  document.getElementById('dropZone').style.display    = 'block';
+  updateBtn();
+}
+
+function keyStore(prov) { return 'stewrd_api_key_' + (prov || provider()); }
+function provider()   { return document.getElementById('provider').value; }
+
+function onKeyInput() {
+  const key = document.getElementById('apiKey').value.trim();
+  if (key.length > 8) localStorage.setItem(keyStore(), key);
+  updateBtn();
+}
+
+function updateBtn() {
+  const key   = document.getElementById('apiKey').value.trim();
+  const keyOk = key.length > 8;
+  document.getElementById('apiKey').style.display  = keyOk ? 'none' : '';
+  document.getElementById('keyChip').style.display = keyOk ? 'flex' : 'none';
+  document.getElementById('analyseBtn').disabled = !(currentFile && keyOk);
+}
+
+function changeKey() {
+  localStorage.removeItem(keyStore());
+  const inp = document.getElementById('apiKey');
+  inp.style.display = '';
+  inp.value = '';
+  document.getElementById('keyChip').style.display = 'none';
+  document.getElementById('keyHint').textContent = '(will be saved in browser)';
+  inp.focus();
+  updateBtn();
+}
+
+function loadKeyForProvider() {
+  const saved = localStorage.getItem(keyStore());
+  const inp = document.getElementById('apiKey');
+  inp.value = saved || '';
+  document.getElementById('keyHint').textContent = saved ? '(saved in browser)' : '(will be saved in browser)';
+  updateBtn();
+}
+
+function onProviderChange() {
+  localStorage.setItem('stewrd_provider', provider());
+  loadKeyForProvider();
+  updateHint();
+}
+
+function initKey() {
+  const savedProv = localStorage.getItem('stewrd_provider');
+  if (savedProv) document.getElementById('provider').value = savedProv;
+  loadKeyForProvider();
+  updateHint();
+}
+
+/* ── Model hint ────────────────────────────────────────────────── */
+const PROVIDER_META = {
+  anthropic: { model: 'claude-opus-4-6',         href: 'https://console.anthropic.com/' },
+  openai:    { model: 'gpt-4o',                   href: 'https://platform.openai.com/api-keys' },
+  google:    { model: 'gemini-2.0-flash',         href: 'https://aistudio.google.com/apikey' },
+  grok:      { model: 'grok-2-vision-1212',       href: 'https://console.x.ai/' },
+  mistral:   { model: 'pixtral-large-latest',     href: 'https://console.mistral.ai/api-keys' },
+};
+
+function updateHint() {
+  const meta = PROVIDER_META[provider()] || PROVIDER_META.anthropic;
+  document.getElementById('modelHint').innerHTML =
+    `Using <span style="font-family:var(--font-mono);font-size:11px;">${meta.model}</span> &nbsp;·&nbsp; <a href="${meta.href}" target="_blank">Get a key →</a>`;
+}
+
+/* ── Prompt ────────────────────────────────────────────────────── */
+const SYSTEM = `You are an AI assistant helping non-professional heritage property custodians understand the condition of their buildings. Your audience has no conservation training.
+
+Analyse the photo and classify the overall condition using these definitions:
+GOOD: No visible defects, or only very minor surface marks or dust. No active deterioration. No immediate action needed. Examples: clean plaster, sound paintwork, intact masonry with no visible cracking, timber elements intact with no rot, windows and doors operating correctly.
+FAIR: Minor to moderate defects present but deterioration appears stable or slow. Routine maintenance by an owner or standard tradesperson is likely sufficient — no heritage specialist needed yet. Review within 12 months. Examples: paintwork weathered/faded/peeling (timber beneath is sound), window putty cracked/missing, superficial staining or soiling, hairline cracks under 1mm, slight efflorescence, small areas of missing mortar, minor biological growth not penetrating joints, gutters with minor debris buildup.
+POOR: Significant defects affecting the building fabric that go beyond repainting, cleaning or minor sealing. A tradesperson with heritage experience is needed within 3–6 months. Do not attempt DIY repairs. Examples: timber repair needed (damaged sills/rails/frames), corroded or failing metal elements causing movement, widespread paint failure exposing bare timber/metal, active water ingress, large cracks wider than 2mm, spalling plaster, biological growth penetrating mortar joints, evidence of structural movement (doors/windows out of square).
+CRITICAL: Severe defects threatening structural integrity, occupant safety, or irreversible loss of heritage fabric. Seek specialist heritage professional advice urgently — do not attempt DIY repairs. Examples: major structural cracking/bulging/leaning walls, iron or steel structural elements severely corroded and causing masonry to move, active subsidence, roof or floor failure, significant biological invasion destroying historic surfaces, major water ingress into structural timber, parapet or chimney instability posing a fall risk.
+
+When uncertain between two levels, choose the more severe one.
+
+Respond with ONLY a valid JSON object — no markdown, no code fences:
+{"condition":"Good|Fair|Poor|Critical","confidence":"low|medium|high","detected_issues":["plain-English issue 1","issue 2"],"suggested_action":"One or two plain-English sentences ending with a verb.","reasoning":"One sentence explaining your rating."}`;
+
+/* ── API calls ─────────────────────────────────────────────────── */
+async function toB64(file) {
+  return new Promise((res,rej) => {
+    const r = new FileReader();
+    r.onload  = e => res(e.target.result.split(',')[1]);
+    r.onerror = rej;
+    r.readAsDataURL(file);
+  });
+}
+
+async function callAnthropic(b64, mime, key, ctx) {
+  const body = {
+    model: "claude-opus-4-6", max_tokens: 1024, system: SYSTEM,
+    messages: [{ role: "user", content: [
+      { type: "image", source: { type: "base64", media_type: mime, data: b64 } },
+      { type: "text",  text: "Assess the condition of the heritage element shown." + (ctx ? `\n\nAssessor context: ${ctx}` : "") }
+    ]}]
+  };
+  const r = await fetch("https://api.anthropic.com/v1/messages", {
+    method: "POST",
+    headers: { "Content-Type":"application/json", "x-api-key": key,
+      "anthropic-version":"2023-06-01", "anthropic-dangerous-direct-browser-access":"true" },
+    body: JSON.stringify(body)
+  });
+  if (!r.ok) { const e = await r.json().catch(()=>({})); throw new Error(e?.error?.message || `Anthropic ${r.status}`); }
+  const d = await r.json();
+  return { raw: d.content[0].text, model: "anthropic/claude-opus-4-6" };
+}
+
+async function callOpenAI(b64, mime, key, ctx) {
+  const body = {
+    model: "gpt-4o", max_tokens: 1024,
+    messages: [
+      { role: "system", content: SYSTEM },
+      { role: "user", content: [
+        { type: "image_url", image_url: { url: `data:${mime};base64,${b64}` } },
+        { type: "text", text: "Assess the condition of the heritage element shown." + (ctx ? `\n\nAssessor context: ${ctx}` : "") }
+      ]}
+    ]
+  };
+  const r = await fetch("https://api.openai.com/v1/chat/completions", {
+    method: "POST",
+    headers: { "Content-Type":"application/json", "Authorization": `Bearer ${key}` },
+    body: JSON.stringify(body)
+  });
+  if (!r.ok) { const e = await r.json().catch(()=>({})); throw new Error(e?.error?.message || `OpenAI ${r.status}`); }
+  const d = await r.json();
+  let raw = d.choices[0].message.content.trim();
+  if (raw.startsWith("```")) { raw = raw.split("```")[1]; if (raw.startsWith("json")) raw = raw.slice(4); }
+  return { raw: raw.trim(), model: "openai/gpt-4o" };
+}
+
+async function callGoogle(b64, mime, key, ctx) {
+  const body = {
+    systemInstruction: { parts: [{ text: SYSTEM }] },
+    contents: [{ parts: [
+      { inline_data: { mime_type: mime, data: b64 } },
+      { text: "Assess the condition of the heritage element shown." + (ctx ? `\n\nAssessor context: ${ctx}` : "") }
+    ]}],
+    generationConfig: { maxOutputTokens: 1024 }
+  };
+  const r = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${key}`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(body)
+  });
+  if (!r.ok) { const e = await r.json().catch(()=>({})); throw new Error(e?.error?.message || `Google ${r.status}`); }
+  const d = await r.json();
+  let raw = d.candidates?.[0]?.content?.parts?.[0]?.text || '';
+  if (raw.startsWith("```")) { raw = raw.split("```")[1]; if (raw.startsWith("json")) raw = raw.slice(4); }
+  return { raw: raw.trim(), model: "google/gemini-2.0-flash" };
+}
+
+async function callGrok(b64, mime, key, ctx) {
+  const body = {
+    model: "grok-2-vision-1212", max_tokens: 1024,
+    messages: [
+      { role: "system", content: SYSTEM },
+      { role: "user", content: [
+        { type: "image_url", image_url: { url: `data:${mime};base64,${b64}` } },
+        { type: "text", text: "Assess the condition of the heritage element shown." + (ctx ? `\n\nAssessor context: ${ctx}` : "") }
+      ]}
+    ]
+  };
+  const r = await fetch("https://api.x.ai/v1/chat/completions", {
+    method: "POST",
+    headers: { "Content-Type": "application/json", "Authorization": `Bearer ${key}` },
+    body: JSON.stringify(body)
+  });
+  if (!r.ok) { const e = await r.json().catch(()=>({})); throw new Error(e?.error?.message || `xAI ${r.status}`); }
+  const d = await r.json();
+  let raw = d.choices[0].message.content.trim();
+  if (raw.startsWith("```")) { raw = raw.split("```")[1]; if (raw.startsWith("json")) raw = raw.slice(4); }
+  return { raw: raw.trim(), model: "xai/grok-2-vision-1212" };
+}
+
+async function callMistral(b64, mime, key, ctx) {
+  const body = {
+    model: "pixtral-large-latest", max_tokens: 1024,
+    messages: [
+      { role: "system", content: SYSTEM },
+      { role: "user", content: [
+        { type: "image_url", image_url: { url: `data:${mime};base64,${b64}` } },
+        { type: "text", text: "Assess the condition of the heritage element shown." + (ctx ? `\n\nAssessor context: ${ctx}` : "") }
+      ]}
+    ]
+  };
+  const r = await fetch("https://api.mistral.ai/v1/chat/completions", {
+    method: "POST",
+    headers: { "Content-Type": "application/json", "Authorization": `Bearer ${key}` },
+    body: JSON.stringify(body)
+  });
+  if (!r.ok) { const e = await r.json().catch(()=>({})); throw new Error(e?.error?.message || `Mistral ${r.status}`); }
+  const d = await r.json();
+  let raw = d.choices[0].message.content.trim();
+  if (raw.startsWith("```")) { raw = raw.split("```")[1]; if (raw.startsWith("json")) raw = raw.slice(4); }
+  return { raw: raw.trim(), model: "mistral/pixtral-large-latest" };
+}
+
+/* ── Run ───────────────────────────────────────────────────────── */
+async function runAnalysis() {
+  if (!currentFile) return;
+  const key  = document.getElementById('apiKey').value.trim();
+  const prov = document.getElementById('provider').value;
+  const ctx  = document.getElementById('context').value.trim();
+
+  document.getElementById('result').style.display    = 'none';
+  document.getElementById('errorBox').style.display  = 'none';
+  document.getElementById('spinner').style.display   = 'block';
+  document.getElementById('analyseBtn').disabled     = true;
+
+  try {
+    const b64  = await toB64(currentFile);
+    const mime = normalizeMime(currentFile);
+    const dispatch = { anthropic: callAnthropic, openai: callOpenAI, google: callGoogle, grok: callGrok, mistral: callMistral };
+    const { raw, model } = await (dispatch[prov] || callAnthropic)(b64, mime, key, ctx);
+
+    let res;
+    try { res = JSON.parse(raw); }
+    catch { throw new Error("Unexpected response from the model. Please try again."); }
+
+    res.model_used  = model;
+    res.captured_at = new Date().toISOString();
+    lastResult = res;
+    renderResult(res);
+
+  } catch(err) {
+    document.getElementById('errorBox').style.display = 'block';
+    document.getElementById('errorBox').textContent   = err.message;
+  } finally {
+    document.getElementById('spinner').style.display = 'none';
+    document.getElementById('analyseBtn').disabled   = false;
+  }
+}
+
+/* ── Render result (pattern 6.2) ───────────────────────────────── */
+function renderResult(r) {
+  const cond = (r.condition || 'Unknown').trim();
+  const cls  = { Good:'cond-good', Fair:'cond-fair', Poor:'cond-poor', Critical:'cond-crit' }[cond] || 'cond-fair';
+  const sub  = { Good:'Stable — revisit at your next annual check', Fair:'Routine upkeep — repaint, clean or seal as needed', Poor:'Consult a heritage professional', Critical:'Seek urgent specialist heritage advice' }[cond] || '';
+
+  // Pill
+  const pill = document.getElementById('condPill');
+  pill.className = `cond-pill ${cls}`;
+  document.getElementById('condLabel').textContent = cond;
+
+  // Confidence ticks
+  const conf = (r.confidence || 'low').toLowerCase();
+  const filled = conf === 'high' ? 3 : conf === 'medium' ? 2 : 1;
+  ['t1','t2','t3'].forEach((id,i) => {
+    document.getElementById(id).className = 'conf-tick' + (i < filled ? ' filled' : '');
+  });
+  document.getElementById('confLabel').textContent = conf.toUpperCase();
+
+  // Fraunces diagnosis — compose from condition + sub-text
+  document.getElementById('diagnosis').textContent = sub;
+
+  // Issues
+  const issues = r.detected_issues || [];
+  const pillsEl = document.getElementById('issuesPills');
+  pillsEl.innerHTML = '';
+  if (issues.length === 0) {
+    document.getElementById('issuesSection').style.display = 'none';
+  } else {
+    document.getElementById('issuesSection').style.display = '';
+    issues.forEach(iss => {
+      const s = document.createElement('span');
+      s.className = 'pill';
+      s.textContent = iss;
+      pillsEl.appendChild(s);
+    });
+  }
+
+  // Action + reasoning
+  document.getElementById('actionText').textContent    = r.suggested_action || '—';
+  document.getElementById('reasoningText').textContent = r.reasoning || '';
+
+  // Meta (mono)
+  document.getElementById('metaRow').innerHTML = `
+    <span class="meta-item"><strong>Model</strong> · ${r.model_used || '—'}</span>
+    <span class="meta-item"><strong>Captured</strong> · ${r.captured_at ? new Date(r.captured_at).toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'}) : '—'}</span>
+  `;
+
+  // Populate report text for copy-paste
+  document.getElementById('reportTextarea').value = buildReportText(r);
+
+  document.getElementById('result').style.display = 'block';
+  document.getElementById('result').scrollIntoView({ behavior:'smooth', block:'start' });
+}
+
+/* ── Actions ───────────────────────────────────────────────────── */
+function resetForm() {
+  document.getElementById('result').style.display = 'none';
+  clearPhoto();
+  window.scrollTo({ top:0, behavior:'smooth' });
+}
+
+function buildReportText(r) {
+  const cap = r.captured_at ? new Date(r.captured_at) : new Date();
+  const timeStr = cap.toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'});
+  const dateStr = cap.toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'});
+  const div = '\u2500'.repeat(46);
+  const conf = r.confidence || '';
+  const lines = [
+    'STEWRD Heritage Copilot \u2014 Condition Assessment',
+    div,
+    `Condition:   ${r.condition || '\u2014'}`,
+    `Confidence:  ${conf.charAt(0).toUpperCase() + conf.slice(1) || '\u2014'}`,
+    '',
+  ];
+  if (r.detected_issues && r.detected_issues.length) {
+    lines.push('Issues identified:');
+    r.detected_issues.forEach(i => lines.push(`  \u2022 ${i}`));
+    lines.push('');
+  }
+  if (r.suggested_action) {
+    lines.push('Suggested action:');
+    lines.push(`  ${r.suggested_action}`);
+    lines.push('');
+  }
+  if (r.reasoning) {
+    lines.push(`Reasoning: ${r.reasoning}`);
+    lines.push('');
+  }
+  lines.push(`Model:    ${r.model_used || '\u2014'}`);
+  lines.push(`Assessed: ${timeStr} \u00b7 ${dateStr}`);
+  return lines.join('\n');
+}
+
+function copyReport() {
+  if (!lastResult) return;
+  const text = document.getElementById('reportTextarea').value;
+  navigator.clipboard.writeText(text).then(() => {
+    const btn = document.getElementById('copyBtn');
+    btn.textContent = 'Copied \u2713';
+    setTimeout(() => btn.textContent = 'Copy text', 2000);
+  });
+}
+
+function saveJSON() {
+  if (!lastResult) return;
+  const blob = new Blob([JSON.stringify(lastResult, null, 2)], {type:'application/json'});
+  const url  = URL.createObjectURL(blob);
+  const a    = document.createElement('a');
+  a.href = url;
+  a.download = `stewrd-condition-${new Date().toISOString().slice(0,10)}.json`;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+}
+
+window.addEventListener('DOMContentLoaded', initKey);
+</script>
+</body>
+</html>
