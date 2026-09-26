@@ -60,7 +60,7 @@ STEWRD's agents map directly onto this cycle. Each tool handles one part of it.
 | **A3** | **Maintenance Planner** | Prioritises repair schedule from A1 and A2 output — ranked by urgency, cost tier, and consequence of inaction. | Planned |
 | **A4** | **Archive Organiser** | Structures accumulated assessment data into a discoverable, publishable archive. | Planned |
 
-*Agent 0 (Heritage Document Analyser) is a professional setup layer — ingests existing CMPs, condition reports, and significance statements to create a Property Intelligence Profile that pre-loads all other agents.*
+*Agent 0 (Heritage Document Analyser) is a professional setup layer — ingests existing CMPs, condition reports, and significance statements to create a place profile and the walk-round prompts for each check-up. It is available now as `heritage-brief`, part of the open [heritage-copilot skill pack](https://github.com/mightytonylun/heritage-copilot-skill).*
 
 ---
 
