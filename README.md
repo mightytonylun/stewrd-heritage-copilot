@@ -59,7 +59,6 @@ STEWRD's agents map directly onto this cycle. Each tool handles one part of it.
 | **A2** | **Condition Report Digitizer** | Guided 10-section on-site form for structured condition recording. Session save/restore, offline-capable, exports to text. | [Open →](https://mightytonylun.github.io/stewrd-heritage-copilot/agent-2/) |
 | **A3** | **Maintenance Planner** | Prioritises repair schedule from A1 and A2 output — ranked by urgency, cost tier, and consequence of inaction. | Planned |
 | **A4** | **Archive Organiser** | Structures accumulated assessment data into a discoverable, publishable archive. | Planned |
-| **A5** | **Narrative Generator** | Transforms pipeline output into accessible narratives — one-page place story, condition summary for grant applications. | Planned |
 
 *Agent 0 (Heritage Document Analyser) is a professional setup layer — ingests existing CMPs, condition reports, and significance statements to create a Property Intelligence Profile that pre-loads all other agents.*
 

@@ -360,7 +360,7 @@ html.solid .rail{background:var(--bg-sunk)} html.solid .glass,html.solid .hero-i
       <button data-v="notice"><span class="step">N</span><span class="t">Notice<small>Walk-round prompts</small></span><span class="cnt" id="nNotice"></span></button>
       <button data-v="record"><span class="step">R</span><span class="t">Record<small>Element register</small></span><span class="cnt" id="nRecord"></span></button>
       <button data-v="read"><span class="step">R</span><span class="t">Read<small>Patterns &amp; priorities</small></span><span class="cnt"></span></button>
-      <button data-v="tend"><span class="step">T</span><span class="t">Tend<small>Care plan &amp; story</small></span><span class="cnt" id="nTend"></span></button>
+      <button data-v="tend"><span class="step">T</span><span class="t">Tend<small>Care plan &amp; export</small></span><span class="cnt" id="nTend"></span></button>
     </nav>
     <div class="agents">
       <div class="nav-lbl">Agents in this cycle</div>
@@ -369,7 +369,6 @@ html.solid .rail{background:var(--bg-sunk)} html.solid .glass,html.solid .hero-i
       <div class="agent">2 · Digitizer <span class="status live">Live</span></div>
       <div class="agent">3 · Maintenance planner <span class="status demo">Demo</span></div>
       <div class="agent">4 · Archive <span class="status">Planned</span></div>
-      <div class="agent">5 · Narrative <span class="status demo">Demo</span></div>
       <p style="font-size:11px;color:var(--ink-3);margin:2px 10px 0;line-height:1.35">Demo = planned agent, shown working in this demo.</p>
       <div class="theme-tg" role="group" aria-label="Theme" style="margin-top:6px"><button id="thC" class="on">Light</button><button id="thO">Dark</button></div>
     </div>
@@ -469,13 +468,6 @@ html.solid .rail{background:var(--bg-sunk)} html.solid .glass,html.solid .hero-i
       <p>Small, timely responses, and deliberate decisions to wait. Each item says who should act, from custodian to specialist.</p></div>
       <button class="btn" id="csvBtn">Export register (CSV for Excel)</button></div>
       <div class="plan" id="plan"></div>
-      <div class="story">
-        <div class="card"><div style="display:flex;justify-content:space-between;align-items:center"><div class="eyebrow">Tell the story</div><span class="status demo">Agent 5 · planned, shown as a demo</span></div>
-          <h3 style="font-size:19px;margin:8px 0">One check-up, three audiences</h3>
-          <p class="muted" style="margin:0 0 12px;font-size:13px">The same record, written for the people who need to act on it.</p>
-          <div class="tabs" id="storyTabs"><button class="chip on" data-a="community">Community</button><button class="chip" data-a="council">Council &amp; funders</button><button class="chip" data-a="team">Property team</button></div></div>
-        <div class="card"><div class="story-txt" id="storyTxt"></div></div>
-      </div>
       <div class="close-cycle"><div><b style="font-family:var(--font-serif);font-size:19px;font-weight:500">Close check-up 1</b><p id="closeTxt"></p></div><button class="btn" id="closeBtn">Close &amp; schedule next →</button></div>
       <p class="note">Demo data: defects, works and photos come from the NTAV Property Condition Report 2026 (inspection 20 Nov 2025). That report records defects and recommended works but no condition grades, so the grades, significance levels and priorities shown here are illustrative. Assessor results marked "cached" were prepared in advance rather than run live.</p>
     </section>
@@ -661,16 +653,7 @@ function renderTend(){
   const watch=rl.filter(e=>bucket(e.sc.v)==='watch').length;
   $('#nTend').textContent=rl.filter(e=>bucket(e.sc.v)==='now').length+' now';
   $('#closeTxt').textContent=`${watch} items kept under watch become prompts for check-up ${cycleNo+1} on 20 Feb 2026.`;
-  story(curA);
 }
-const STORY={
- community:()=>`Waller House is the home the artists Napier and Christian Waller built by hand in 1922. This spring's check-up found the house sound in most places after recent roof and laundry repairs, but water is still getting in above the dining room. Our first job is to stop that leak, because it protects the ceilings, wallpaper and collection underneath. After that, the windows need a careful re-putty and repaint. Volunteers who can help with gutter clearing are always welcome.`,
- council:()=>{const rl=rankList();const now=rl.filter(e=>bucket(e.sc.v)==='now');return `Check-up 1 (20 Nov 2025) recorded ${EL.length} elements across four buildings of a VHR-listed place (H0617). ${EL.filter(e=>e.condition==='Poor').length} are in poor condition, and ${now.length} are in the act-now band, led by an active roof leak and unsatisfactory asbestos sheet in the studio. Most of the remaining work is a single joinery programme for about 30 windows. Addressing water entry first reduces the cost of interior repairs that would otherwise follow.`;},
- team:()=>{const rl=rankList().slice(0,3).map(e=>e.ref).join(', ');return `Top three by score: ${rl}. Engage a roof plumber for the flashing below Window 8 and the downpipe extension, and a licensed contractor to remove or seal the studio ACM. Room 12 ceiling repair waits until the leak is fixed. ${rankList().filter(e=>bucket(e.sc.v)==='watch').length} items are on watch for February.`;},
-};
-let curA='community';
-function story(a){curA=a; $$('#storyTabs .chip').forEach(c=>c.classList.toggle('on',c.dataset.a===a)); $('#storyTxt').textContent=STORY[a]();}
-$$('#storyTabs .chip').forEach(c=>c.onclick=()=>story(c.dataset.a));
 $('#closeBtn').onclick=()=>{ cycleNo++; done.clear(); renderNotice(); go('place'); drawLoop('notice'); toast(`Check-up 1 closed. Check-up 2 scheduled for 20 Feb 2026 with the watch list as prompts.`); $('#v-place .eyebrow').textContent='Check-up 2 · due 20 Feb 2026'; };
 $('#csvBtn').onclick=()=>{ const head=['Ref','Building','Zone','Element','Defect','Recommended works','Condition','Significance','Risks','Priority score','Band','Who'];
   const rows=EL.map(e=>{const s=score(e);return [e.ref,BLD[e.building],e.zone,e.element,e.defect,e.works,e.condition||'',e.significance,e.flags.join('; '),s?s.v:'',s?BK.find(b=>b[0]===bucket(s.v))[1]:'',who(e)];});
