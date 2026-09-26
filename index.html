@@ -3,6 +3,7 @@
 <head>
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="theme-color" content="#f7f1e4"/>
   <title>STEWRD — Heritage Copilot</title>
   <link rel="preconnect" href="https://fonts.googleapis.com"/>
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
@@ -11,12 +12,11 @@
     :root {
       --font-serif: "Fraunces","Source Serif 4",ui-serif,Georgia,serif;
       --font-sans:  "Inter","Inter Variable",ui-sans-serif,-apple-system,system-ui,sans-serif;
-      --bg:#f4efe6; --surface:#fbf8f2;
-      --ink:#1a1f2e; --ink-2:#3b3f4a; --ink-3:#6b6f78;
-      --accent:#8b3a2f; --accent-hi:#a24937;
-      --line:rgba(26,31,46,0.10); --line-strong:rgba(26,31,46,0.16);
-      --moss:#6b705c;
-      --shadow-md:0 4px 14px rgba(40,28,20,0.08),0 1px 2px rgba(40,28,20,0.04);
+      --bg:#f7f1e4; --surface:#fffaf0; --sunk:#ece4d3;
+      --ink:#2a2016; --ink-2:#4a4036; --ink-3:#6a5d4f;
+      --brand:#8b3a2f; --action:#5c6a2b; --action-hi:#4f5c24; --action-wash:#e6ead3;
+      --line:rgba(42,32,22,0.12); --line-strong:rgba(42,32,22,0.18);
+            --shadow-md:0 4px 14px rgba(40,28,20,0.08),0 1px 2px rgba(40,28,20,0.04);
     }
     *,*::before,*::after { box-sizing:border-box; margin:0; padding:0; }
     body {
@@ -55,7 +55,7 @@
     }
     .hero-eyebrow {
       font-size: 11px; font-weight: 600; letter-spacing: 0.12em;
-      text-transform: uppercase; color: var(--accent);
+      text-transform: uppercase; color: var(--brand);
       margin-bottom: 16px;
     }
     .hero-heading {
@@ -93,15 +93,15 @@
       flex-shrink: 0;
       width: 40px; height: 40px;
       border-radius: 8px;
-      background: var(--accent);
-      color: #fbf8f2;
+      background: var(--action);
+      color: #fffaf0;
       display: flex; align-items: center; justify-content: center;
       font-size: 11px; font-weight: 700; letter-spacing: 0.04em;
     }
     .agent-info { flex: 1; min-width: 0; }
     .agent-label {
       font-size: 11px; font-weight: 600; letter-spacing: 0.10em;
-      text-transform: uppercase; color: var(--moss);
+      text-transform: uppercase; color: var(--ink-3);
       margin-bottom: 4px;
     }
     .agent-name {
@@ -115,18 +115,44 @@
       flex-shrink: 0; color: var(--ink-3); margin-top: 2px;
       transition: transform 150ms;
     }
-    .agent-card:hover .agent-arrow { transform: translateX(3px); }
+    .agent-card:hover .agent-arrow { transform: translateX(3px); color: var(--action); }
+    .agent-card:focus-visible { outline: 3px solid rgba(92,106,43,0.45); outline-offset: 2px; }
 
-    /* coming soon */
-    .agent-card.soon { opacity: 0.55; pointer-events: none; }
-    .agent-card.soon .agent-badge { background: var(--moss); }
-    .soon-tag {
-      display: inline-block; margin-top: 8px;
-      font-size: 11px; font-weight: 600; letter-spacing: 0.08em;
-      text-transform: uppercase; color: var(--moss);
-      background: rgba(107,112,92,0.12); border-radius: 4px;
-      padding: 2px 7px;
+    /* status chips */
+    .status {
+      display: inline-flex; align-items: center; gap: 6px; margin-top: 10px;
+      font-size: 12px; font-weight: 600; letter-spacing: 0.02em;
+      border-radius: 999px; padding: 3px 10px;
     }
+    .status.live { background: var(--action-wash); color: #434e1d; }
+    .status.live::before { content:''; width:7px; height:7px; border-radius:50%; background: var(--action); }
+    .status.planned { background: var(--sunk); color: var(--ink-3); }
+
+    /* planned list */
+    .planned-head {
+      font-size: 11px; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase;
+      color: var(--brand); margin: 20px 0 2px;
+    }
+    .planned {
+      background: transparent; border: 1px dashed var(--line-strong); border-radius: 12px;
+      padding: 4px 20px;
+    }
+    .planned-row {
+      display: flex; align-items: baseline; gap: 14px; padding: 14px 0;
+      border-bottom: 1px solid var(--line);
+    }
+    .planned-row:last-child { border-bottom: 0; }
+    .planned-num { flex-shrink:0; width: 40px; font-size: 12px; font-weight: 700; color: var(--ink-3); letter-spacing: 0.04em; }
+    .planned-name { font-family: var(--font-serif); font-size: 17px; font-weight: 500; color: var(--ink); }
+    .planned-desc { font-size: 14px; line-height: 1.55; color: var(--ink-3); margin-top: 2px; }
+    .planned-row .status { margin-top: 0; margin-left: auto; flex-shrink: 0; }
+
+    /* loop */
+    .loop {
+      max-width: 560px; margin: -16px auto 32px; padding: 0 24px;
+      text-align: center; font-size: 14px; color: var(--ink-2);
+    }
+    .loop b { font-weight: 600; color: var(--ink); }
 
     /* ── Footer ── */
     footer {
@@ -137,7 +163,7 @@
       border-top: 1px solid var(--line);
     }
     footer a { color: var(--ink-3); text-decoration: none; }
-    footer a:hover { color: var(--accent); }
+    footer a:hover { color: var(--action); }
   </style>
 </head>
 <body>
@@ -160,14 +186,17 @@
     <p class="hero-sub">We're building these tools and sharing them as we go. Try them, use them on your property, and let us know what works — and what doesn't.</p>
   </div>
 
+  <p class="loop">Built around one care cycle: <b>Notice</b> → <b>Record</b> → <b>Read</b> → <b>Tend</b>, then back to Notice at your next check-up.</p>
+
   <div class="agents">
 
     <a class="agent-card" href="agent-1/">
       <div class="agent-badge">A1</div>
       <div class="agent-info">
-        <div class="agent-label">Agent 1</div>
+        <div class="agent-label">Agent 1 · Record</div>
         <div class="agent-name">Condition Assessor</div>
         <div class="agent-desc">Upload a photo. The AI classifies the condition of the building element — Good, Fair, Poor, or Critical — and tells you what to do next.</div>
+        <span class="status live">Live</span>
       </div>
       <svg class="agent-arrow" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
         <path d="M5 12h14M13 6l6 6-6 6"/>
@@ -177,22 +206,37 @@
     <a class="agent-card" href="agent-2/">
       <div class="agent-badge">A2</div>
       <div class="agent-info">
-        <div class="agent-label">Agent 2</div>
+        <div class="agent-label">Agent 2 · Record</div>
         <div class="agent-name">Condition Report Digitizer</div>
         <div class="agent-desc">Turn a paper condition report into a structured digital record. Fill in the form on-site or from your notes.</div>
+        <span class="status live">Live</span>
       </div>
       <svg class="agent-arrow" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
         <path d="M5 12h14M13 6l6 6-6 6"/>
       </svg>
     </a>
 
-    <div class="agent-card soon">
-      <div class="agent-badge">A3</div>
-      <div class="agent-info">
-        <div class="agent-label">Agent 3</div>
-        <div class="agent-name">Maintenance Planner</div>
-        <div class="agent-desc">Generate a prioritised maintenance schedule from your assessment records.</div>
-        <span class="soon-tag">Coming soon</span>
+    <div class="planned-head">Coming next</div>
+    <div class="planned">
+      <div class="planned-row">
+        <div class="planned-num">A0</div>
+        <div><div class="planned-name">Heritage Document Analyser</div><div class="planned-desc">Reads your existing CMPs, condition reports and significance statements to build a place profile that pre-loads the other agents. A one-off professional setup.</div></div>
+        <span class="status planned">Planned</span>
+      </div>
+      <div class="planned-row">
+        <div class="planned-num">A3</div>
+        <div><div class="planned-name">Maintenance Planner</div><div class="planned-desc">Ranks repairs from Agent 1 and 2 records by urgency, cost tier and consequence of inaction, with the reasons visible.</div></div>
+        <span class="status planned">Planned</span>
+      </div>
+      <div class="planned-row">
+        <div class="planned-num">A4</div>
+        <div><div class="planned-name">Archive Organiser</div><div class="planned-desc">Structures accumulated assessment data into a discoverable, publishable archive.</div></div>
+        <span class="status planned">Planned</span>
+      </div>
+      <div class="planned-row">
+        <div class="planned-num">A5</div>
+        <div><div class="planned-name">Narrative Generator</div><div class="planned-desc">Turns the record into accessible narratives: a one-page place story, or a condition summary for grant applications.</div></div>
+        <span class="status planned">Planned</span>
       </div>
     </div>
 

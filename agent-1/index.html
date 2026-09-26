@@ -20,25 +20,25 @@
   --r-xs:2px; --r-sm:4px; --r-md:6px; --r-lg:10px;
   --r-xl:16px; --r-2xl:22px; --r-full:9999px;
 
-  --cond-good-ink:#3a6b4a; --cond-good-fill:#d9e5d4;
-  --cond-fair-ink:#8a6a2c; --cond-fair-fill:#efe4cc;
-  --cond-poor-ink:#a05321; --cond-poor-fill:#efd9c6;
-  --cond-crit-ink:#8c2e22; --cond-crit-fill:#ecd0c9;
+  --cond-good-ink:#1f5f5a; --cond-good-fill:#dcf0ec;
+  --cond-fair-ink:#7a5a0c; --cond-fair-fill:#f4e7c2;
+  --cond-poor-ink:#a63f14; --cond-poor-fill:#f9dccb;
+  --cond-crit-ink:#8a1c1c; --cond-crit-fill:#f4d0d0;
 }
 
 .theme-custodian {
-  --bg:#f4efe6; --bg-sunk:#ebe4d6;
-  --surface:#fbf8f2; --surface-2:#f8f3e8; --surface-3:#ffffff;
-  --ink:#1a1f2e; --ink-2:#3b3f4a; --ink-3:#6b6f78; --ink-4:#9a9992;
-  --accent:#8b3a2f; --accent-hi:#a24937; --accent-lo:#6e2b22;
-  --accent-wash:rgba(139,58,47,0.08);
+  --bg:#f7f1e4; --bg-sunk:#ece4d3;
+  --surface:#fffaf0; --surface-2:#f8f3e8; --surface-3:#ffffff;
+  --ink:#2a2016; --ink-2:#4a4036; --ink-3:#6a5d4f; --ink-4:#6a5d4f;
+  --accent:#5c6a2b; --brand:#8b3a2f; --accent-hi:#4f5c24; --accent-lo:#434e1d;
+  --accent-wash:rgba(92,106,43,0.09);
   --moss:#6b705c; --moss-wash:rgba(107,112,92,0.10);
-  --line:rgba(26,31,46,0.10);
-  --line-strong:rgba(26,31,46,0.18);
-  --line-soft:rgba(26,31,46,0.05);
+  --line:rgba(42,32,22,0.10);
+  --line-strong:rgba(42,32,22,0.18);
+  --line-soft:rgba(42,32,22,0.05);
   --shadow-sm:0 1px 2px rgba(40,28,20,0.05);
   --shadow-md:0 4px 14px rgba(40,28,20,0.08),0 1px 2px rgba(40,28,20,0.04);
-  --focus-ring:0 0 0 3px rgba(139,58,47,0.18);
+  --focus-ring:0 0 0 3px rgba(92,106,43,0.25);
   --cond-good-bg:var(--cond-good-fill); --cond-good-fg:var(--cond-good-ink);
   --cond-fair-bg:var(--cond-fair-fill); --cond-fair-fg:var(--cond-fair-ink);
   --cond-poor-bg:var(--cond-poor-fill); --cond-poor-fg:var(--cond-poor-ink);
@@ -301,7 +301,7 @@ button,input,textarea,select { font-family:inherit; }
 }
 .drop-mobile-btn input[type=file] { display:none; }
 .drop-mobile-btn-camera {
-  background:var(--accent); color:#fbf8f2;
+  background:var(--accent); color:#fffaf0;
   box-shadow:var(--shadow-sm);
 }
 .drop-mobile-btn-camera:active { background:var(--accent-hi); }
@@ -323,8 +323,8 @@ button,input,textarea,select { font-family:inherit; }
 .preview-wrap img { width:100%; max-height:320px; object-fit:cover; display:block; }
 .preview-clear {
   position:absolute; top:var(--s-2); right:var(--s-2);
-  background:rgba(26,31,46,0.65);
-  color:#fbf8f2;
+  background:rgba(42,32,22,0.65);
+  color:#fffaf0;
   border:none;
   border-radius:var(--r-full);
   width:30px; height:30px;
@@ -353,7 +353,7 @@ button,input,textarea,select { font-family:inherit; }
 .btn:focus-visible { outline:none; box-shadow:var(--focus-ring); }
 .btn-primary {
   background:var(--accent);
-  color:#fbf8f2;
+  color:#fffaf0;
   width:100%;
 }
 .btn-primary:hover:not(:disabled) { background:var(--accent-hi); }
@@ -557,6 +557,11 @@ footer {
 }
 footer a { color:var(--ink-3); text-decoration:none; }
 footer a:hover { color:var(--accent); }
+.eyebrow{color:var(--brand)!important}
+.cond-good .cond-pill-dot{width:15px;height:15px;border-radius:0;background:currentColor;-webkit-mask:url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22black%22%20stroke-width%3D%222.4%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpath%20d%3D%22M5%2012.5l4.5%204.5L19%207.5%22/%3E%3C/svg%3E") center/contain no-repeat;mask:url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22black%22%20stroke-width%3D%222.4%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpath%20d%3D%22M5%2012.5l4.5%204.5L19%207.5%22/%3E%3C/svg%3E") center/contain no-repeat;}
+.cond-fair .cond-pill-dot{width:15px;height:15px;border-radius:0;background:currentColor;-webkit-mask:url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22black%22%20stroke-width%3D%222.4%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpath%20d%3D%22M2%2012s3.6-6.5%2010-6.5S22%2012%2022%2012s-3.6%206.5-10%206.5S2%2012%202%2012z%22/%3E%3Ccircle%20cx%3D%2212%22%20cy%3D%2212%22%20r%3D%222.8%22/%3E%3C/svg%3E") center/contain no-repeat;mask:url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22black%22%20stroke-width%3D%222.4%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpath%20d%3D%22M2%2012s3.6-6.5%2010-6.5S22%2012%2022%2012s-3.6%206.5-10%206.5S2%2012%202%2012z%22/%3E%3Ccircle%20cx%3D%2212%22%20cy%3D%2212%22%20r%3D%222.8%22/%3E%3C/svg%3E") center/contain no-repeat;}
+.cond-poor .cond-pill-dot{width:15px;height:15px;border-radius:0;background:currentColor;-webkit-mask:url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22black%22%20stroke-width%3D%222.4%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpath%20d%3D%22M14.7%206.3a4%204%200%200%200-5.4%205.4L4%2017l3%203%205.3-5.3a4%204%200%200%200%205.4-5.4l-2.4%202.4-2.6-.4-.4-2.6z%22/%3E%3C/svg%3E") center/contain no-repeat;mask:url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22black%22%20stroke-width%3D%222.4%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpath%20d%3D%22M14.7%206.3a4%204%200%200%200-5.4%205.4L4%2017l3%203%205.3-5.3a4%204%200%200%200%205.4-5.4l-2.4%202.4-2.6-.4-.4-2.6z%22/%3E%3C/svg%3E") center/contain no-repeat;}
+.cond-crit .cond-pill-dot{width:15px;height:15px;border-radius:0;background:currentColor;-webkit-mask:url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22black%22%20stroke-width%3D%222.4%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpath%20d%3D%22M12%203l10%2018H2z%22/%3E%3Cpath%20d%3D%22M12%2010v5M12%2018v.01%22/%3E%3C/svg%3E") center/contain no-repeat;mask:url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22black%22%20stroke-width%3D%222.4%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpath%20d%3D%22M12%203l10%2018H2z%22/%3E%3Cpath%20d%3D%22M12%2010v5M12%2018v.01%22/%3E%3C/svg%3E") center/contain no-repeat;}
 </style>
 </head>
 
@@ -593,10 +598,10 @@ footer a:hover { color:var(--accent); }
           <label class="field-label" for="provider">AI Provider</label>
           <select class="field-input field-select" id="provider" onchange="onProviderChange()">
             <option value="anthropic">Anthropic Claude</option>
-            <option value="openai">OpenAI GPT-4o</option>
+            <option value="openai">OpenAI GPT</option>
             <option value="google">Google Gemini</option>
             <option value="grok">xAI Grok</option>
-            <option value="mistral">Mistral Pixtral</option>
+            <option value="mistral">Mistral</option>
           </select>
         </div>
         <div>
@@ -610,8 +615,8 @@ footer a:hover { color:var(--accent); }
         </div>
       </div>
       <p class="field-hint-line" id="modelHint">
-        Using <span style="font-family:var(--font-mono);font-size:11px;">claude-opus-4-6</span> &nbsp;·&nbsp;
-        <a href="https://console.anthropic.com/" target="_blank">Get a key →</a>
+        Using <span style="font-family:var(--font-mono);font-size:11px;">claude-opus-5-5</span> &nbsp;·&nbsp;
+        <a href="https://platform.claude.com/" target="_blank">Get a key →</a>
       </p>
     </div>
 
@@ -853,11 +858,11 @@ function initKey() {
 
 /* ── Model hint ────────────────────────────────────────────────── */
 const PROVIDER_META = {
-  anthropic: { model: 'claude-opus-4-6',         href: 'https://console.anthropic.com/' },
+  anthropic: { model: 'claude-opus-5-5',         href: 'https://platform.claude.com/' },
   openai:    { model: 'gpt-4o',                   href: 'https://platform.openai.com/api-keys' },
-  google:    { model: 'gemini-2.0-flash',         href: 'https://aistudio.google.com/apikey' },
-  grok:      { model: 'grok-2-vision-1212',       href: 'https://console.x.ai/' },
-  mistral:   { model: 'pixtral-large-latest',     href: 'https://console.mistral.ai/api-keys' },
+  google:    { model: 'gemini-3.8-flash',         href: 'https://aistudio.google.com/apikey' },
+  grok:      { model: 'grok-4.7',       href: 'https://console.x.ai/' },
+  mistral:   { model: 'mistral-medium-latest',     href: 'https://console.mistral.ai/api-keys' },
 };
 
 function updateHint() {
@@ -892,7 +897,7 @@ async function toB64(file) {
 
 async function callAnthropic(b64, mime, key, ctx) {
   const body = {
-    model: "claude-opus-4-6", max_tokens: 1024, system: SYSTEM,
+    model: "claude-opus-5-5", max_tokens: 1024, system: SYSTEM,
     messages: [{ role: "user", content: [
       { type: "image", source: { type: "base64", media_type: mime, data: b64 } },
       { type: "text",  text: "Assess the condition of the heritage element shown." + (ctx ? `\n\nAssessor context: ${ctx}` : "") }
@@ -906,7 +911,7 @@ async function callAnthropic(b64, mime, key, ctx) {
   });
   if (!r.ok) { const e = await r.json().catch(()=>({})); throw new Error(e?.error?.message || `Anthropic ${r.status}`); }
   const d = await r.json();
-  return { raw: d.content[0].text, model: "anthropic/claude-opus-4-6" };
+  return { raw: d.content[0].text, model: "anthropic/claude-opus-5-5" };
 }
 
 async function callOpenAI(b64, mime, key, ctx) {
@@ -941,7 +946,7 @@ async function callGoogle(b64, mime, key, ctx) {
     ]}],
     generationConfig: { maxOutputTokens: 1024 }
   };
-  const r = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${key}`, {
+  const r = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-3.8-flash:generateContent?key=${key}`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(body)
@@ -950,12 +955,12 @@ async function callGoogle(b64, mime, key, ctx) {
   const d = await r.json();
   let raw = d.candidates?.[0]?.content?.parts?.[0]?.text || '';
   if (raw.startsWith("```")) { raw = raw.split("```")[1]; if (raw.startsWith("json")) raw = raw.slice(4); }
-  return { raw: raw.trim(), model: "google/gemini-2.0-flash" };
+  return { raw: raw.trim(), model: "google/gemini-3.8-flash" };
 }
 
 async function callGrok(b64, mime, key, ctx) {
   const body = {
-    model: "grok-2-vision-1212", max_tokens: 1024,
+    model: "grok-4.7", max_tokens: 1024,
     messages: [
       { role: "system", content: SYSTEM },
       { role: "user", content: [
@@ -973,12 +978,12 @@ async function callGrok(b64, mime, key, ctx) {
   const d = await r.json();
   let raw = d.choices[0].message.content.trim();
   if (raw.startsWith("```")) { raw = raw.split("```")[1]; if (raw.startsWith("json")) raw = raw.slice(4); }
-  return { raw: raw.trim(), model: "xai/grok-2-vision-1212" };
+  return { raw: raw.trim(), model: "xai/grok-4.7" };
 }
 
 async function callMistral(b64, mime, key, ctx) {
   const body = {
-    model: "pixtral-large-latest", max_tokens: 1024,
+    model: "mistral-medium-latest", max_tokens: 1024,
     messages: [
       { role: "system", content: SYSTEM },
       { role: "user", content: [
@@ -996,7 +1001,7 @@ async function callMistral(b64, mime, key, ctx) {
   const d = await r.json();
   let raw = d.choices[0].message.content.trim();
   if (raw.startsWith("```")) { raw = raw.split("```")[1]; if (raw.startsWith("json")) raw = raw.slice(4); }
-  return { raw: raw.trim(), model: "mistral/pixtral-large-latest" };
+  return { raw: raw.trim(), model: "mistral/mistral-medium-latest" };
 }
 
 /* ── Run ───────────────────────────────────────────────────────── */
@@ -1039,7 +1044,7 @@ async function runAnalysis() {
 function renderResult(r) {
   const cond = (r.condition || 'Unknown').trim();
   const cls  = { Good:'cond-good', Fair:'cond-fair', Poor:'cond-poor', Critical:'cond-crit' }[cond] || 'cond-fair';
-  const sub  = { Good:'Stable — revisit at your next annual check', Fair:'Routine upkeep — repaint, clean or seal as needed', Poor:'Consult a heritage professional', Critical:'Seek urgent specialist heritage advice' }[cond] || '';
+  const sub  = { Good:'Stable', Fair:'Monitor', Poor:'Engage a tradesperson', Critical:'Refer to a specialist' }[cond] || '';
 
   // Pill
   const pill = document.getElementById('condPill');

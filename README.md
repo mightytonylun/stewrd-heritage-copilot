@@ -57,7 +57,7 @@ STEWRD's agents map directly onto this cycle. Each tool handles one part of it.
 |--|-------|-------------|--|
 | **A1** | **Condition Assessor** | Photograph a building element → AI rates it Good / Fair / Poor / Critical → plain-English next step. Works on phone, 5 AI providers, API key remembered. | [Open →](https://mightytonylun.github.io/stewrd-heritage-copilot/agent-1/) |
 | **A2** | **Condition Report Digitizer** | Guided 10-section on-site form for structured condition recording. Session save/restore, offline-capable, exports to text. | [Open →](https://mightytonylun.github.io/stewrd-heritage-copilot/agent-2/) |
-| **A3** | **Urgency Ranker** | Prioritises repair schedule from A1 and A2 output — ranked by urgency, cost tier, and consequence of inaction. | Planned |
+| **A3** | **Maintenance Planner** | Prioritises repair schedule from A1 and A2 output — ranked by urgency, cost tier, and consequence of inaction. | Planned |
 | **A4** | **Archive Organiser** | Structures accumulated assessment data into a discoverable, publishable archive. | Planned |
 | **A5** | **Narrative Generator** | Transforms pipeline output into accessible narratives — one-page place story, condition summary for grant applications. | Planned |
 
@@ -71,10 +71,10 @@ Built from ICOMOS condition state definitions and Heritage Victoria guidelines:
 
 | | Level | Headline | Who acts |
 |--|-------|----------|---------|
-| 🟢 | **Good** | Stable — revisit at your next annual check | No action needed |
-| 🟡 | **Fair** | Routine upkeep — repaint, clean or seal as needed | Owner or standard tradesperson |
-| 🟠 | **Poor** | Consult a heritage professional | Heritage tradesperson within 3–6 months |
-| 🔴 | **Critical** | Seek urgent specialist heritage advice | Urgent — do not DIY |
+| 🟢 | **Good** | Stable | No action needed |
+| 🟡 | **Fair** | Monitor | Owner or standard tradesperson |
+| 🟠 | **Poor** | Engage a tradesperson | Heritage tradesperson within 3–6 months |
+| 🔴 | **Critical** | Refer to a specialist | Urgent — do not DIY |
 
 ---
 
