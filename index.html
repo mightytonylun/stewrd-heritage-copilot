@@ -154,6 +154,35 @@
     }
     .loop b { font-weight: 600; color: var(--ink); }
 
+    /* demo feature */
+    .demo {
+      max-width: 560px; margin: 0 auto 36px; padding: 0 24px;
+    }
+    .demo-card {
+      background: var(--surface); border: 1px solid var(--line-strong); border-radius: 14px;
+      overflow: hidden; box-shadow: var(--shadow-md);
+    }
+    .demo-card img { display:block; width:100%; height:auto; border-bottom:1px solid var(--line); }
+    .demo-body { padding: 20px 24px 22px; }
+    .demo-eyebrow { font-size: 11px; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase; color: var(--brand); margin-bottom: 6px; }
+    .demo-title { font-family: var(--font-serif); font-size: 24px; font-weight: 500; line-height: 1.2; margin-bottom: 8px; }
+    .demo-desc { font-size: 14.5px; line-height: 1.6; color: var(--ink-2); margin-bottom: 16px; }
+    .demo-actions { display:flex; flex-wrap:wrap; gap:10px; }
+    .btn { display:inline-flex; align-items:center; gap:6px; font: 600 15px var(--font-sans); border-radius: 10px; padding: 11px 16px; text-decoration: none; }
+    .btn.pri { background: var(--action); color: #fffaf0; }
+    .btn.pri:hover { background: var(--action-hi); }
+    .btn.sec { background: var(--surface); color: var(--ink); border: 1.5px solid var(--line-strong); }
+    .btn.sec:hover { border-color: var(--action); }
+    .btn:focus-visible { outline: 3px solid rgba(92,106,43,0.45); outline-offset: 2px; }
+    .demo-note { font-size: 12px; line-height: 1.5; color: var(--ink-3); margin-top: 14px; }
+    .section-head {
+      font-size: 11px; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase;
+      color: var(--brand); margin: 0 0 -4px;
+    }
+    .status { white-space: nowrap; }
+    @media (max-width: 520px) { .planned-row { flex-wrap: wrap; } .planned-row .status { margin-left: 54px; } }
+    .status.demo { background: transparent; color: var(--ink-3); border: 1.5px dashed var(--line-strong); }
+
     /* ── Footer ── */
     footer {
       margin-top: auto;
@@ -188,7 +217,26 @@
 
   <p class="loop">Built around one care cycle: <b>Notice</b> → <b>Record</b> → <b>Read</b> → <b>Tend</b>, then back to Notice at your next check-up.</p>
 
+
+  <section class="demo" aria-label="Demo">
+    <div class="demo-card">
+      <a href="demo/"><img src="demo/preview.jpg" alt="The STEWRD care-cycle app showing a check-up of Napier Waller House" width="1200" height="750"/></a>
+      <div class="demo-body">
+        <div class="demo-eyebrow">Demo · Napier Waller House</div>
+        <div class="demo-title">See a full check-up, start to finish</div>
+        <p class="demo-desc">Walk through one check-up of a real heritage house: the walk-round, recording each element, the priority list and a care plan. It shows where STEWRD is heading, with all the agents working together.</p>
+        <div class="demo-actions">
+          <a class="btn pri" href="demo/">Open the laptop demo →</a>
+          <a class="btn sec" href="demo/phone.html">The phone version</a>
+        </div>
+        <p class="demo-note">Defects, works and photos from the National Trust of Australia (Victoria) Property Condition Report 2026. Condition grades and priorities are illustrative, and assessor results in the demo were prepared in advance.</p>
+      </div>
+    </div>
+  </section>
+
   <div class="agents">
+
+    <div class="section-head">Try the tools</div>
 
     <a class="agent-card" href="agent-1/">
       <div class="agent-badge">A1</div>
@@ -226,7 +274,7 @@
       <div class="planned-row">
         <div class="planned-num">A3</div>
         <div><div class="planned-name">Maintenance Planner</div><div class="planned-desc">Ranks repairs from Agent 1 and 2 records by urgency, cost tier and consequence of inaction, with the reasons visible.</div></div>
-        <span class="status planned">Planned</span>
+        <span class="status demo">Planned · shown as a demo</span>
       </div>
       <div class="planned-row">
         <div class="planned-num">A4</div>
@@ -236,7 +284,7 @@
       <div class="planned-row">
         <div class="planned-num">A5</div>
         <div><div class="planned-name">Narrative Generator</div><div class="planned-desc">Turns the record into accessible narratives: a one-page place story, or a condition summary for grant applications.</div></div>
-        <span class="status planned">Planned</span>
+        <span class="status demo">Planned · shown as a demo</span>
       </div>
     </div>
 
