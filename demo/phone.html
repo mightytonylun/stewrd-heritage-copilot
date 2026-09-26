@@ -131,9 +131,10 @@ body{padding:0;min-height:100vh;display:grid;place-items:center}
 .choice b{display:block;font-size:17px}.choice small{color:var(--ink-3);font-size:14px}
 .c-good i{background:var(--good-fg)}.c-fair i{background:var(--fair-fg)}.c-poor i{background:var(--poor-fg)}.c-crit i{background:var(--crit-fg)}
 .choice:hover{border-color:#5c6a2b}
-.homelink{font-size:14px;font-weight:600;color:#5c6a2b;text-decoration:none}.homelink:hover{text-decoration:underline}
 @media (max-width:820px){body{place-items:start center}.stagebox{flex-direction:column;gap:22px;padding:24px 16px 40px;align-items:center}.side{width:auto;max-width:390px}.side h1{font-size:28px}}
 @media (max-width:480px){.stagebox{padding:16px 12px 32px;width:100%;box-sizing:border-box}.phone{transform:none!important;width:100%;max-width:390px;padding:6px;border-radius:44px;box-sizing:border-box}}
+@media (max-width:480px){.side p:not(.hint){display:none}.side h1{font-size:26px}}
+.homelink{font-size:14px;font-weight:600;color:#5c6a2b;text-decoration:none}.homelink:hover{text-decoration:underline}
 </style></head><body>
 <div class="stagebox">
  <div class="side"><div class="eyebrow">STEWRD on a phone</div><h1>The same check-up, in the room</h1><p>Volunteers record on site with a phone; the register, ranking and reports stay on the laptop. One question per screen, in plain words.</p><p class="hint">Tap through it: tick the walk-round, record Room 12, ask how serious it looks, then accept the answer or give your own.</p><button class="restart" id="restart">Start again</button><a class="homelink" href="../">← STEWRD home</a> <a class="homelink" href="./">See the laptop demo →</a></div>

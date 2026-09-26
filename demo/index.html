@@ -240,7 +240,7 @@ h1,h2,h3{font-family:var(--font-serif);font-weight:500;letter-spacing:-.015em;ma
 .score{font-family:var(--font-mono);font-weight:500;text-align:right}
 .weights{display:flex;gap:18px;flex-wrap:wrap;align-items:center;font-size:12.5px;color:var(--ink-2);padding:10px 0 4px}
 .weights label{display:flex;gap:8px;align-items:center}
-.weights input{accent-color:var(--accent);width:110px}
+.weights input{accent-color:var(--action);width:110px}
 
 /* TEND */
 .plan{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
@@ -266,7 +266,7 @@ h1,h2,h3{font-family:var(--font-serif);font-weight:500;letter-spacing:-.015em;ma
 .toast.on{opacity:1;transform:translate(-50%,0)}
 
 @media (max-width:1100px){.rec{grid-template-columns:1fr}.detail{position:static}.plan{grid-template-columns:1fr 1fr}.place-hero,.setup,.read2,.story{grid-template-columns:1fr}}
-@media (max-width:760px){.app{grid-template-columns:1fr}.rail{position:static;height:auto}.main{padding-inline:16px}.kpis,.facts{grid-template-columns:1fr 1fr}.plan{grid-template-columns:1fr}.rk{grid-template-columns:24px 1fr 44px}.rk .why,.rk .th{display:none}}
+@media (max-width:760px){.app{grid-template-columns:1fr}.rail{position:static;height:auto}.main{padding-inline:16px}.kpis,.facts{grid-template-columns:1fr 1fr}.plan{grid-template-columns:1fr}.rk{grid-template-columns:24px minmax(0,1fr) 44px}.rk .why,.rk .th{display:none}}
 
 body{font-size:15px}
 .btn.pri{background:var(--action);border-color:var(--action);color:var(--on-action)}
@@ -316,6 +316,30 @@ html.solid .rail{background:var(--bg-sunk)} html.solid .glass,html.solid .hero-i
 @media (prefers-reduced-transparency: reduce){.bgphoto{display:none}.rail{background:var(--bg-sunk);backdrop-filter:none}}
 
 .status.demo{background:transparent;border:1px dashed var(--line-strong);color:var(--ink-2)}
+@media (max-width:760px){
+ .rail{position:sticky;top:0;z-index:30;height:auto;padding:10px 12px 8px;gap:8px;border-right:0;border-bottom:1px solid var(--line);overflow:visible}
+ .rail .place-chip,.rail .agents,.rail .nav-lbl{display:none}
+ .rail .brand svg{width:22px;height:22px}.rail .brand b{font-size:15px}.rail .brand span{display:none}
+ .rail .homelink{margin:-2px 0 0}
+ .nav{flex-direction:row;overflow-x:auto;gap:6px;scrollbar-width:none;margin:0 -12px;padding:0 12px 2px}
+ .nav::-webkit-scrollbar{display:none}
+ .nav{justify-content:space-between}
+ .nav button{display:flex;align-items:center;gap:0;padding:7px 11px;white-space:nowrap;flex:0 0 auto;border:1px solid var(--line);background:var(--surface-2);font-size:14px;border-radius:99px}
+ .nav button.on{background:var(--action);border-color:var(--action);color:var(--on-action)}
+ .nav button.on .t{color:var(--on-action)}
+ .nav .t small,.nav .cnt,.nav button:not([data-v="place"]) .step{display:none}
+ .nav button[data-v="place"]{padding:5px}
+ .nav button[data-v="place"] .t{display:none}
+ .nav button[data-v="place"] .step{width:24px;height:24px;border:0}
+ .nav button.on[data-v="place"] .step{background:transparent;color:var(--on-action)}
+ .main{padding-block:18px 48px}
+ .vhead h1{font-size:26px}
+ #v-notice .grid{grid-template-columns:minmax(0,1fr)!important}
+ .rec{grid-template-columns:minmax(0,1fr)!important}
+ #v-notice .notice-side{order:-1}
+ .toolbar .search{flex:1 1 100%;min-width:0;width:100%}
+ .detail{scroll-margin-top:120px}
+}
 .homelink{display:block;margin:-4px 10px 10px;font-size:12px;font-weight:600;color:var(--moss);text-decoration:none}.homelink:hover{text-decoration:underline}
 </style>
 </head>
@@ -480,6 +504,7 @@ if (matchMedia('(prefers-color-scheme: dark)').matches) { $('#thO').classList.ad
 /* nav */
 function go(v){ $$('.view').forEach(s=>s.classList.toggle('on',s.id==='v-'+v)); $$('.nav button').forEach(b=>b.classList.toggle('on',b.dataset.v===v)); window.scrollTo({top:0}); if(v==='read')renderRead(); if(v==='tend')renderTend(); if(v==='place')renderPlace(); drawLoop(v); }
 $$('.nav button').forEach(b=>b.onclick=()=>go(b.dataset.v));
+const _sel=select; select=function(r,q){ _sel(r,q); if(!q && innerWidth<=760 && document.getElementById('v-record').classList.contains('on')) setTimeout(()=>document.getElementById('detail').scrollIntoView({behavior:'smooth',block:'start'}),60); };
 document.addEventListener('click',e=>{const g=e.target.closest('[data-go]'); if(g) go(g.dataset.go);});
 
 /* loop diagram */
